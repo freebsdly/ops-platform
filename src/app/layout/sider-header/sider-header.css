@@ -1,0 +1,36 @@
+.sider-header {
+  height: var(--header-height);
+  width: var(--sider-width);
+  padding: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sider-header-link,
+.sider-header-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  text-decoration: none;
+}
+
+.sider-header-link:hover {
+  text-decoration: none;
+}
+
+.sider-header-logo {
+  height: var(--header-height);
+  width: auto;
+}
+
+.sider-header-title {
+  margin: 0 0 0 12px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

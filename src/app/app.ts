@@ -1,15 +1,20 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
-import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { SiderHeader } from './layout/sider-header/sider-header';
+import { SiderMenu } from './layout/sider-menu/sider-menu';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterLink, RouterOutlet, NzIconModule, NzLayoutModule, NzMenuModule],
+  imports: [RouterOutlet, NzIconModule, NzLayoutModule, SiderHeader, SiderMenu],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {
+  logoSrc = 'https://ng.ant.design/assets/img/logo.svg';
+  logoAlt = 'Logo';
+  title = 'Ant Design of Angular';
+  logoLink = 'https://ng.ant.design/';
   isCollapsed = false;
 }
