@@ -1,4 +1,4 @@
-import { Component, input } from '@angular/core';
+import { Component } from '@angular/core';
 import { SiderHeader } from '../sider-header/sider-header';
 import { SiderMenu } from '../sider-menu/sider-menu';
 import { SiderFooter } from '../sider-footer/sider-footer';
@@ -9,6 +9,4 @@ import { SiderFooter } from '../sider-footer/sider-footer';
   templateUrl: './sider.html',
   styleUrl: './sider.css',
 })
-export class Sider {
-  isCollapsed = input(false);
-}
+export class Sider {}

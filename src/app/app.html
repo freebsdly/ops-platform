@@ -5,10 +5,11 @@
     [nzWidth]="248"
     [nzCollapsedWidth]="48"
     nzBreakpoint="md"
-    [(nzCollapsed)]="isCollapsed"
+    [nzCollapsed]="isCollapsed()"
+    (nzCollapsedChange)="layoutService.setCollapsed($event)"
     [nzTrigger]="null"
   >
-    <app-sider [isCollapsed]="isCollapsed()" class="app-layout-sider-inner" />
+    <app-sider class="app-layout-sider-inner" />
   </nz-sider>
   <nz-layout class="app-layout-right">
     <nz-header class="app-layout-header"> </nz-header>
