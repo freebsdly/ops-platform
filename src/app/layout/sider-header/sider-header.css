@@ -1,4 +1,7 @@
 :host {
-  display: block;
+  display: flex;
+  flex-shrink: 0;
   height: 48px;
+  align-items: center;
+  justify-content: center;
 }
