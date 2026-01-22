@@ -8,11 +8,7 @@
     [(nzCollapsed)]="isCollapsed"
     [nzTrigger]="null"
   >
-    <div class="app-layout-sider-inner">
-      <app-sider-header class="app-layout-sider-header" />
-      <app-sider-menu [isCollapsed]="isCollapsed" class="app-layout-sider-content" />
-      <app-sider-footer class="app-layout-sider-footer" />
-    </div>
+    <app-sider [isCollapsed]="isCollapsed()" class="app-layout-sider-inner" />
   </nz-sider>
   <nz-layout class="app-layout-right">
     <nz-header class="app-layout-header"> </nz-header>

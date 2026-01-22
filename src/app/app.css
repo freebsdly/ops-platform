@@ -55,23 +55,3 @@
   border-top: 1px solid lightgray;
   flex-shrink: 0;
 }
-
-.app-layout-sider-header {
-  height: 48px;
-  background: var(--bg-white);
-  border-bottom: 1px solid lightgray;
-  flex-shrink: 0;
-}
-
-.app-layout-sider-content {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 0;
-}
-
-.app-layout-sider-footer {
-  height: 48px;
-  background: white;
-  border-top: 1px solid lightgray;
-  flex-shrink: 0;
-}
