@@ -1,0 +1,35 @@
+:host {
+  position: absolute;
+  right: -15px;
+  top: 9%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.collapse-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid #d9d9d9;
+  background: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s;
+}
+
+.collapse-btn:hover {
+  background: #f5f5f5;
+  border-color: #40a9ff;
+  color: #40a9ff;
+}
+
+.collapse-btn:active {
+  background: #e6f7ff;
+}
+
+.collapse-btn span {
+  font-size: 12px;
+}

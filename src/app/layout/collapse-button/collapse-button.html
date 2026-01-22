@@ -1,0 +1,11 @@
+<button
+  (click)="toggleCollapse()"
+  type="button"
+  class="collapse-btn"
+>
+  @if (isCollapsed()) {
+    <span nz-icon nzType="right"></span>
+  } @else {
+    <span nz-icon nzType="left"></span>
+  }
+</button>
