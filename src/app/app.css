@@ -7,57 +7,61 @@
 
 .app-layout {
   height: 100vh;
+  background-color: white;
 }
 
-.app-sidebar {
+.app-alyout-left {
+  height: 100vh;
+}
+
+.app-layout-right {
+  height: 100vh;
+}
+
+.app-layout-sidebar {
   position: relative;
   z-index: var(--z-index-fixed);
   min-height: 100vh;
   box-shadow: var(--sidebar-shadow);
-  background-color: var(--bg-white);
+  border-right: 1px solid lightgray;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
 }
 
-.header-trigger {
-  height: var(--header-height);
-  padding: 14px;
-  font-size: var(--font-size-xl);
-  cursor: pointer;
-  transition: var(--transition-base), padding 0s;
-}
-
-.trigger:hover {
-  color: var(--primary-color);
-}
-
-nz-header {
-  padding: 0;
-  width: 100%;
-  z-index: var(--z-index-sticky);
-}
-
-.app-header {
-  position: relative;
-  height: var(--header-height);
-  padding: 0;
+.app-layout-header {
+  height: 48px;
   background: var(--bg-white);
-  box-shadow: var(--header-shadow);
+  border-bottom: 1px solid lightgray;
+  background-color: white;
 }
 
-nz-menu {
-  background-color: var(--bg-white);
-}
-
-nz-content {
-  margin: var(--spacing-lg);
-}
-
-.inner-content {
-  padding: var(--spacing-lg);
-  background: var(--bg-white);
+.app-layout-content {
+  padding: 0 0 0 0;
+  margin: 0px;
+  background: white;
   height: 100%;
 }
 
-.ant-layout-header {
+.app-layout-footer {
+  height: 48px;
+  background: white;
+  border-top: 1px solid lightgray;
+}
+
+.app-layout-sider-header {
+  height: 48px;
   background: var(--bg-white);
-  height: var(--sidebar-bg);
+  border-bottom: 1px solid lightgray;
+}
+
+.app-layout-sider-content {
+  height: 100%;
+}
+
+.app-layout-sider-footer {
+  height: 48px;
+  background: white;
+  border-top: 1px solid lightgray;
+  flex-shrink: 0;
 }

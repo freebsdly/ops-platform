@@ -1,37 +1,4 @@
 :root {
   /* Colors */
   --primary-color: #1890ff;
-  --sidebar-bg: #ecedee;
-  --text-white: #fff;
-  --text-color: rgba(0, 0, 0, 0.85);
-  --bg-white: #fff;
-  --sidebar-shadow: 0px 0 0px rgba(0, 21, 41, 0.35);
-  --header-shadow: 0 0px 0px rgba(0, 21, 41, 0.08);
-
-  /* Typography */
-  --font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
-  --font-size-base: 14px;
-  --font-size-lg: 16px;
-  --font-size-xl: 20px;
-
-  /* Spacing */
-  --header-height: 48px;
-  --sider-width: 248px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-
-  /* Transitions */
-  --transition-base: all 0.3s;
-  --transition-fast: all 0.2s;
-
-  /* Z-index */
-  --z-index-dropdown: 1050;
-  --z-index-sticky: 1020;
-  --z-index-fixed: 1030;
-  --z-index-modal-backdrop: 1040;
-  --z-index-modal: 1050;
-  --z-index-popover: 1060;
-  --z-index-tooltip: 1070;
 }

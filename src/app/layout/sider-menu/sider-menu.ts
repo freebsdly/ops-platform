@@ -7,9 +7,6 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
   imports: [RouterLink, NzMenuModule],
   templateUrl: './sider-menu.html',
   styleUrl: './sider-menu.css',
-  host: {
-    'class': 'sider-menu'
-  }
 })
 export class SiderMenu {
   isCollapsed = input(false);

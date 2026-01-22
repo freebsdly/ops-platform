@@ -5,13 +5,9 @@ import { Component, input, computed } from '@angular/core';
   imports: [],
   templateUrl: './sider-header.html',
   styleUrl: './sider-header.css',
-  host: {
-    class: 'sider-header',
-  },
 })
 export class SiderHeader {
   logoSrc = input('');
-  logoAlt = input('Logo');
   title = input('');
   logoLink = input('');
 
