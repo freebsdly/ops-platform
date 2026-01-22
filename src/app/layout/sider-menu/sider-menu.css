@@ -1,4 +1,10 @@
-.sider-menu {
+:host {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+ul {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
