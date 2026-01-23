@@ -1,16 +1,14 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { LayoutService } from '../../layout.service';
+import { Logo } from '../logo/logo';
 
 @Component({
   selector: 'app-sider-header',
-  imports: [],
+  imports: [Logo],
   templateUrl: './sider-header.html',
   styleUrl: './sider-header.css',
 })
 export class SiderHeader {
-  logoSrc = input('');
-  title = input('');
-  logoLink = input('');
-
-  showLogo = computed(() => !!this.logoSrc());
-  showTitle = computed(() => !!this.title());
+  protected layoutService = inject(LayoutService);
+  title = 'Ops Platform';
 }

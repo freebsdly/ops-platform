@@ -1,0 +1,21 @@
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  overflow: hidden;
+  padding: 0 16px;
+}
+
+.logo-icon {
+  font-size: 24px;
+  flex-shrink: 0;
+  color: #1890ff;
+}
+
+.logo-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 16px;
+  font-weight: 500;
+}
