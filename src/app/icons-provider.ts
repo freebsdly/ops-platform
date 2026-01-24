@@ -3,6 +3,7 @@ import {
   MenuUnfoldOutline,
   FormOutline,
   DashboardOutline,
+  GlobalOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const icons = [
@@ -10,4 +11,5 @@ export const icons = [
   MenuUnfoldOutline,
   DashboardOutline,
   FormOutline,
+  GlobalOutline,
 ];
