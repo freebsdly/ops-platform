@@ -1,0 +1,102 @@
+.lang-selector-trigger {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px;
+  border-radius: var(--radius-xl, 12px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  height: 40px;
+  width: 40px;
+  font-size: 16px;
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+  border: 1px solid #91d5ff;
+}
+
+.lang-selector-trigger:hover {
+  background: linear-gradient(135deg, #bae7ff 0%, #91d5ff 100%);
+  border-color: #69c0ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
+}
+
+.lang-selector-trigger:active {
+  transform: translateY(0);
+}
+
+.lang-selector-icon {
+  font-size: 18px;
+  color: #8c8c8c;
+  transition: color 0.3s ease;
+}
+
+.lang-selector-trigger:hover .lang-selector-icon {
+  color: #1890ff;
+}
+
+.lang-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lang-flag {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.lang-label {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+/* Header-specific styles */
+:host-context(.app-layout-header) .lang-selector-trigger {
+  border-radius: 0;
+  padding: 0 12px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  border-left: 1px solid #f0f0f0;
+  border-right: none;
+  background: transparent;
+  width: auto;
+}
+
+:host-context(.app-layout-header) .lang-selector-trigger:hover {
+  background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+:host-context(.app-layout-header) .lang-selector-trigger:active {
+  transform: none;
+}
+
+/* Menu item styles */
+.ant-menu-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px !important;
+  margin: 4px 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.ant-menu-item:hover {
+  background: linear-gradient(90deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.12) 100%);
+  border-left: 3px solid #1890ff;
+  padding-left: 19px !important;
+}
+
+.ant-menu-item-selected {
+  background: linear-gradient(90deg, rgba(24, 144, 255, 0.15) 0%, rgba(24, 144, 255, 0.2) 100%);
+  color: #1890ff;
+  border-left: 3px solid #1890ff;
+  padding-left: 19px !important;
+}
+
+.ant-menu-item-selected .lang-label {
+  color: #1890ff;
+  font-weight: 600;
+}

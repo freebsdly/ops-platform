@@ -6,10 +6,11 @@ import { Sider } from './layout/sider/sider';
 import { LayoutService } from './layout.service';
 import { CollapseButton } from './layout/collapse-button/collapse-button';
 import { UserInfo } from './layout/user-info/user-info';
+import { LangSelector } from './layout/lang-selector/lang-selector';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo],
+  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo, LangSelector],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })

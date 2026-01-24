@@ -1,0 +1,22 @@
+<a
+  nz-dropdown
+  [nzDropdownMenu]="menu"
+  nzTrigger="hover"
+  nzPlacement="bottomRight"
+  class="lang-selector-trigger"
+>
+  <span nz-icon nzType="global" class="lang-selector-icon"></span>
+</a>
+
+<nz-dropdown-menu #menu="nzDropdownMenu">
+  <ul nz-menu>
+    @for (lang of languages; track lang.key) {
+      <li nz-menu-item (click)="changeLanguage(lang.key)" [class.ant-menu-item-selected]="currentLanguage === lang.key">
+        <span class="lang-item">
+          <span class="lang-flag">{{ lang.icon }}</span>
+          <span class="lang-label">{{ lang.label }}</span>
+        </span>
+      </li>
+    }
+  </ul>
+</nz-dropdown-menu>
