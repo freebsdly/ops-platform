@@ -1,22 +1,30 @@
 <ul nz-menu nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed()">
-  <li nz-submenu nzOpen nzTitle="Dashboard" nzIcon="dashboard">
-    <ul>
-      <li nz-menu-item nzMatchRouter>
-        <a routerLink="/welcome">Welcome</a>
+  @for (item of menuData(); track item.text) {
+    @if (item.children && item.children.length > 0) {
+      <li nz-submenu [nzOpen]="item.open" [nzTitle]="item.text" [nzIcon]="item.icon ?? null">
+        <ul>
+          @for (child of item.children; track child.text) {
+            <li nz-menu-item nzMatchRouter>
+              @if (child.link) {
+                <a routerLink="{{ child.link }}">{{ child.text }}</a>
+              } @else {
+                <a>{{ child.text }}</a>
+              }
+            </li>
+          }
+        </ul>
       </li>
+    } @else {
       <li nz-menu-item nzMatchRouter>
-        <a>Monitor</a>
+        @if (item.icon) {
+          <span nz-icon [nzType]="item.icon"></span>
+        }
+        @if (item.link) {
+          <a routerLink="{{ item.link }}">{{ item.text }}</a>
+        } @else {
+          <a>{{ item.text }}</a>
+        }
       </li>
-      <li nz-menu-item nzMatchRouter>
-        <a>Workplace</a>
-      </li>
-    </ul>
-  </li>
-  <li nz-submenu nzOpen nzTitle="Form" nzIcon="form">
-    <ul>
-      <li nz-menu-item nzMatchRouter>
-        <a>Basic Form</a>
-      </li>
-    </ul>
-  </li>
+    }
+  }
 </ul>
