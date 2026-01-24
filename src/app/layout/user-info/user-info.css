@@ -1,0 +1,25 @@
+.app-user-info {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+}
+
+.user-info-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  height: 100%;
+}
+
+.user-info-container:hover {
+  background-color: rgba(0, 0, 0, 0.025);
+}
+
+.user-name {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.85);
+}

@@ -5,10 +5,11 @@ import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { Sider } from './layout/sider/sider';
 import { LayoutService } from './layout.service';
 import { CollapseButton } from './layout/collapse-button/collapse-button';
+import { UserInfo } from './layout/user-info/user-info';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton],
+  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
