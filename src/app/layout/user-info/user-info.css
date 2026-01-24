@@ -5,21 +5,202 @@
   height: 100%;
 }
 
-.user-info-container {
+.user-info-trigger {
+  height: 100%;
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 0 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  height: 100%;
+  border-left: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
 }
 
-.user-info-container:hover {
-  background-color: rgba(0, 0, 0, 0.025);
+.user-info-trigger:hover {
+  background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
+}
+
+.user-info-avatar {
+  height: 36px !important;
+  width: 36px !important;
+  border: 2px solid #e0f2fe;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.15);
+  transition: all 0.3s ease;
+}
+
+.user-info-trigger:hover .user-info-avatar {
+  border-color: #91d5ff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+  transform: scale(1.05);
 }
 
 .user-name {
   font-size: 14px;
   color: rgba(0, 0, 0, 0.85);
+  font-weight: 500;
+}
+
+.user-info-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 1px solid #f0f0f0;
+}
+
+.user-info-card :deep(.ant-card-body) {
+  padding: 0;
+}
+
+.user-info-profile-header {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+  padding: 1.5rem;
+  position: relative;
+}
+
+.user-info-profile-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, #1890ff 0%, #40a9ff 50%, #1890ff 100%);
+}
+
+.user-info-profile-avatar {
+  height: 72px !important;
+  width: 72px !important;
+  border: 4px solid #fff;
+  box-shadow: 0 4px 12px rgba(24, 144, 255, 0.25);
+}
+
+.user-info-name {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #262626;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+.user-info-role {
+  font-size: 0.875rem;
+  color: #8c8c8c;
+  line-height: 1.25;
+  font-weight: 500;
+}
+
+.user-info-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  color: #595959;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #f6ffed 0%, #d9f7be 100%);
+  border-radius: 12px;
+  width: fit-content;
+}
+
+.user-info-status-icon {
+  color: #52c41a;
+  font-size: 14px;
+}
+
+.user-info-menu {
+  padding: 0.75rem 0;
+  border: none !important;
+  margin: 0;
+}
+
+.user-info-menu-item {
+  height: 56px !important;
+  padding-left: 1.5rem !important;
+  padding-right: 1.5rem !important;
+  transition: all 0.2s ease;
+  margin: 0.25rem 0;
+  border-radius: 8px;
+}
+
+.user-info-menu-item:hover {
+  background: linear-gradient(90deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.12) 100%);
+  border-left: 3px solid #1890ff;
+  padding-left: 1.75rem !important;
+}
+
+.user-info-menu-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.user-info-menu-icon-blue {
+  background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
+}
+
+.user-info-menu-icon-blue .anticon {
+  color: #1890ff;
+}
+
+.user-info-menu-icon-purple {
+  background: linear-gradient(135deg, #f9f0ff 0%, #efdbff 100%);
+}
+
+.user-info-menu-icon-purple .anticon {
+  color: #722ed1;
+}
+
+.user-info-menu-icon-yellow {
+  background: linear-gradient(135deg, #fffbe6 0%, #fff1b8 100%);
+}
+
+.user-info-menu-icon-yellow .anticon {
+  color: #faad14;
+}
+
+.user-info-menu-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-info-menu-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #262626;
+  line-height: 1.25;
+}
+
+.user-info-menu-desc {
+  font-size: 0.8125rem;
+  color: #8c8c8c;
+  line-height: 1.125;
+}
+
+.user-info-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+  margin: 0;
+}
+
+.user-info-logout-button {
+  height: 2.75rem !important;
+  font-size: 0.9375rem !important;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.user-info-logout-button:hover {
+  background: linear-gradient(135deg, #fff1f0 0%, #ffccc7 100%) !important;
+  border-color: #ffa39e !important;
+  color: #f5222d !important;
+  box-shadow: 0 4px 12px rgba(245, 34, 45, 0.2);
+  transform: translateY(-2px);
+}
+
+.user-info-logout-button :deep(.ant-btn-icon) {
+  margin-right: 0.5rem;
 }
