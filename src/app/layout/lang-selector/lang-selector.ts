@@ -2,23 +2,25 @@ import { Component, inject, AfterViewInit, ChangeDetectionStrategy } from '@angu
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NzI18nService, zh_CN, en_US, NzI18nInterface } from 'ng-zorro-antd/i18n';
 
 @Component({
   selector: 'app-lang-selector',
-  imports: [NzDropdownModule, NzIconModule, NzMenuModule],
+  imports: [NzDropdownModule, NzIconModule, NzMenuModule, TranslateModule],
   templateUrl: './lang-selector.html',
   styleUrl: './lang-selector.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LangSelector implements AfterViewInit {
+  private translate = inject(TranslateService);
   private i18n = inject(NzI18nService);
 
   currentLanguage = 'zh';
 
   languages = [
-    { key: 'zh', label: '简体中文', icon: '🇨🇳', locale: zh_CN },
-    { key: 'en', label: 'English', icon: '🇺🇸', locale: en_US },
+    { key: 'zh', label: 'LANGUAGE.ZH', icon: '🇨🇳', locale: zh_CN },
+    { key: 'en', label: 'LANGUAGE.EN', icon: '🇺🇸', locale: en_US },
   ];
 
   ngAfterViewInit() {
@@ -33,6 +35,7 @@ export class LangSelector implements AfterViewInit {
     if (!language) return;
 
     this.currentLanguage = lang;
+    this.translate.use(lang);
     this.i18n.setLocale(language.locale as NzI18nInterface);
     localStorage.setItem('preferredLanguage', lang);
 

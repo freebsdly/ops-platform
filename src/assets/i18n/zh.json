@@ -1,0 +1,86 @@
+{
+  "APP": {
+    "TITLE": "运维管理平台",
+    "DESCRIPTION": "企业级运维管理与监控平台"
+  },
+  "MENU": {
+    "HOME": "首页",
+    "DASHBOARD": "仪表板",
+    "ANALYTICS": "分析",
+    "REPORTS": "报告",
+    "SECURITY": "安全",
+    "USER_MANAGEMENT": "用户管理",
+    "ROLE_MANAGEMENT": "角色管理",
+    "PERMISSION_MANAGEMENT": "权限管理",
+    "AUDIT": "审计日志",
+    "NOTIFICATIONS": "通知",
+    "SYSTEM": "系统",
+    "SETTINGS": "设置"
+  },
+  "LAYOUT": {
+    "HEADER": {
+      "PROFILE": "个人资料",
+      "SETTINGS": "设置",
+      "LOGOUT": "退出登录"
+    },
+    "SIDER": {
+      "COLLAPSE": "收起菜单",
+      "EXPAND": "展开菜单"
+    }
+  },
+  "BUTTONS": {
+    "SAVE": "保存",
+    "CANCEL": "取消",
+    "EDIT": "编辑",
+    "DELETE": "删除",
+    "ADD": "添加",
+    "SEARCH": "搜索",
+    "RESET": "重置",
+    "CONFIRM": "确认",
+    "CLOSE": "关闭",
+    "VIEW_ALL": "查看全部"
+  },
+  "COMMON": {
+    "LOADING": "加载中...",
+    "ERROR": "发生错误",
+    "SUCCESS": "操作成功",
+    "WARNING": "警告",
+    "INFO": "信息",
+    "YES": "是",
+    "NO": "否",
+    "OK": "确定",
+    "BACK": "返回",
+    "NEXT": "下一步",
+    "PREVIOUS": "上一步",
+    "USER": "用户",
+    "ACTION": "操作",
+    "STATUS": "状态",
+    "TIME": "时间",
+    "FULL_NAME": "全名",
+    "EMAIL_ADDRESS": "邮箱地址",
+    "PHONE_NUMBER": "电话号码",
+    "ROLE": "角色",
+    "ALL_RIGHTS_RESERVED": "保留所有权利",
+    "DISABLED": "已禁用",
+    "ENABLED": "已启用"
+  },
+  "SETTINGS": {
+    "TWO_FACTOR_AUTH": "双重认证",
+    "EMAIL_NOTIFICATIONS": "邮件通知",
+    "PASSWORD_EXPIRY": "密码有效期"
+  },
+  "LANGUAGE": {
+    "EN": "English",
+    "ZH": "中文",
+    "SELECT": "选择语言"
+  },
+  "USER_CARD": {
+    "STATUS_ONLINE": "在线",
+    "PROFILE_DESCRIPTION": "查看和编辑您的个人资料",
+    "SETTINGS_DESCRIPTION": "配置您的偏好设置",
+    "NOTIFICATIONS": "通知",
+    "NOTIFICATIONS_DESCRIPTION": "管理您的提醒",
+    "HELP_SUPPORT": "帮助与支持",
+    "HELP_DESCRIPTION": "获取帮助"
+  }
+}

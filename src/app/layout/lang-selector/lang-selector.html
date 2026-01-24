@@ -14,7 +14,7 @@
       <li nz-menu-item (click)="changeLanguage(lang.key)" [class.ant-menu-item-selected]="currentLanguage === lang.key">
         <span class="lang-item">
           <span class="lang-flag">{{ lang.icon }}</span>
-          <span class="lang-label">{{ lang.label }}</span>
+          <span class="lang-label">{{ lang.label | translate }}</span>
         </span>
       </li>
     }

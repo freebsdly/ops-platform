@@ -1,1 +1,5 @@
-<p>welcome works!</p>
+<nz-card [nzTitle]="'APP.TITLE' | translate">
+  <p>{{ 'APP.DESCRIPTION' | translate }}</p>
+  <p>{{ 'COMMON.LOADING' | translate }}</p>
+  <button nz-button nzType="primary">{{ 'BUTTONS.VIEW_ALL' | translate }}</button>
+</nz-card>

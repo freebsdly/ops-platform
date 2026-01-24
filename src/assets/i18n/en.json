@@ -1,0 +1,86 @@
+{
+  "APP": {
+    "TITLE": "Ops Management Platform",
+    "DESCRIPTION": "Enterprise-level operations management and monitoring platform"
+  },
+  "MENU": {
+    "HOME": "Home",
+    "DASHBOARD": "Dashboard",
+    "ANALYTICS": "Analytics",
+    "REPORTS": "Reports",
+    "SECURITY": "Security",
+    "USER_MANAGEMENT": "User Management",
+    "ROLE_MANAGEMENT": "Role Management",
+    "PERMISSION_MANAGEMENT": "Permission Management",
+    "AUDIT": "Audit Log",
+    "NOTIFICATIONS": "Notifications",
+    "SYSTEM": "System",
+    "SETTINGS": "Settings"
+  },
+  "LAYOUT": {
+    "HEADER": {
+      "PROFILE": "Profile",
+      "SETTINGS": "Settings",
+      "LOGOUT": "Logout"
+    },
+    "SIDER": {
+      "COLLAPSE": "Collapse menu",
+      "EXPAND": "Expand menu"
+    }
+  },
+  "BUTTONS": {
+    "SAVE": "Save",
+    "CANCEL": "Cancel",
+    "EDIT": "Edit",
+    "DELETE": "Delete",
+    "ADD": "Add",
+    "SEARCH": "Search",
+    "RESET": "Reset",
+    "CONFIRM": "Confirm",
+    "CLOSE": "Close",
+    "VIEW_ALL": "View All"
+  },
+  "COMMON": {
+    "LOADING": "Loading...",
+    "ERROR": "An error occurred",
+    "SUCCESS": "Operation successful",
+    "WARNING": "Warning",
+    "INFO": "Information",
+    "YES": "Yes",
+    "NO": "No",
+    "OK": "OK",
+    "BACK": "Back",
+    "NEXT": "Next",
+    "PREVIOUS": "Previous",
+    "USER": "User",
+    "ACTION": "Action",
+    "STATUS": "Status",
+    "TIME": "Time",
+    "FULL_NAME": "Full Name",
+    "EMAIL_ADDRESS": "Email Address",
+    "PHONE_NUMBER": "Phone Number",
+    "ROLE": "Role",
+    "ALL_RIGHTS_RESERVED": "All rights reserved",
+    "DISABLED": "Disabled",
+    "ENABLED": "Enabled"
+  },
+  "SETTINGS": {
+    "TWO_FACTOR_AUTH": "Two-Factor Authentication",
+    "EMAIL_NOTIFICATIONS": "Email Notifications",
+    "PASSWORD_EXPIRY": "Password Expiry"
+  },
+  "LANGUAGE": {
+    "EN": "English",
+    "ZH": "Chinese",
+    "SELECT": "Select Language"
+  },
+  "USER_CARD": {
+    "STATUS_ONLINE": "Online",
+    "PROFILE_DESCRIPTION": "View and edit your profile",
+    "SETTINGS_DESCRIPTION": "Configure your preferences",
+    "NOTIFICATIONS": "Notifications",
+    "NOTIFICATIONS_DESCRIPTION": "Manage your alerts",
+    "HELP_SUPPORT": "Help & Support",
+    "HELP_DESCRIPTION": "Get assistance"
+  }
+}

@@ -16,6 +16,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDropdownDirective, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { TranslateModule } from '@ngx-translate/core';
 
 export interface UserInfoData {
   name: string;
@@ -34,6 +35,7 @@ export interface UserInfoData {
     NzDropdownMenuComponent,
     NzCardModule,
     NzSpaceModule,
+    TranslateModule,
   ],
   templateUrl: './user-info.html',
   styleUrl: './user-info.css',

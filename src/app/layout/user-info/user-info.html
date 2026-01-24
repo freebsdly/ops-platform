@@ -35,7 +35,7 @@
             }
             <div class="user-info-status">
               <span nz-icon nzType="check-circle" nzTheme="outline" class="user-info-status-icon"></span>
-              <span>在线</span>
+              <span>{{ 'USER_CARD.STATUS_ONLINE' | translate }}</span>
             </div>
           </div>
         </nz-space>
@@ -46,8 +46,8 @@
           <nz-space [nzSize]="'middle'">
             <span nz-icon nzType="user" nzTheme="outline" class="user-info-menu-icon user-info-menu-icon-blue"></span>
             <div class="user-info-menu-text">
-              <div class="user-info-menu-title">个人中心</div>
-              <div class="user-info-menu-desc">查看和编辑个人资料</div>
+              <div class="user-info-menu-title">{{ 'LAYOUT.HEADER.PROFILE' | translate }}</div>
+              <div class="user-info-menu-desc">{{ 'USER_CARD.PROFILE_DESCRIPTION' | translate }}</div>
             </div>
           </nz-space>
         </li>
@@ -55,8 +55,8 @@
           <nz-space [nzSize]="'middle'">
             <span nz-icon nzType="setting" nzTheme="outline" class="user-info-menu-icon user-info-menu-icon-purple"></span>
             <div class="user-info-menu-text">
-              <div class="user-info-menu-title">设置</div>
-              <div class="user-info-menu-desc">管理账户和偏好设置</div>
+              <div class="user-info-menu-title">{{ 'LAYOUT.HEADER.SETTINGS' | translate }}</div>
+              <div class="user-info-menu-desc">{{ 'USER_CARD.SETTINGS_DESCRIPTION' | translate }}</div>
             </div>
           </nz-space>
         </li>
@@ -64,8 +64,8 @@
           <nz-space [nzSize]="'middle'">
             <span nz-icon nzType="bell" nzTheme="outline" class="user-info-menu-icon user-info-menu-icon-yellow"></span>
             <div class="user-info-menu-text">
-              <div class="user-info-menu-title">通知</div>
-              <div class="user-info-menu-desc">查看最新通知</div>
+              <div class="user-info-menu-title">{{ 'USER_CARD.NOTIFICATIONS' | translate }}</div>
+              <div class="user-info-menu-desc">{{ 'USER_CARD.NOTIFICATIONS_DESCRIPTION' | translate }}</div>
             </div>
           </nz-space>
         </li>
@@ -81,7 +81,7 @@
           class="user-info-logout-button"
         >
           <span nz-icon nzType="logout" nzTheme="outline"></span>
-          <span>退出登录</span>
+          <span>{{ 'LAYOUT.HEADER.LOGOUT' | translate }}</span>
         </button>
       </div>
     </nz-card>
