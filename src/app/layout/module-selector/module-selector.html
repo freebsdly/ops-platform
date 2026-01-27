@@ -18,7 +18,7 @@
       </div>
       <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex">
         @for (module of modules(); track module.id) {
-          <div nz-flex [nzFlex]="'0 0 calc(50% - 4px)'">
+          <div nz-flex [nzFlex]="'0 0 calc(25% - 6px)'">
             <button
               class="module-card"
               [class.module-card-selected]="currentModule() === module.id"
@@ -31,7 +31,6 @@
               </div>
               <div class="module-card-content">
                 <span class="module-card-title">{{ module.title }}</span>
-                <span class="module-card-desc">{{ module.description }}</span>
               </div>
               @if (currentModule() === module.id) {
                 <span nz-icon nzType="check" class="module-card-check"></span>

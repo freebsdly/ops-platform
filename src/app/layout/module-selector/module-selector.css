@@ -80,9 +80,10 @@
 
 .module-card {
   display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 12px;
   border: 1px solid #f0f0f0;
   border-radius: 8px;
   background: #fff;
@@ -90,7 +91,8 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   width: 100%;
-  text-align: left;
+  text-align: center;
+  height: 100%;
 }
 
 .module-card:hover {
@@ -110,9 +112,9 @@
 }
 
 .module-card-icon {
-  width: 40px;
-  height: 40px;
-  border-radius: 8px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   background: linear-gradient(135deg, var(--module-color, #1890ff) 0%, color-mix(in srgb, var(--module-color, #1890ff) 80%, white) 100%);
   display: flex;
   align-items: center;
@@ -121,14 +123,13 @@
 }
 
 .module-card-icon ::ng-deep .anticon {
-  font-size: 20px;
+  font-size: 24px;
   color: #fff;
 }
 
 .module-card-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
   flex: 1;
   min-width: 0;
 }
@@ -137,12 +138,6 @@
   font-size: 14px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.85);
-  line-height: 1.4;
-}
-
-.module-card-desc {
-  font-size: 12px;
-  color: rgba(0, 0, 0, 0.45);
   line-height: 1.4;
 }
 
@@ -182,13 +177,20 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .module-flex ::ng-deep .ant-flex-item {
-    flex: 1 1 100% !important;
-    max-width: 100% !important;
+  .module-flex ::ng-deep .ant-flex > div {
+    flex: 0 0 calc(50% - 4px) !important;
+    max-width: 50% !important;
   }
 
   .module-dropdown-menu {
     min-width: 320px;
     max-width: 90vw;
+  }
+}
+
+@media (max-width: 480px) {
+  .module-flex ::ng-deep .ant-flex > div {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
   }
 }
