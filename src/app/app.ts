@@ -7,10 +7,11 @@ import { LayoutService } from './layout.service';
 import { CollapseButton } from './layout/collapse-button/collapse-button';
 import { UserInfo } from './layout/user-info/user-info';
 import { LangSelector } from './layout/lang-selector/lang-selector';
+import { ModuleSelector } from './layout/module-selector/module-selector';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo, LangSelector],
+  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo, LangSelector, ModuleSelector],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
