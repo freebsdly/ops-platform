@@ -1,9 +1,22 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component } from '@angular/core';
+import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { ModuleSelector } from './module-selector';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Observable, Subject } from 'rxjs';
+
+const translations = {
+  MODULE_SELECTOR: {
+    TITLE: 'Select Module',
+    DASHBOARD: 'Dashboard',
+    FORMS: 'Forms',
+    MONITOR: 'Monitor',
+    REPORTS: 'Reports',
+    SETTINGS: 'Settings',
+  },
+};
 
 @Component({
   template: `<app-module-selector />`,
@@ -17,8 +30,47 @@ describe('ModuleSelector', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ModuleSelector, NzDropdownModule, NzIconModule, TestHostComponent],
-      providers: [provideRouter([])],
+      schemas: [NO_ERRORS_SCHEMA],
+      imports: [
+        ModuleSelector,
+        NzDropdownModule,
+        NzIconModule,
+        TranslateModule.forChild(),
+        TestHostComponent,
+      ],
+      providers: [
+        provideRouter([]),
+        {
+          provide: TranslateService,
+          useValue: {
+            get: (key: string | string[]) => {
+              const k = Array.isArray(key) ? key[0] : key;
+              const keys = k.split('.');
+              let value: any = translations;
+              for (const keyPart of keys) {
+                value = value?.[keyPart];
+              }
+              return new Observable((observer) => {
+                observer.next(value || k);
+                observer.complete();
+                return { unsubscribe: () => {} };
+              });
+            },
+            instant: (key: string | string[]) => {
+              const k = Array.isArray(key) ? key[0] : key;
+              const keys = k.split('.');
+              let value: any = translations;
+              for (const keyPart of keys) {
+                value = value?.[keyPart];
+              }
+              return value || k;
+            },
+            onLangChange: new Subject(),
+            onTranslationChange: new Subject(),
+            onDefaultLangChange: new Subject(),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ModuleSelector);

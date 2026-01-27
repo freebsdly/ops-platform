@@ -56,6 +56,18 @@
   padding: 12px;
 }
 
+.module-menu-header {
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 8px;
+}
+
+.module-menu-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.85);
+}
+
 .module-flex {
   display: flex;
   flex-wrap: wrap;

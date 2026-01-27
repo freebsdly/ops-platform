@@ -82,5 +82,13 @@
     "NOTIFICATIONS_DESCRIPTION": "Manage your alerts",
     "HELP_SUPPORT": "Help & Support",
     "HELP_DESCRIPTION": "Get assistance"
+  },
+  "MODULE_SELECTOR": {
+    "TITLE": "Select Module",
+    "DASHBOARD": "Dashboard",
+    "FORMS": "Forms",
+    "MONITOR": "Monitor",
+    "REPORTS": "Reports",
+    "SETTINGS": "Settings"
   }
 }

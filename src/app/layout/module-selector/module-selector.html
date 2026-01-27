@@ -13,6 +13,9 @@
 <nz-dropdown-menu #moduleMenu="nzDropdownMenu" class="module-dropdown-menu">
   <div class="module-menu-wrapper">
     <div class="module-menu-content">
+      <div class="module-menu-header">
+        <span class="module-menu-title">{{ 'MODULE_SELECTOR.TITLE' | translate }}</span>
+      </div>
       <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex">
         @for (module of modules(); track module.id) {
           <div nz-flex [nzFlex]="'0 0 calc(25% - 6px)'">
@@ -27,7 +30,7 @@
                 <span nz-icon [nzType]="module.icon" nzTheme="outline"></span>
               </div>
               <div class="module-card-content">
-                <span class="module-card-title">{{ module.title }}</span>
+                <span class="module-card-title">{{ module.title | translate }}</span>
               </div>
               @if (currentModule() === module.id) {
                 <span nz-icon nzType="check" class="module-card-check"></span>

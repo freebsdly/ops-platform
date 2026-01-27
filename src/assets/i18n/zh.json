@@ -82,5 +82,13 @@
     "NOTIFICATIONS_DESCRIPTION": "管理您的提醒",
     "HELP_SUPPORT": "帮助与支持",
     "HELP_DESCRIPTION": "获取帮助"
+  },
+  "MODULE_SELECTOR": {
+    "TITLE": "选择模块",
+    "DASHBOARD": "仪表板",
+    "FORMS": "表单",
+    "MONITOR": "监控",
+    "REPORTS": "报告",
+    "SETTINGS": "设置"
   }
 }
