@@ -17,7 +17,6 @@ export class LayoutService {
   private router = inject(Router);
   isCollapsed = signal(false);
   private appVersion = signal('v1.0.0');
-  menuData = signal<MenuItem[]>([]);
 
   toggle() {
     this.isCollapsed.update((v) => !v);
@@ -29,10 +28,5 @@ export class LayoutService {
 
   getAppVersion() {
     return this.appVersion;
-  }
-
-  // 在 module-selector 中设置菜单数据
-  setMenuData(menuData: MenuItem[]) {
-    this.menuData.set(menuData);
   }
 }
