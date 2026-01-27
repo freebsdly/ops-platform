@@ -11,31 +11,33 @@
 </button>
 
 <nz-dropdown-menu #moduleMenu="nzDropdownMenu" class="module-dropdown-menu">
-  <div class="module-menu-content">
-    <div class="module-menu-header">
-      <span class="module-menu-title">Select Module</span>
-    </div>
-    <div class="module-grid">
-      @for (module of modules(); track module.id) {
-        <button
-          class="module-card"
-          [class.module-card-selected]="currentModule() === module.id"
-          (click)="selectModule(module)"
-          [attr.aria-pressed]="currentModule() === module.id"
-          [style.--module-color]="module.color"
-        >
-          <div class="module-card-icon">
-            <span nz-icon [nzType]="module.icon" nzTheme="outline"></span>
-          </div>
-          <div class="module-card-content">
-            <span class="module-card-title">{{ module.title }}</span>
-            <span class="module-card-desc">{{ module.description }}</span>
-          </div>
-          @if (currentModule() === module.id) {
-            <span nz-icon nzType="check" class="module-card-check"></span>
-          }
-        </button>
-      }
+  <div class="module-menu-wrapper">
+    <div class="module-menu-content">
+      <div class="module-menu-header">
+        <span class="module-menu-title">Select Module</span>
+      </div>
+      <div class="module-grid">
+        @for (module of modules(); track module.id) {
+          <button
+            class="module-card"
+            [class.module-card-selected]="currentModule() === module.id"
+            (click)="selectModule(module)"
+            [attr.aria-pressed]="currentModule() === module.id"
+            [style.--module-color]="module.color"
+          >
+            <div class="module-card-icon">
+              <span nz-icon [nzType]="module.icon" nzTheme="outline"></span>
+            </div>
+            <div class="module-card-content">
+              <span class="module-card-title">{{ module.title }}</span>
+              <span class="module-card-desc">{{ module.description }}</span>
+            </div>
+            @if (currentModule() === module.id) {
+              <span nz-icon nzType="check" class="module-card-check"></span>
+            }
+          </button>
+        }
+      </div>
     </div>
   </div>
 </nz-dropdown-menu>
