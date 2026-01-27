@@ -17,26 +17,7 @@ export class LayoutService {
   private router = inject(Router);
   isCollapsed = signal(false);
   private appVersion = signal('v1.0.0');
-  menuData = signal<MenuItem[]>([
-    {
-      text: 'Dashboard',
-      icon: 'dashboard',
-      open: true,
-      children: [
-        { text: 'Welcome', link: '/welcome' },
-        { text: 'Monitor' },
-        { text: 'Workplace' },
-      ],
-    },
-    {
-      text: 'Form',
-      icon: 'form',
-      open: true,
-      children: [
-        { text: 'Basic Form' },
-      ],
-    },
-  ]);
+  menuData = signal<MenuItem[]>([]);
 
   toggle() {
     this.isCollapsed.update((v) => !v);
@@ -50,6 +31,7 @@ export class LayoutService {
     return this.appVersion;
   }
 
+  // 在 module-selector 中设置菜单数据
   setMenuData(menuData: MenuItem[]) {
     this.menuData.set(menuData);
   }
