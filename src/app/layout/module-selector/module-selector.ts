@@ -1,6 +1,7 @@
 import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzFlexModule } from 'ng-zorro-antd/flex';
 import { Router } from '@angular/router';
 import { signal, computed } from '@angular/core';
 
@@ -15,7 +16,7 @@ export interface ModuleOption {
 
 @Component({
   selector: 'app-module-selector',
-  imports: [NzDropdownModule, NzIconModule],
+  imports: [NzDropdownModule, NzIconModule, NzFlexModule],
   templateUrl: './module-selector.html',
   styleUrl: './module-selector.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

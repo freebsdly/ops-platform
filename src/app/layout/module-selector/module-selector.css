@@ -56,6 +56,12 @@
   padding: 12px;
 }
 
+.module-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .module-menu-content {
   padding: 12px;
 }
@@ -70,12 +76,6 @@
   font-size: 14px;
   font-weight: 600;
   color: rgba(0, 0, 0, 0.85);
-}
-
-.module-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 8px;
 }
 
 .module-card {
@@ -182,8 +182,9 @@
 
 /* Responsive */
 @media (max-width: 768px) {
-  .module-grid {
-    grid-template-columns: 1fr;
+  .module-flex ::ng-deep .ant-flex-item {
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
   }
 
   .module-dropdown-menu {
