@@ -2,12 +2,13 @@ import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { TranslateModule } from '@ngx-translate/core';
 import { ModuleMenuService } from '../../services/module-menu.service';
 import { LayoutService } from '../../layout.service';
 
 @Component({
   selector: 'app-sider-menu',
-  imports: [RouterLink, NzMenuModule, NzIconModule],
+  imports: [RouterLink, NzMenuModule, NzIconModule, TranslateModule],
   templateUrl: './sider-menu.html',
   styleUrl: './sider-menu.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -20,6 +21,6 @@ export class SiderMenu {
   isCollapsed = this.layoutService.isCollapsed.asReadonly();
 
   trackByMenuId(_index: number, item: any): string {
-    return item.text;
+    return item.key;
   }
 }

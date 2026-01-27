@@ -1,14 +1,14 @@
 <ul nz-menu nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed()">
   @for (item of menuData(); track item.text) {
     @if (item.children && item.children.length > 0) {
-      <li nz-submenu [nzOpen]="item.open" [nzTitle]="item.text" [nzIcon]="item.icon ?? null">
+      <li nz-submenu [nzOpen]="item.open" [nzTitle]="item.key | translate" [nzIcon]="item.icon">
         <ul>
           @for (child of item.children; track child.text) {
             <li nz-menu-item nzMatchRouter>
               @if (child.link) {
-                <a routerLink="{{ child.link }}">{{ child.text }}</a>
+                <a routerLink="{{ child.link }}">{{ child.key | translate }}</a>
               } @else {
-                <a>{{ child.text }}</a>
+                <a>{{ child.key | translate }}</a>
               }
             </li>
           }
@@ -20,9 +20,9 @@
           <span nz-icon [nzType]="item.icon"></span>
         }
         @if (item.link) {
-          <a routerLink="{{ item.link }}">{{ item.text }}</a>
+          <a routerLink="{{ item.link }}">{{ item.key | translate }}</a>
         } @else {
-          <a>{{ item.text }}</a>
+          <a>{{ item.key | translate }}</a>
         }
       </li>
     }
