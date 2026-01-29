@@ -13,6 +13,12 @@
   --sidebar-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
 }
 
+/* 移除Ant Design菜单的默认右侧边框，避免与侧边栏边框重叠 */
+.ant-menu-inline,
+.ant-menu-vertical {
+  border-right: none !important;
+}
+
 nz-layout,
 .ant-layout {
   height: 100%;

@@ -15,6 +15,8 @@ ul {
   /* 隐藏滚动条但保持滚动功能 */
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+  /* 移除Ant Design菜单的默认右侧边框 */
+  border-right: none !important;
 }
 
 /* 隐藏Webkit浏览器滚动条 */
