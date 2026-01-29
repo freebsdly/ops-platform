@@ -23,7 +23,7 @@
   box-shadow: var(--sidebar-shadow);
   border-right: 1px solid lightgray;
   background-color: white;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .app-layout-sider-inner {
@@ -32,6 +32,15 @@
   height: 100%;
   width: 100%;
   overflow: hidden;
+}
+
+/* 外部折叠按钮的样式 */
+.external-collapse-button {
+  position: absolute;
+  top: 9%;
+  transform: translate(-50%, -50%); /* 将按钮圆心定位在边框上 */
+  z-index: var(--z-index-fixed);
+  transition: left 0.2s cubic-bezier(0.215, 0.61, 0.355, 1); /* 添加平滑过渡效果 */
 }
 
 .app-layout-header {
