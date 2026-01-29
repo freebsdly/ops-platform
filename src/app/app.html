@@ -17,9 +17,13 @@
   
   <nz-layout class="app-layout-right">
     <nz-header class="app-layout-header">
-      <app-module-selector />
-      <app-lang-selector />
-      <app-user-info />
+      <div class="header-left">
+        <app-module-selector />
+      </div>
+      <div class="header-right">
+        <app-lang-selector />
+        <app-user-info />
+      </div>
     </nz-header>
     <nz-content class="app-layout-content">
       <router-outlet></router-outlet>
