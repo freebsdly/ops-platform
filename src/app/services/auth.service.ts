@@ -1,4 +1,12 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { delay } from 'rxjs/operators';
+import { User } from '../core/types/user.interface';
+
+export interface AuthResponse {
+  user: User;
+  token: string;
+}
 
 @Injectable({
   providedIn: 'root',
@@ -6,46 +14,55 @@ import { Injectable, signal } from '@angular/core';
 export class AuthService {
   private readonly tokenKey = 'auth_token';
   private readonly userKey = 'user';
-  private readonly tabsKey = 'app_tabs';
-  
-  authState = signal<{isAuthenticated: boolean; user: { name: string; email: string } | null}>({
-    isAuthenticated: !!localStorage.getItem(this.tokenKey),
-    user: localStorage.getItem(this.userKey) 
-      ? JSON.parse(localStorage.getItem(this.userKey)!) 
-      : null
-  });
 
-  login(email: string, password: string): Promise<boolean> {
+  login(username: string, password: string): Observable<AuthResponse> {
     // Simulate API call
-    return new Promise((resolve) => {
+    return new Observable<AuthResponse>((observer) => {
       setTimeout(() => {
-        // Mock successful login (any email/password combination works for demo)
-        const token = 'mock_jwt_token_' + Date.now();
-        const user = {
+        // Mock successful login
+        const user: User = {
+          id: 1,
+          username,
+          email: `${username}@example.com`,
           name: 'Demo User',
-          email: email,
+          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+          roles: ['admin'],
         };
-        
+
+        const token = 'mock_jwt_token_' + Date.now();
+
         localStorage.setItem(this.tokenKey, token);
         localStorage.setItem(this.userKey, JSON.stringify(user));
-        
-        this.authState.set({
-          isAuthenticated: true,
-          user: user
-        });
-        resolve(true);
+
+        observer.next({ user, token });
+        observer.complete();
       }, 500);
     });
   }
 
-  logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.userKey);
-    localStorage.removeItem(this.tabsKey);
-    this.authState.set({
-      isAuthenticated: false,
-      user: null
+  logout(): Observable<void> {
+    return new Observable<void>((observer) => {
+      localStorage.removeItem(this.tokenKey);
+      localStorage.removeItem(this.userKey);
+      observer.next();
+      observer.complete();
     });
+  }
+
+  checkAuth(): Observable<{ user: User | null; token: string | null }> {
+    const token = localStorage.getItem(this.tokenKey);
+    const userStr = localStorage.getItem(this.userKey);
+
+    let user: User | null = null;
+    if (userStr) {
+      try {
+        user = JSON.parse(userStr);
+      } catch {
+        user = null;
+      }
+    }
+
+    return of({ user, token }).pipe(delay(100));
   }
 
   getToken(): string | null {

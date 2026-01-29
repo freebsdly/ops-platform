@@ -1,61 +1,57 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { Sider } from './layout/sider/sider';
 import { LayoutService } from './layout.service';
 import { CollapseButton } from './layout/collapse-button/collapse-button';
-import { UserInfo, UserInfoData } from './layout/user-info/user-info';
+import { UserInfo } from './layout/user-info/user-info';
 import { LangSelector } from './layout/lang-selector/lang-selector';
 import { ModuleSelector } from './layout/module-selector/module-selector';
-import { AuthService } from './services/auth.service';
+import { StoreService } from './core/stores/store.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo, LangSelector, ModuleSelector],
+  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo, LangSelector, ModuleSelector, AsyncPipe],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
-  logoSrc = 'https://ng.ant.design/assets/img/logo.svg';
+export class App implements OnInit {
+  logoSrc = 'https://ng.ant.design/assets.img/logo.svg';
   logoAlt = 'Logo';
   title = 'Ant Design of Angular';
   logoLink = 'https://ng.ant.design/';
 
   layoutService = inject(LayoutService);
   private router = inject(Router);
-  private authService = inject(AuthService);
+  storeService = inject(StoreService);
   
-  isCollapsed = this.layoutService.isCollapsed.asReadonly();
-  authState = this.authService.authState.asReadonly();
+  // NgRx state observables
+  isAuthenticated$ = this.storeService.isAuthenticated$;
+  user$ = this.storeService.user$;
+  isSiderCollapsed$ = this.storeService.isSiderCollapsed$;
+  modules$ = this.storeService.modules$;
+
+  ngOnInit(): void {
+    // Check authentication status on app initialization
+    this.storeService.checkAuth();
+    // Load available modules
+    this.storeService.loadModules();
+    
+    // Initialize layout state from localStorage
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
+      this.storeService.setTheme(savedTheme);
+    }
+    
+    const savedSiderCollapsed = localStorage.getItem('siderCollapsed');
+    if (savedSiderCollapsed) {
+      this.storeService.setSiderCollapsed(savedSiderCollapsed === 'true');
+    }
+  }
 
   isLoginPage(): boolean {
     return this.router.url === '/login' || this.router.url.startsWith('/login?');
-  }
-
-  getUserInfoData(): UserInfoData | null {
-    const user = this.authState().user;
-    if (!user) {
-      return null;
-    }
-    
-    // 从email推断角色（示例逻辑）
-    const getRoleFromEmail = (email: string): string => {
-      if (email.includes('admin')) return 'Administrator';
-      if (email.includes('manager')) return 'Manager';
-      return 'User';
-    };
-    
-    return {
-      name: user.name,
-      email: user.email,
-      avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.name}`,
-      role: getRoleFromEmail(user.email)
-    };
-  }
-
-  handleLogout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
   }
 }

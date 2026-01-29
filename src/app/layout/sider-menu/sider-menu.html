@@ -1,9 +1,9 @@
-<ul nz-menu nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed()">
-  @for (item of menuData(); track item.text) {
+<ul nz-menu nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed$ | async">
+  @for (item of menuData; track item.key) {
     @if (item.children && item.children.length > 0) {
-      <li nz-submenu [nzOpen]="item.open" [nzTitle]="item.key | translate" [nzIcon]="item.icon">
+      <li nz-submenu [nzOpen]="item.open || false" [nzTitle]="item.key | translate" [nzIcon]="item.icon || null">
         <ul>
-          @for (child of item.children; track child.text) {
+          @for (child of item.children; track child.key) {
             <li nz-menu-item nzMatchRouter>
               @if (child.icon) {
                 <span nz-icon [nzType]="child.icon"></span>

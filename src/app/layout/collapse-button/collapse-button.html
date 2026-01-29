@@ -1,11 +1,13 @@
-<button
-  (click)="toggleCollapse()"
-  type="button"
-  class="collapse-btn"
->
-  @if (isCollapsed()) {
-    <span nz-icon nzType="right"></span>
-  } @else {
-    <span nz-icon nzType="left"></span>
-  }
-</button>
+<div class="collapse-button-wrapper" [class.collapsed]="isSiderCollapsed$ | async">
+  <button
+    (click)="toggleCollapse()"
+    type="button"
+    class="collapse-btn"
+  >
+    @if (isSiderCollapsed$ | async) {
+      <span nz-icon nzType="right"></span>
+    } @else {
+      <span nz-icon nzType="left"></span>
+    }
+  </button>
+</div>

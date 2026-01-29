@@ -1,27 +1,20 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { LayoutService } from '../../layout.service';
+import { StoreService } from '../../core/stores/store.service';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
   selector: 'app-collapse-button',
-  imports: [NzIconModule],
+  imports: [NzIconModule, AsyncPipe],
   templateUrl: './collapse-button.html',
-  styleUrl: './collapse-button.css',
-  host: {
-    class: 'external-collapse-button',
-    '[style.left.px]': 'leftPosition()'
-  }
+  styleUrl: './collapse-button.css'
 })
 export class CollapseButton {
-  layoutService = inject(LayoutService);
-  isCollapsed = this.layoutService.isCollapsed.asReadonly();
+  private storeService = inject(StoreService);
   
-  // 根据折叠状态计算left位置
-  leftPosition = computed(() => {
-    return this.isCollapsed() ? 48 : 248; // 折叠时48px，展开时248px
-  });
+  isSiderCollapsed$ = this.storeService.isSiderCollapsed$;
 
   toggleCollapse() {
-    this.layoutService.setCollapsed(!this.isCollapsed());
+    this.storeService.toggleSider();
   }
 }

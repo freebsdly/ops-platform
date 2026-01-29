@@ -7,7 +7,20 @@
   aria-label="Module selector"
   aria-haspopup="true"
 >
-  <span nz-icon [nzType]="currentModuleData().icon || 'appstore'" class="module-selector-icon"></span>
+  <!-- We'll need to combine data from service with module ID -->
+  @if (availableModules$ | async; as modules) {
+    @if (currentModule$ | async; as currentModuleId) {
+      @for (module of modules; track module.id) {
+        @if (module.id === currentModuleId) {
+          <span nz-icon [nzType]="module.icon || 'appstore'" class="module-selector-icon"></span>
+        }
+      }
+    } @else {
+      <span nz-icon nzType="appstore" class="module-selector-icon"></span>
+    }
+  } @else {
+    <span nz-icon nzType="appstore" class="module-selector-icon"></span>
+  }
 </button>
 
 <nz-dropdown-menu #moduleMenu="nzDropdownMenu" class="module-dropdown-menu">
@@ -17,26 +30,30 @@
         <span class="module-menu-title">{{ 'MODULE_SELECTOR.TITLE' | translate }}</span>
       </div>
       <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex">
-        @for (module of modules(); track module.id) {
-          <div nz-flex [nzFlex]="'0 0 calc((100% - 24px) / 4)'">
-            <button
-              class="module-card"
-              [class.module-card-selected]="module.isActive"
-              (click)="selectModule(module.id)"
-              [attr.aria-pressed]="module.isActive"
-              [style.--module-color]="module.color"
-            >
-              <div class="module-card-icon">
-                <span nz-icon [nzType]="module.icon" nzTheme="outline"></span>
+        @if (availableModules$ | async; as modules) {
+          @if (currentModule$ | async; as currentModuleId) {
+            @for (module of modules; track module.id) {
+              <div nz-flex [nzFlex]="'0 0 calc((100% - 24px) / 4)'">
+                <button
+                  class="module-card"
+                  [class.module-card-selected]="module.id === currentModuleId"
+                  (click)="selectModule(module.id)"
+                  [attr.aria-pressed]="module.id === currentModuleId"
+                  [style.--module-color]="module.color"
+                >
+                  <div class="module-card-icon">
+                    <span nz-icon [nzType]="module.icon" nzTheme="outline"></span>
+                  </div>
+                  <div class="module-card-content">
+                    <span class="module-card-title">{{ module.title | translate }}</span>
+                  </div>
+                  @if (module.id === currentModuleId) {
+                    <span nz-icon nzType="check" class="module-card-check"></span>
+                  }
+                </button>
               </div>
-              <div class="module-card-content">
-                <span class="module-card-title">{{ module.title | translate }}</span>
-              </div>
-              @if (module.isActive) {
-                <span nz-icon nzType="check" class="module-card-check"></span>
-              }
-            </button>
-          </div>
+            }
+          }
         }
       </div>
     </div>

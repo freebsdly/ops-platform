@@ -1,4 +1,4 @@
 <app-logo
-  [isCollapsed]="layoutService.isCollapsed()"
+  [isCollapsed]="(isSiderCollapsed$ | async) ?? false"
   [title]="title"
 ></app-logo>

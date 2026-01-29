@@ -12,6 +12,10 @@ import en from '@angular/common/locales/en';
 import { NzConfig, provideNzConfig } from 'ng-zorro-antd/core/config';
 import { provideTranslateService } from '@ngx-translate/core';
 import { provideTranslateHttpLoader } from '@ngx-translate/http-loader';
+import { provideStore } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideRouterStore } from '@ngrx/router-store';
+import { provideStoreDevtools } from '@ngrx/store-devtools';
 
 registerLocaleData(zh);
 registerLocaleData(en);
@@ -19,6 +23,11 @@ registerLocaleData(en);
 const ngZorroConfig: NzConfig = {
   // 注意组件名称没有 nz 前缀
 };
+
+import { rootReducer } from './core/stores/root.reducer';
+import { AuthEffects } from './core/stores/auth/auth.effects';
+import { LayoutEffects } from './core/stores/layout/layout.effects';
+import { ModuleEffects } from './core/stores/module/module.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -36,6 +45,15 @@ export const appConfig: ApplicationConfig = {
       }),
       fallbackLang: 'zh',
       lang: 'zh',
+    }),
+    // NgRx Store Configuration
+    provideStore(rootReducer),
+    provideEffects(AuthEffects, LayoutEffects, ModuleEffects),
+    provideRouterStore(),
+    provideStoreDevtools({
+      maxAge: 25,
+      logOnly: false,
+      autoPause: true,
     }),
   ],
 };

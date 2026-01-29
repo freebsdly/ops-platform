@@ -29,6 +29,30 @@ importers:
       '@angular/router':
         specifier: ^21.1.0
         version: 21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@angular/platform-browser@21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)))(rxjs@7.8.2)
+      '@ngrx/component':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngrx/component-store':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngrx/effects':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngrx/entity':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngrx/router-store':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@angular/router@21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@angular/platform-browser@21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)))(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngrx/signals':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngrx/store':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@ngrx/store-devtools':
+        specifier: ^21.0.1
+        version: 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)
       '@ngx-translate/core':
         specifier: ^17.0.0
         version: 17.0.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))
@@ -951,6 +975,64 @@ packages:
 
   '@napi-rs/wasm-runtime@1.1.1':
     resolution: {integrity: sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==}
+
+  '@ngrx/component-store@21.0.1':
+    resolution: {integrity: sha512-aOfudK8MqCZQUuBjMnXAXRxRcr9Qu/+9/2iIh4aLhmGXC5JCpkDi1a82A/39EUFZy2xBbI4lPI7P817b1PQRvQ==}
+    peerDependencies:
+      '@angular/core': ^21.0.0
+      rxjs: ^6.5.3 || ^7.5.0
+
+  '@ngrx/component@21.0.1':
+    resolution: {integrity: sha512-NjeLVcYwnCRv1OCnBQYpy4JOKOr8L53hBvySdPo2qg6mYYFtxfkVMoA/k95xAcv9DMpHkV7iPn+1DXq4KgXGwQ==}
+    peerDependencies:
+      '@angular/common': ^21.0.0
+      '@angular/core': ^21.0.0
+      rxjs: ^6.5.3 || ^7.5.0
+
+  '@ngrx/effects@21.0.1':
+    resolution: {integrity: sha512-hSdpToAiSYa5FJ/CAygQHpnCaF2S1HO7q/57ob3XvNTWmkofa0VqI/IIe4W57bojh2YOWCJ91SCn3kAjymaV3g==}
+    peerDependencies:
+      '@angular/core': ^21.0.0
+      '@ngrx/store': 21.0.1
+      rxjs: ^6.5.3 || ^7.5.0
+
+  '@ngrx/entity@21.0.1':
+    resolution: {integrity: sha512-h7PjW8WzkPwSYDlicWcEw6EJ9yBfa+fbf5tmIty4cZ8yH6+Ld3aHuGAMAu8xbnV79oj0TGa/PSynu5LZq4jXdA==}
+    peerDependencies:
+      '@angular/core': ^21.0.0
+      '@ngrx/store': 21.0.1
+      rxjs: ^6.5.3 || ^7.5.0
+
+  '@ngrx/router-store@21.0.1':
+    resolution: {integrity: sha512-hacH8ciwCRMLg7p7bThslYn564GOyS5LPf9c8cX4FTyOH+iJM32eJd2Lt64cA62vN6ruofV/IM2vB09nCkxHzg==}
+    peerDependencies:
+      '@angular/common': ^21.0.0
+      '@angular/core': ^21.0.0
+      '@angular/router': ^21.0.0
+      '@ngrx/store': 21.0.1
+      rxjs: ^6.5.3 || ^7.5.0
+
+  '@ngrx/signals@21.0.1':
+    resolution: {integrity: sha512-krmZDhgHrnmZrxfEJ41bp/aM8Mc55k5B2N7oCLT5w4M3YbOkbnWPkP6bBWMv4XPI+2rqVgkLRW6DaWLwoESaBw==}
+    peerDependencies:
+      '@angular/core': ^21.0.0
+      rxjs: ^6.5.3 || ^7.4.0
+    peerDependenciesMeta:
+      rxjs:
+        optional: true
+
+  '@ngrx/store-devtools@21.0.1':
+    resolution: {integrity: sha512-G9fO7CFwYUpz8+JZ9uny+lVJ7iv6PcFJDg+jae5CCrAUIiflnR8gbwD8exAd2AODpxPCpmnSojuLNpLDAcwGzQ==}
+    peerDependencies:
+      '@angular/core': ^21.0.0
+      '@ngrx/store': 21.0.1
+      rxjs: ^6.5.3 || ^7.5.0
+
+  '@ngrx/store@21.0.1':
+    resolution: {integrity: sha512-2hGnw/c5o8nmKzyx7TrUUM7FXjE2zqjX0EF+wLbw9Oy/L+VdCmx+ZI1BFjuAR4B8PKEWHG2KSbOM13SMNkpZiA==}
+    peerDependencies:
+      '@angular/core': ^21.0.0
+      rxjs: ^6.5.3 || ^7.5.0
 
   '@ngx-translate/core@17.0.0':
     resolution: {integrity: sha512-Rft2D5ns2pq4orLZjEtx1uhNuEBerUdpFUG1IcqtGuipj6SavgB8SkxtNQALNDA+EVlvsNCCjC2ewZVtUeN6rg==}
@@ -3634,6 +3716,62 @@ snapshots:
       '@emnapi/runtime': 1.8.1
       '@tybys/wasm-util': 0.10.1
     optional: true
+
+  '@ngrx/component-store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ngrx/component@21.0.1(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/common': 21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ngrx/effects@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      '@ngrx/store': 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ngrx/entity@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      '@ngrx/store': 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ngrx/router-store@21.0.1(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@angular/router@21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@angular/platform-browser@21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)))(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/common': 21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      '@angular/router': 21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@angular/platform-browser@21.1.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)))(rxjs@7.8.2)
+      '@ngrx/store': 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ngrx/signals@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      tslib: 2.8.1
+    optionalDependencies:
+      rxjs: 7.8.2
+
+  '@ngrx/store-devtools@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      '@ngrx/store': 21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
+
+  '@ngrx/store@21.0.1(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2)':
+    dependencies:
+      '@angular/core': 21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2)
+      rxjs: 7.8.2
+      tslib: 2.8.1
 
   '@ngx-translate/core@17.0.0(@angular/common@21.1.0(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))(rxjs@7.8.2))(@angular/core@21.1.0(@angular/compiler@21.1.0)(rxjs@7.8.2))':
     dependencies:

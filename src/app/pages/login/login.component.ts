@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -12,7 +12,9 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LangSelector } from '../../layout/lang-selector/lang-selector';
-import { AuthService } from '../../services/auth.service';
+import { StoreService } from '../../core/stores/store.service';
+import { AsyncPipe } from '@angular/common';
+import { combineLatest, take } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -28,6 +30,7 @@ import { AuthService } from '../../services/auth.service';
     NzAlertModule,
     TranslateModule,
     LangSelector,
+    AsyncPipe,
   ],
   template: `
     <div
@@ -97,8 +100,8 @@ import { AuthService } from '../../services/auth.service';
               nzType="primary"
               nzBlock
               nzSize="large"
-              [nzLoading]="loading"
-              [disabled]="loginForm.invalid || loading"
+              [nzLoading]="isLoading$ | async"
+              [disabled]="loginForm.invalid || (isLoading$ | async)"
               type="submit"
               class="mb-4"
             >
@@ -113,7 +116,7 @@ import { AuthService } from '../../services/auth.service';
           </form>
         </nz-card>
 
-        @if (error) {
+        @if (authError$ | async; as error) {
         <nz-alert nzType="error" [nzMessage]="error" class="mt-4" nzShowIcon></nz-alert>
         }
       </div>
@@ -121,17 +124,17 @@ import { AuthService } from '../../services/auth.service';
   `,
 })
 export class LoginComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private router = inject(Router);
+  private message = inject(NzMessageService);
+  private translate = inject(TranslateService);
+  private storeService = inject(StoreService);
+  
   loginForm!: FormGroup;
-  loading = false;
-  error: string | null = null;
-
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private message: NzMessageService,
-    private translate: TranslateService
-  ) {}
+  
+  // NgRx state observables
+  isLoading$ = this.storeService.isLoading$;
+  authError$ = this.storeService.authError$;
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -139,6 +142,9 @@ export class LoginComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false],
     });
+
+    // Clear any previous auth errors
+    this.storeService.clearAuthError();
   }
 
   onSubmit(): void {
@@ -146,29 +152,23 @@ export class LoginComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
-    this.error = null;
-
     const { email, password } = this.loginForm.value;
+    
+    // Dispatch login action
+    this.storeService.login(email, password);
 
-    this.authService
-      .login(email, password)
-      .then((success: boolean) => {
-        this.loading = false;
-
-        if (success) {
-          this.message.success(this.translate.instant('LOGIN.SUCCESS'));
-          const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/';
-          this.router.navigateByUrl(returnUrl);
-        } else {
-          this.message.error(this.translate.instant('LOGIN.ERROR.INVALID_CREDENTIALS'));
-          this.error = this.translate.instant('LOGIN.ERROR.INVALID_CREDENTIALS');
-        }
-      })
-      .catch(() => {
-        this.loading = false;
-        this.message.error(this.translate.instant('LOGIN.ERROR.SERVER_ERROR'));
-        this.error = this.translate.instant('LOGIN.ERROR.SERVER_ERROR');
-      });
+    // Subscribe to login success/failure
+    combineLatest([
+      this.storeService.isAuthenticated$,
+      this.storeService.authError$
+    ]).pipe(take(1)).subscribe(([isAuthenticated, error]) => {
+      if (isAuthenticated) {
+        this.message.success(this.translate.instant('LOGIN.SUCCESS'));
+        const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/';
+        this.router.navigateByUrl(returnUrl);
+      } else if (error) {
+        this.message.error(error);
+      }
+    });
   }
 }

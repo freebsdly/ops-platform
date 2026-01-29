@@ -1,6 +1,6 @@
-import { Injectable, signal } from '@angular/core';
-import { inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Injectable, inject } from '@angular/core';
+import { StoreService } from './core/stores/store.service';
+import { Observable } from 'rxjs';
 
 export interface MenuItem {
   text: string;
@@ -14,19 +14,31 @@ export interface MenuItem {
   providedIn: 'root',
 })
 export class LayoutService {
-  private router = inject(Router);
-  isCollapsed = signal(false);
-  private appVersion = signal('v1.0.0');
+  private storeService = inject(StoreService);
+  
+  get isCollapsed(): { asReadonly: () => Observable<boolean> } {
+    return {
+      asReadonly: () => this.storeService.isSiderCollapsed$
+    };
+  }
 
   toggle() {
-    this.isCollapsed.update((v) => !v);
+    this.storeService.toggleSider();
   }
 
   setCollapsed(collapsed: boolean) {
-    this.isCollapsed.set(collapsed);
+    this.storeService.setSiderCollapsed(collapsed);
   }
 
   getAppVersion() {
-    return this.appVersion;
+    return {
+      asReadonly: () => {
+        const version = 'v1.0.0';
+        return {
+          get: () => version,
+          subscribe: () => ({ unsubscribe: () => {} })
+        };
+      }
+    };
   }
 }
