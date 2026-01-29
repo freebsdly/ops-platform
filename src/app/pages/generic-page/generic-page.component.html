@@ -1,0 +1,75 @@
+<div class="generic-page">
+  <nz-card [nzBordered]="true" [nzTitle]="currentTitle()">
+    <!-- 页面信息 -->
+    <nz-alert
+      nzType="info"
+      [nzMessage]="currentDescription()"
+      [nzDescription]="'当前路由: ' + currentPath()"
+      nzShowIcon
+      class="mb-4"
+    >
+    </nz-alert>
+
+    <!-- 模块信息 -->
+    <div class="module-info mb-6">
+      <h3><span nz-icon [nzType]="moduleInfo().icon"></span> {{ moduleInfo().name }}</h3>
+      <p class="text-muted">当前模块提供相关功能和服务，点击菜单切换不同功能页面。</p>
+    </div>
+
+    <!-- 模拟功能区 -->
+    <div class="function-area">
+      <h4>功能模拟</h4>
+      <p class="text-muted mb-4">这是一个通用页面，用于模拟不同功能页面的展示。</p>
+      
+      <div class="function-cards">
+        <nz-card class="function-card" nzHoverable>
+          <div class="card-header">
+            <span nz-icon nzType="search" nzTheme="outline"></span>
+            <h5>数据查询</h5>
+          </div>
+          <p>模拟数据查询功能，可以展示相关数据信息。</p>
+          <button nz-button nzType="primary" (click)="simulateAction('数据查询')">查询</button>
+        </nz-card>
+
+        <nz-card class="function-card" nzHoverable>
+          <div class="card-header">
+            <span nz-icon nzType="line-chart" nzTheme="outline"></span>
+            <h5>数据分析</h5>
+          </div>
+          <p>模拟数据分析功能，展示图表和统计信息。</p>
+          <button nz-button nzType="primary" (click)="simulateAction('数据分析')">分析</button>
+        </nz-card>
+
+        <nz-card class="function-card" nzHoverable>
+          <div class="card-header">
+            <span nz-icon nzType="setting" nzTheme="outline"></span>
+            <h5>配置管理</h5>
+          </div>
+          <p>模拟配置管理功能，可以查看和修改相关配置。</p>
+          <button nz-button nzType="primary" (click)="simulateAction('配置管理')">管理</button>
+        </nz-card>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="action-buttons mt-6">
+      <button nz-button nzType="default" (click)="goBack()">
+        <span nz-icon nzType="left"></span>
+        返回
+      </button>
+      <button nz-button nzType="primary" (click)="refreshPage()" class="ml-3">
+        <span nz-icon nzType="reload"></span>
+        刷新
+      </button>
+      <button nz-button nzType="dashed" (click)="simulateAction('模拟操作')" class="ml-3">
+        <span nz-icon nzType="experiment"></span>
+        模拟操作
+      </button>
+    </div>
+
+    <!-- 状态信息 -->
+    <div class="status-info mt-6">
+      <nz-alert nzType="success" nzMessage="页面加载成功" nzDescription="这是一个通用页面，用于展示不同功能模块的内容。" nzShowIcon></nz-alert>
+    </div>
+  </nz-card>
+</div>
