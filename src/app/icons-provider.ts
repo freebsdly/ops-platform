@@ -67,6 +67,8 @@ import {
   StarOutline,
   DollarOutline,
   UpCircleOutline,
+  // 添加API图标
+  ApiOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const icons = [
@@ -138,4 +140,6 @@ export const icons = [
   StarOutline,
   DollarOutline,
   UpCircleOutline,
+  // 添加可能缺失的图标
+  ApiOutline,
 ];

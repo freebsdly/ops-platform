@@ -30,14 +30,14 @@ export const MODULES_CONFIG: ModuleConfig[] = [
   {
     id: 'monitoring',
     title: 'CONFIG.MONITOR_CENTER',
-    icon: 'monitor',
+    icon: 'desktop',
     color: '#52c41a',
     defaultPath: '/monitoring/management/object',
   },
   {
     id: 'incident',
     title: 'CONFIG.INCIDENT_CENTER',
-    icon: 'alert',
+    icon: 'warning',
     color: '#faad14',
     defaultPath: '/incident/management/aggregation',
   },
@@ -60,7 +60,7 @@ export const MENUS_CONFIG: Record<string, MenuItem[]> = {
       icon: 'database',
       open: true,
       children: [
-        { key: 'CONFIG.MODEL_MANAGEMENT', text: '模型管理', icon: 'golden', link: '/configuration/management/model' },
+        { key: 'CONFIG.MODEL_MANAGEMENT', text: '模型管理', icon: 'appstore', link: '/configuration/management/model' },
         { key: 'CONFIG.ATTRIBUTE_MANAGEMENT', text: '属性管理', icon: 'appstore', link: '/configuration/management/attribute' },
         { key: 'CONFIG.RELATIONSHIP', text: '关联关系', icon: 'deployment-unit', link: '/configuration/management/relationship' },
       ],
@@ -98,8 +98,8 @@ export const MENUS_CONFIG: Record<string, MenuItem[]> = {
       children: [
         { key: 'CONFIG.MONITOR_OBJECT', text: '监控对象', icon: 'desktop', link: '/monitoring/management/object' },
         { key: 'CONFIG.MULTI_DIMENSION_COLLECTION', text: '多维度采集', icon: 'radar-chart', link: '/monitoring/management/collection' },
-        { key: 'CONFIG.COLLECTOR_MANAGEMENT', text: '采集器管理', icon: 'cloud-server', link: '/monitoring/management/collector' },
-        { key: 'CONFIG.METRIC_STORAGE', text: '指标存储', icon: 'hdd', link: '/monitoring/management/storage' },
+        { key: 'CONFIG.COLLECTOR_MANAGEMENT', text: '采集器管理', icon: 'cloud', link: '/monitoring/management/collector' },
+        { key: 'CONFIG.METRIC_STORAGE', text: '指标存储', icon: 'database', link: '/monitoring/management/storage' },
         { key: 'CONFIG.LOG_COLLECTION', text: '日志采集', icon: 'file-text', link: '/monitoring/management/log' },
         { key: 'CONFIG.LINK_MONITORING', text: '链路监控', icon: 'link', link: '/monitoring/management/link' },
         { key: 'CONFIG.CLOUD_NATIVE_MONITORING', text: '云原生监控', icon: 'cloud', link: '/monitoring/management/cloud' },
@@ -149,7 +149,7 @@ export const MENUS_CONFIG: Record<string, MenuItem[]> = {
         { key: 'CONFIG.ONCALL_SCHEDULING', text: 'OnCall排班', icon: 'team', link: '/incident/management/oncall' },
         { key: 'CONFIG.EVENT_CLASSIFICATION', text: '事件分类', icon: 'tags', link: '/incident/management/classification' },
         { key: 'CONFIG.SHIFT_HANDOVER', text: '值班交接', icon: 'swap', link: '/incident/management/handover' },
-        { key: 'CONFIG.EVENT_SILENCE', text: '事件静默', icon: 'mute', link: '/incident/management/silence' },
+        { key: 'CONFIG.EVENT_SILENCE', text: '事件静默', icon: 'bell', link: '/incident/management/silence' },
       ],
     },
     {
