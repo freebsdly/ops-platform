@@ -1,0 +1,17 @@
+<div class="generic-page">
+  <!-- 页面信息 -->
+  <nz-alert
+    nzType="info"
+    [nzMessage]="currentDescription()"
+    [nzDescription]="'当前路由: ' + currentPath()"
+    nzShowIcon
+    class="mb-4"
+  >
+  </nz-alert>
+
+  <!-- 模块信息 -->
+  <div class="module-info mb-6">
+    <h3><span nz-icon [nzType]="moduleInfo().icon"></span> {{ moduleInfo().name }}</h3>
+    <p class="text-muted">当前模块提供相关功能和服务，点击菜单切换不同功能页面。</p>
+  </div>
+</div>

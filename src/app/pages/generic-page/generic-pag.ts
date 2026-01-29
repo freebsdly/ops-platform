@@ -18,8 +18,8 @@ import { TranslateModule } from '@ngx-translate/core';
     NzIconModule,
     TranslateModule
   ],
-  templateUrl: './generic-page.component.html',
-  styleUrl: './generic-page.component.css'
+  templateUrl: './generic-page.html',
+  styleUrl: './generic-page.css'
 })
 export class GenericPageComponent {
   private route = inject(ActivatedRoute);
@@ -27,26 +27,26 @@ export class GenericPageComponent {
 
   // 路由参数信号
   private routeParams = signal<any>({});
-  
+
   // 当前页面标题
   currentTitle = computed(() => {
     const params = this.routeParams();
     const route = this.router.url;
-    
+
     // 从路由中提取页面名称
     const segments = route.split('/').filter(segment => segment.length > 0);
     const lastSegment = segments[segments.length - 1] || 'welcome';
-    
+
     // 将路由段转换为可读的标题
     return this.formatRouteTitle(lastSegment);
   });
-  
+
   // 当前页面描述
   currentDescription = computed(() => {
     const title = this.currentTitle();
     return `这是 ${title} 页面，显示相关功能和数据。`;
   });
-  
+
   // 页面URL路径
   currentPath = computed(() => {
     return this.router.url;
@@ -56,16 +56,16 @@ export class GenericPageComponent {
   moduleInfo = computed(() => {
     const route = this.router.url;
     const segments = route.split('/').filter(segment => segment.length > 0);
-    
+
     if (segments.length === 0) return { name: '欢迎页', icon: 'home' };
-    
+
     const moduleMap: Record<string, { name: string, icon: string }> = {
       'configuration': { name: '配置中心', icon: 'setting' },
       'monitoring': { name: '监控中心', icon: 'monitor' },
       'incident': { name: '事件中心', icon: 'alert' },
       'service': { name: '服务中心', icon: 'customer-service' }
     };
-    
+
     return moduleMap[segments[0]] || { name: '未知模块', icon: 'question-circle' };
   });
 
@@ -147,7 +147,7 @@ export class GenericPageComponent {
       'improvement': '服务改进',
       'welcome': '欢迎页'
     };
-    
+
     return titleMap[routeSegment] || this.toReadableTitle(routeSegment);
   }
 

@@ -1,11 +1,11 @@
 // 根据菜单配置生成路由配置的工具
 import { MENUS_CONFIG } from '../../config/menu.config';
-import { GenericPageComponent } from './generic-page.component';
+import { GenericPageComponent } from './generic-pag';
 
 // 收集所有菜单链接的函数
 export function getAllMenuLinks(): string[] {
   const links: string[] = [];
-  
+
   Object.values(MENUS_CONFIG).forEach(moduleMenus => {
     moduleMenus.forEach(menu => {
       if (menu.link) {
@@ -20,14 +20,14 @@ export function getAllMenuLinks(): string[] {
       }
     });
   });
-  
+
   return links;
 }
 
 // 生成路由配置的函数
 export function generateMenuRoutes() {
   const links = getAllMenuLinks();
-  
+
   // 为每个链接创建一个路由
   const routes = links.map(link => {
     return {
@@ -35,6 +35,6 @@ export function generateMenuRoutes() {
       component: GenericPageComponent
     };
   });
-  
+
   return routes;
 }

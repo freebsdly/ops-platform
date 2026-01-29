@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { GenericPageComponent } from './generic-page.component';
+import { GenericPageComponent } from './generic-pag';
 import { getAllMenuLinks } from './menu-routes.util';
 
 // 获取所有菜单链接
