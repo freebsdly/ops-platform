@@ -41,6 +41,13 @@
     "ROLE_MANAGEMENT": "Roles",
     "PERMISSION_MANAGEMENT": "Permissions"
   },
+  "LAYOUT": {
+    "HEADER": {
+      "PROFILE": "Profile",
+      "SETTINGS": "Settings",
+      "LOGOUT": "Logout"
+    }
+  },
   "LOGIN": {
     "TITLE": "Sign in to your account",
     "EMAIL_PLACEHOLDER": "Email address",

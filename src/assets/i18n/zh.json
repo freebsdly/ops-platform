@@ -41,6 +41,13 @@
     "ROLE_MANAGEMENT": "角色管理",
     "PERMISSION_MANAGEMENT": "权限管理"
   },
+  "LAYOUT": {
+    "HEADER": {
+      "PROFILE": "个人资料",
+      "SETTINGS": "设置",
+      "LOGOUT": "退出登录"
+    }
+  },
   "LOGIN": {
     "TITLE": "登录到您的账户",
     "EMAIL_PLACEHOLDER": "邮箱地址",
@@ -60,8 +67,8 @@
     }
   },
   "SIDER": {
-      "COLLAPSE": "收起菜单",
-      "EXPAND": "展开菜单"
+    "COLLAPSE": "收起菜单",
+    "EXPAND": "展开菜单"
   },
   "BUTTONS": {
     "SAVE": "保存",
