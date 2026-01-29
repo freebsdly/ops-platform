@@ -12,12 +12,11 @@
   width: 40px;
   font-size: 16px;
   background: linear-gradient(135deg, #e6f7ff 0%, #bae7ff 100%);
-  border: 1px solid #91d5ff;
+  border: none;
 }
 
 .lang-selector-trigger:hover {
   background: linear-gradient(135deg, #bae7ff 0%, #91d5ff 100%);
-  border-color: #69c0ff;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.2);
 }
@@ -59,7 +58,7 @@
   height: 48px;
   display: flex;
   align-items: center;
-  border-left: 1px solid #f0f0f0;
+  border-left: none;
   border-right: none;
   background: transparent;
   width: auto;
