@@ -8,6 +8,15 @@ ul {
   flex: 1;
   overflow-y: auto;
   overflow-x: hidden;
+  /* 隐藏滚动条但保持滚动功能 */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* 隐藏Webkit浏览器滚动条 */
+ul::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 /* Adjust spacing between icon and text in menu items */
