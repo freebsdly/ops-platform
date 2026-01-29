@@ -9,3 +9,17 @@ ul {
   overflow-y: auto;
   overflow-x: hidden;
 }
+
+/* Adjust spacing between icon and text in menu items */
+.ant-menu-item .anticon,
+li[nz-menu-item] .anticon,
+li[nz-menu-item] span[nz-icon] {
+  margin-right: 8px;
+}
+
+/* Ensure proper alignment for collapsed state */
+.ant-menu-inline-collapsed .ant-menu-item .anticon,
+.ant-menu-inline-collapsed li[nz-menu-item] .anticon,
+.ant-menu-inline-collapsed li[nz-menu-item] span[nz-icon] {
+  margin-right: 0;
+}

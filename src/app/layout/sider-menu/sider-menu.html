@@ -5,6 +5,9 @@
         <ul>
           @for (child of item.children; track child.text) {
             <li nz-menu-item nzMatchRouter>
+              @if (child.icon) {
+                <span nz-icon [nzType]="child.icon"></span>
+              }
               @if (child.link) {
                 <a routerLink="{{ child.link }}">{{ child.key | translate }}</a>
               } @else {
