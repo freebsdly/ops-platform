@@ -23,6 +23,7 @@
   box-shadow: var(--sidebar-shadow);
   border-right: 1px solid lightgray;
   background-color: white;
+  overflow: visible;
 }
 
 .app-layout-sider-inner {
@@ -30,6 +31,7 @@
   flex-direction: column;
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 .app-layout-header {

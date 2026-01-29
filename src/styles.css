@@ -1,6 +1,16 @@
 :root {
   /* Colors */
   --primary-color: #1890ff;
+  --bg-white: #ffffff;
+  
+  /* Border radius */
+  --radius-xl: 12px;
+  
+  /* Z-index layers */
+  --z-index-fixed: 1000;
+  
+  /* Shadows */
+  --sidebar-shadow: 2px 0 8px 0 rgba(29, 35, 41, 0.05);
 }
 
 nz-layout,
