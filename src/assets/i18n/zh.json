@@ -41,16 +41,27 @@
     "ROLE_MANAGEMENT": "角色管理",
     "PERMISSION_MANAGEMENT": "权限管理"
   },
-  "LAYOUT": {
-    "HEADER": {
-      "PROFILE": "个人资料",
-      "SETTINGS": "设置",
-      "LOGOUT": "退出登录"
+  "LOGIN": {
+    "TITLE": "登录到您的账户",
+    "EMAIL_PLACEHOLDER": "邮箱地址",
+    "PASSWORD_PLACEHOLDER": "密码",
+    "REMEMBER_ME": "记住我",
+    "FORGOT_PASSWORD": "忘记密码？",
+    "LOGIN_BUTTON": "登录",
+    "REGISTER_LINK": "新用户？创建账户",
+    "SUCCESS": "登录成功",
+    "VALIDATION": {
+      "EMAIL_REQUIRED": "请输入您的邮箱地址",
+      "PASSWORD_REQUIRED": "请输入您的密码"
     },
-    "SIDER": {
+    "ERROR": {
+      "INVALID_CREDENTIALS": "邮箱或密码错误",
+      "SERVER_ERROR": "服务器错误，请稍后重试"
+    }
+  },
+  "SIDER": {
       "COLLAPSE": "收起菜单",
       "EXPAND": "展开菜单"
-    }
   },
   "BUTTONS": {
     "SAVE": "保存",

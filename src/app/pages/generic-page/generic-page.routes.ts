@@ -11,9 +11,8 @@ const routes = menuLinks.map(link => ({
   component: GenericPageComponent
 }));
 
-// 添加欢迎页面路由
+// 导出所有菜单路由
 const allRoutes: Routes = [
-  { path: 'welcome', component: GenericPageComponent },
   ...routes
 ];
 

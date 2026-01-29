@@ -41,16 +41,27 @@
     "ROLE_MANAGEMENT": "Roles",
     "PERMISSION_MANAGEMENT": "Permissions"
   },
-  "LAYOUT": {
-    "HEADER": {
-      "PROFILE": "Profile",
-      "SETTINGS": "Settings",
-      "LOGOUT": "Logout"
+  "LOGIN": {
+    "TITLE": "Sign in to your account",
+    "EMAIL_PLACEHOLDER": "Email address",
+    "PASSWORD_PLACEHOLDER": "Password",
+    "REMEMBER_ME": "Remember me",
+    "FORGOT_PASSWORD": "Forgot password?",
+    "LOGIN_BUTTON": "Sign in",
+    "REGISTER_LINK": "New here? Create an account",
+    "SUCCESS": "Login successful",
+    "VALIDATION": {
+      "EMAIL_REQUIRED": "Please enter your email address",
+      "PASSWORD_REQUIRED": "Please enter your password"
     },
-    "SIDER": {
-      "COLLAPSE": "Collapse menu",
-      "EXPAND": "Expand menu"
+    "ERROR": {
+      "INVALID_CREDENTIALS": "Invalid email or password",
+      "SERVER_ERROR": "Server error, please try again later"
     }
+  },
+  "SIDER": {
+    "COLLAPSE": "Collapse menu",
+    "EXPAND": "Expand menu"
   },
   "BUTTONS": {
     "SAVE": "Save",

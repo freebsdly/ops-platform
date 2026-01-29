@@ -1,35 +1,39 @@
-<nz-layout class="app-layout">
-  <nz-sider
-    class="app-layout-sidebar app-layout-left"
-    nzCollapsible
-    [nzWidth]="248"
-    [nzCollapsedWidth]="48"
-    nzBreakpoint="md"
-    [nzCollapsed]="isCollapsed()"
-    (nzCollapsedChange)="layoutService.setCollapsed($event)"
-    [nzTrigger]="null"
-  >
-    <app-sider class="app-layout-sider-inner" />
-  </nz-sider>
-  
-  <!-- 折叠按钮放在侧边栏外部，定位在侧边栏右侧 -->
-  <app-collapse-button />
-  
-  <nz-layout class="app-layout-right">
-    <nz-header class="app-layout-header">
-      <div class="header-left">
-        <app-module-selector />
-      </div>
-      <div class="header-right">
-        <app-lang-selector />
-        <app-user-info />
-      </div>
-    </nz-header>
-    <nz-content class="app-layout-content">
-      <router-outlet></router-outlet>
-    </nz-content>
-    <nz-footer class="app-layout-footer">
-      <p>footer</p>
-    </nz-footer>
+@if (!isLoginPage()) {
+  <nz-layout class="app-layout">
+    <nz-sider
+      class="app-layout-sidebar app-layout-left"
+      nzCollapsible
+      [nzWidth]="248"
+      [nzCollapsedWidth]="48"
+      nzBreakbreakpoint="md"
+      [nzCollapsed]="isCollapsed()"
+      (nzCollapsedChange)="layoutService.setCollapsed($event)"
+      [nzTrigger]="null"
+    >
+      <app-sider class="app-layout-sider-inner" />
+    </nz-sider>
+    
+    <!-- 折叠按钮放在侧边栏外部，定位在侧边栏右侧 -->
+    <app-collapse-button />
+    
+    <nz-layout class="app-layout-right">
+      <nz-header class="app-layout-header">
+        <div class="header-left">
+          <app-module-selector />
+        </div>
+        <div class="header-right">
+          <app-lang-selector />
+          <app-user-info />
+        </div>
+      </nz-header>
+      <nz-content class="app-layout-content">
+        <router-outlet></router-outlet>
+      </nz-content>
+      <nz-footer class="app-layout-footer">
+        <p>footer</p>
+      </nz-footer>
+    </nz-layout>
   </nz-layout>
-</nz-layout>
+} @else {
+  <router-outlet></router-outlet>
+}

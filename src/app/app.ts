@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
 import { Sider } from './layout/sider/sider';
@@ -22,5 +22,10 @@ export class App {
   logoLink = 'https://ng.ant.design/';
 
   layoutService = inject(LayoutService);
+  private router = inject(Router);
   isCollapsed = this.layoutService.isCollapsed.asReadonly();
+
+  isLoginPage(): boolean {
+    return this.router.url === '/login' || this.router.url.startsWith('/login?');
+  }
 }
