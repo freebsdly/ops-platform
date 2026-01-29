@@ -69,6 +69,21 @@ import {
   UpCircleOutline,
   // 添加API图标
   ApiOutline,
+  // 添加Logout图标
+  LogoutOutline,
+  // 添加其他可能缺少的outline图标
+  InfoCircleOutline,
+  PoweroffOutline,
+  MailOutline,
+  PhoneOutline,
+  EnvironmentOutline,
+  CameraOutline,
+  LaptopOutline,
+  TabletOutline,
+  MobileOutline,
+  BulbOutline,
+  FireOutline,
+  ThunderboltOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const icons = [
@@ -142,4 +157,19 @@ export const icons = [
   UpCircleOutline,
   // 添加可能缺失的图标
   ApiOutline,
+  // 添加Logout图标
+  LogoutOutline,
+  // 添加其他可能缺少的图标
+  InfoCircleOutline,
+  PoweroffOutline,
+  MailOutline,
+  PhoneOutline,
+  EnvironmentOutline,
+  CameraOutline,
+  LaptopOutline,
+  TabletOutline,
+  MobileOutline,
+  BulbOutline,
+  FireOutline,
+  ThunderboltOutline,
 ];
