@@ -49,9 +49,28 @@ export class App implements OnInit {
     if (savedSiderCollapsed) {
       this.storeService.setSiderCollapsed(savedSiderCollapsed === 'true');
     }
+    
+    // Set current module based on initial URL
+    this.setInitialModule();
   }
 
   isLoginPage(): boolean {
     return this.router.url === '/login' || this.router.url.startsWith('/login?');
+  }
+
+  private setInitialModule(): void {
+    const url = this.router.url;
+    const segments = url.split('/').filter(segment => segment.length > 0);
+    
+    // Default to dashboard if no segments or first segment is dashboard
+    let currentModule = segments[0] || 'dashboard';
+    
+    // Check if it's a valid module from MODULES_CONFIG
+    const validModules = ['dashboard', 'configuration', 'monitoring', 'incident', 'service'];
+    if (!validModules.includes(currentModule)) {
+      currentModule = 'dashboard';
+    }
+    
+    this.storeService.setCurrentModule(currentModule);
   }
 }

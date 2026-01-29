@@ -5,6 +5,7 @@ import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
+import { MODULES_CONFIG } from '../../../config/menu.config';
 
 @Injectable()
 export class AuthEffects {
@@ -36,7 +37,13 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.loginSuccess),
         tap(() => {
-          this.router.navigate(['/dashboard']);
+          // 登录成功后重定向到第一个模块的默认路径
+          if (MODULES_CONFIG.length > 0) {
+            this.router.navigate([MODULES_CONFIG[0].defaultPath]);
+          } else {
+            // 如果没有配置模块，重定向到根路径
+            this.router.navigate(['/']);
+          }
         })
       ),
     { dispatch: false }

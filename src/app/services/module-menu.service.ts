@@ -3,11 +3,10 @@
 
 import { Injectable, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
-import { filter } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
+import { filter, map, delay } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MODULES_CONFIG, MENUS_CONFIG, MenuItem, ModuleConfig } from '../config/menu.config';
-import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
 
 export interface ModuleOption {
   id: string;
@@ -43,19 +42,62 @@ export class ModuleMenuService {
   }
 
   getCurrentModuleId(): Observable<string> {
-    // This is a simplified implementation
-    // In a real app, you would track current module based on URL
-    return of('dashboard').pipe(delay(50));
+    // 基于当前URL确定当前模块
+    const currentUrl = this.router.url;
+    const segments = currentUrl.split('/').filter(segment => segment.length > 0);
+    
+    if (segments.length === 0) {
+      return of('dashboard'); // 默认仪表板
+    }
+    
+    // 从URL的第一个段获取模块ID
+    const moduleId = segments[0];
+    const moduleConfig = MODULES_CONFIG.find(m => m.id === moduleId);
+    
+    if (moduleConfig) {
+      return of(moduleId).pipe(delay(50));
+    }
+    
+    return of('dashboard').pipe(delay(50)); // 回退到仪表板
+  }
+
+  getCurrentModule(): Observable<ModuleConfig | null> {
+    const currentUrl = this.router.url;
+    const segments = currentUrl.split('/').filter(segment => segment.length > 0);
+    
+    if (segments.length === 0) {
+      return of(null).pipe(delay(50));
+    }
+    
+    const moduleId = segments[0];
+    const moduleConfig = MODULES_CONFIG.find(m => m.id === moduleId);
+    
+    return of(moduleConfig || null).pipe(delay(50));
+  }
+
+  // 监听模块变化
+  listenToModuleChanges(): Observable<string> {
+    return this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd),
+      map(event => {
+        const url = (event as NavigationEnd).url;
+        const segments = url.split('/').filter(segment => segment.length > 0);
+        return segments[0] || 'dashboard';
+      }),
+      takeUntilDestroyed()
+    );
   }
 
   getAvailableModules(): Observable<ModuleOption[]> {
+    const currentModuleId = this.router.url.split('/').filter(segment => segment.length > 0)[0];
+    
     const modules = MODULES_CONFIG.map(module => ({
       id: module.id,
       title: module.title,
       icon: module.icon,
       color: module.color,
       defaultPath: module.defaultPath,
-      isActive: module.id === 'dashboard', // Simplified
+      isActive: module.id === currentModuleId,
     }));
     return of(modules).pipe(delay(100));
   }

@@ -15,7 +15,7 @@ export class ModuleEffects {
       ofType(ModuleActions.loadModules),
       mergeMap(() =>
         this.moduleMenuService.getModules().pipe(
-          map((modules) => ModuleActions.loadModulesSuccess({ modules })),
+          map((modules: string[]) => ModuleActions.loadModulesSuccess({ modules })),
           catchError((error) =>
             of(ModuleActions.loadModulesFailure({ error: error.message }))
           )

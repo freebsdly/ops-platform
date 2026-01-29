@@ -1,6 +1,6 @@
 // 根据菜单配置生成路由配置的工具
 import { MENUS_CONFIG } from '../../config/menu.config';
-import { GenericPageComponent } from './generic-pag';
+import { GenericPageComponent } from './generic-page.component';
 
 // 收集所有菜单链接的函数
 export function getAllMenuLinks(): string[] {

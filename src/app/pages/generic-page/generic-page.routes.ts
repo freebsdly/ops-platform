@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { GenericPageComponent } from './generic-pag';
+import { GenericPageComponent } from './generic-page.component';
 import { getAllMenuLinks } from './menu-routes.util';
 import { AuthGuard } from '../../guards/auth.guard';
 

@@ -1,33 +1,36 @@
-<ul nz-menu nzTheme="light" nzMode="inline" [nzInlineCollapsed]="isCollapsed$ | async">
-  @for (item of menuData; track item.key) {
-    @if (item.children && item.children.length > 0) {
-      <li nz-submenu [nzOpen]="item.open || false" [nzTitle]="item.key | translate" [nzIcon]="item.icon || null">
-        <ul>
-          @for (child of item.children; track child.key) {
-            <li nz-menu-item nzMatchRouter>
-              @if (child.icon) {
-                <span nz-icon [nzType]="child.icon"></span>
-              }
-              @if (child.link) {
-                <a routerLink="{{ child.link }}">{{ child.key | translate }}</a>
-              } @else {
-                <a>{{ child.key | translate }}</a>
-              }
-            </li>
+@let vm = vm$ | async;
+@if (vm) {
+  <ul nz-menu nzTheme="light" nzMode="inline" [nzInlineCollapsed]="vm.isCollapsed">
+    @for (item of vm.menuData; track trackByMenuId($index, item)) {
+      @if (item.children && item.children.length > 0) {
+        <li nz-submenu [nzOpen]="item.open || false" [nzTitle]="item.key | translate" [nzIcon]="item.icon || null">
+          <ul>
+            @for (child of item.children; track trackByMenuId($index, child)) {
+              <li nz-menu-item nzMatchRouter>
+                @if (child.icon) {
+                  <span nz-icon [nzType]="child.icon"></span>
+                }
+                @if (child.link) {
+                  <a routerLink="{{ child.link }}">{{ child.key | translate }}</a>
+                } @else {
+                  <a>{{ child.key | translate }}</a>
+                }
+              </li>
+            }
+          </ul>
+        </li>
+      } @else {
+        <li nz-menu-item nzMatchRouter>
+          @if (item.icon) {
+            <span nz-icon [nzType]="item.icon"></span>
           }
-        </ul>
-      </li>
-    } @else {
-      <li nz-menu-item nzMatchRouter>
-        @if (item.icon) {
-          <span nz-icon [nzType]="item.icon"></span>
-        }
-        @if (item.link) {
-          <a routerLink="{{ item.link }}">{{ item.key | translate }}</a>
-        } @else {
-          <a>{{ item.key | translate }}</a>
-        }
-      </li>
+          @if (item.link) {
+            <a routerLink="{{ item.link }}">{{ item.key | translate }}</a>
+          } @else {
+            <a>{{ item.key | translate }}</a>
+          }
+        </li>
+      }
     }
-  }
-</ul>
+  </ul>
+}
