@@ -8,12 +8,12 @@ export class AuthService {
   private readonly userKey = 'user';
   private readonly tabsKey = 'app_tabs';
   
-  isAuthenticated = signal<boolean>(!!localStorage.getItem(this.tokenKey));
-  user = signal<{ name: string; email: string } | null>(
-    localStorage.getItem(this.userKey) 
+  authState = signal<{isAuthenticated: boolean; user: { name: string; email: string } | null}>({
+    isAuthenticated: !!localStorage.getItem(this.tokenKey),
+    user: localStorage.getItem(this.userKey) 
       ? JSON.parse(localStorage.getItem(this.userKey)!) 
       : null
-  );
+  });
 
   login(email: string, password: string): Promise<boolean> {
     // Simulate API call
@@ -29,8 +29,10 @@ export class AuthService {
         localStorage.setItem(this.tokenKey, token);
         localStorage.setItem(this.userKey, JSON.stringify(user));
         
-        this.isAuthenticated.set(true);
-        this.user.set(user);
+        this.authState.set({
+          isAuthenticated: true,
+          user: user
+        });
         resolve(true);
       }, 500);
     });
@@ -40,11 +42,17 @@ export class AuthService {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
     localStorage.removeItem(this.tabsKey);
-    this.isAuthenticated.set(false);
-    this.user.set(null);
+    this.authState.set({
+      isAuthenticated: false,
+      user: null
+    });
   }
 
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
+  }
+
+  isAuthenticated(): boolean {
+    return !!localStorage.getItem(this.tokenKey);
   }
 }

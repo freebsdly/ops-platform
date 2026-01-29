@@ -23,7 +23,12 @@
         </div>
         <div class="header-right">
           <app-lang-selector />
-          <app-user-info />
+          @if (authState().isAuthenticated && getUserInfoData()) {
+            <app-user-info 
+              [user]="getUserInfoData()!" 
+              (onLogout)="handleLogout()"
+            />
+          }
         </div>
       </nz-header>
       <nz-content class="app-layout-content">
