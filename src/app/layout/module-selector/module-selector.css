@@ -189,14 +189,15 @@
 /* Header-specific styles */
 :host-context(.app-layout-header) .module-selector-trigger {
   border-radius: 0;
-  padding: 0 12px;
+  padding: 0;
   height: 48px;
+  width: 48px;
   display: flex;
   align-items: center;
+  justify-content: center;
   border-left: none;
   border-right: none;
   background: transparent;
-  width: auto;
 }
 
 :host-context(.app-layout-header) .module-selector-trigger:hover {
