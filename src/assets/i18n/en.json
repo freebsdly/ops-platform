@@ -204,6 +204,7 @@
     "BULK_WORK_ORDER_PROCESSING": "Bulk Work Order Processing",
     "SELF_SERVICE": "Self Service",
     "SERVICE_REPORT": "Service Report",
+    "SERVICE_REPORT_DETAIL": "Service Report Details",
     "WORK_ORDER_STATISTICS": "Work Order Statistics",
     "COST_ALLOCATION": "Cost Allocation",
     "SERVICE_IMPROVEMENT": "Service Improvement"

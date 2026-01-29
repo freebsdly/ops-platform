@@ -224,7 +224,7 @@ export const MENUS_CONFIG: Record<string, MenuItem[]> = {
       children: [
         { key: 'CONFIG.SERVICE_REPORT', text: '服务报告', icon: 'file-text', link: '/service/collaboration/report' },
         { key: 'CONFIG.WORK_ORDER_STATISTICS', text: '工单统计', icon: 'bar-chart', link: '/service/collaboration/statistics' },
-        { key: 'CONFIG.SERVICE_REPORT', text: '服务报告', icon: 'file-text', link: '/service/collaboration/service-report' },
+        { key: 'CONFIG.SERVICE_REPORT_DETAIL', text: '服务报告详情', icon: 'file-text', link: '/service/collaboration/service-report' },
         { key: 'CONFIG.COST_ALLOCATION', text: '成本分摊', icon: 'dollar', link: '/service/collaboration/cost' },
         { key: 'CONFIG.DATA_ANALYSIS', text: '数据分析', icon: 'line-chart', link: '/service/collaboration/analysis' },
         { key: 'CONFIG.SERVICE_IMPROVEMENT', text: '服务改进', icon: 'up-circle', link: '/service/collaboration/improvement' },

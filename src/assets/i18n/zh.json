@@ -204,6 +204,7 @@
     "BULK_WORK_ORDER_PROCESSING": "批量工单处理",
     "SELF_SERVICE": "自助服务",
     "SERVICE_REPORT": "服务报告",
+    "SERVICE_REPORT_DETAIL": "服务报告详情",
     "WORK_ORDER_STATISTICS": "工单统计",
     "COST_ALLOCATION": "成本分摊",
     "SERVICE_IMPROVEMENT": "服务改进"
