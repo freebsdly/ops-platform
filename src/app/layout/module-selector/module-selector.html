@@ -18,7 +18,7 @@
       </div>
       <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex">
         @for (module of modules(); track module.id) {
-          <div nz-flex [nzFlex]="'0 0 calc(25% - 6px)'">
+          <div nz-flex [nzFlex]="'0 0 calc((100% - 24px) / 4)'">
             <button
               class="module-card"
               [class.module-card-selected]="module.isActive"
