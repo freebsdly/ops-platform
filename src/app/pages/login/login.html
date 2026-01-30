@@ -25,7 +25,8 @@
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" nz-form nzLayout="vertical">
         <nz-form-item>
           <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.EMAIL_REQUIRED' | translate">
-            <nz-input-group nzPrefixIcon="user" nzSize="large">
+            <nz-input-wrapper nzSize="large">
+              <nz-icon nzInputPrefix nzType="user-outlined" />
               <input
                 nz-input
                 [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate"
@@ -33,13 +34,14 @@
                 type="email"
                 autocomplete="email"
               />
-            </nz-input-group>
+            </nz-input-wrapper>
           </nz-form-control>
         </nz-form-item>
 
         <nz-form-item>
           <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.PASSWORD_REQUIRED' | translate">
-            <nz-input-group nzPrefixIcon="lock" nzSize="large">
+            <nz-input-password nzSize="large">
+              <nz-icon nzInputPrefix nzType="lock" />
               <input
                 nz-input
                 [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
@@ -47,7 +49,14 @@
                 type="password"
                 autocomplete="current-password"
               />
-            </nz-input-group>
+              <ng-template nzInputPasswordIcon let-visible>
+                @if (visible) {
+                  <nz-icon nzType="eye" nzTheme="twotone" />
+                } @else {
+                  <nz-icon nzType="eye-invisible" nzTheme="outline" />
+                }
+              </ng-template>
+            </nz-input-password>
           </nz-form-control>
         </nz-form-item>
 

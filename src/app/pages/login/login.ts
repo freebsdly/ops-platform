@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -41,6 +41,8 @@ export class LoginComponent implements OnInit {
   private message = inject(NzMessageService);
   private translate = inject(TranslateService);
   private storeService = inject(StoreService);
+
+  readonly passwordVisible = signal(false);
 
   loginForm!: FormGroup;
 
