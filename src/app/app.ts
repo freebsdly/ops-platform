@@ -9,7 +9,7 @@ import { UserInfo } from './layout/user-info/user-info';
 import { LangSelector } from './layout/lang-selector/lang-selector';
 import { ModuleSelector } from './layout/module-selector/module-selector';
 import { StoreService } from './core/stores/store.service';
-import { RouteLoadingIndicatorComponent } from './components/route-loading-indicator.component';
+import { Loading } from './layout/loading/loading';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
@@ -25,7 +25,7 @@ import { AuthService } from './services/auth.service';
     UserInfo, 
     LangSelector, 
     ModuleSelector,
-    RouteLoadingIndicatorComponent
+    Loading
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
