@@ -10,10 +10,22 @@ import { LangSelector } from './layout/lang-selector/lang-selector';
 import { ModuleSelector } from './layout/module-selector/module-selector';
 import { StoreService } from './core/stores/store.service';
 import { AsyncPipe } from '@angular/common';
+import { RouteLoadingIndicatorComponent } from './components/route-loading-indicator.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, NzIconModule, NzLayoutModule, Sider, CollapseButton, UserInfo, LangSelector, ModuleSelector, AsyncPipe],
+  imports: [
+    RouterOutlet, 
+    NzIconModule, 
+    NzLayoutModule, 
+    Sider, 
+    CollapseButton, 
+    UserInfo, 
+    LangSelector, 
+    ModuleSelector, 
+    AsyncPipe,
+    RouteLoadingIndicatorComponent
+  ],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
