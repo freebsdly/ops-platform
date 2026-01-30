@@ -162,11 +162,13 @@
 }
 
 .input-wrapper:hover,
-.password-wrapper:hover,
+.password-wrapper:hover {
+  border-color: #d1d5db !important;
+}
+
 .input-wrapper:focus-within,
 .password-wrapper:focus-within {
   border-color: #3b82f6 !important;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .input-icon {
@@ -451,7 +453,6 @@
 }
 
 /* Focus styles for better accessibility */
-.input-field:focus,
 .login-button:focus,
 .social-button:focus {
   outline: 2px solid #3b82f6;
