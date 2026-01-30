@@ -1,0 +1,397 @@
+/* Login Page Styles - Optimized Version */
+
+.login-container {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Background Styles */
+.background-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+}
+
+.gradient-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  opacity: 0.95;
+}
+
+/* Content Wrapper */
+.content-wrapper {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 420px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lang-selector-wrapper {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+}
+
+/* Login Card */
+.login-card {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Brand Section */
+.brand-section {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.brand-logo {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.logo-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3);
+}
+
+.logo-icon nz-icon {
+  font-size: 28px;
+}
+
+.brand-title {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.brand-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Form Section */
+.form-section {
+  margin-bottom: 32px;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #1f2937;
+  margin: 0 0 8px 0;
+  text-align: center;
+}
+
+.form-subtitle {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 0 0 24px 0;
+  text-align: center;
+}
+
+.form-item {
+  margin-bottom: 20px !important;
+}
+
+.input-wrapper,
+.password-wrapper {
+  border-radius: 12px !important;
+  overflow: hidden;
+  border: 1px solid #e5e7eb !important;
+  transition: border-color 0.2s ease;
+}
+
+.input-wrapper:hover,
+.password-wrapper:hover,
+.input-wrapper:focus-within,
+.password-wrapper:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.input-icon {
+  color: #9ca3af;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.input-field {
+  font-size: 14px;
+  color: #1f2937;
+}
+
+.input-field::placeholder {
+  color: #9ca3af;
+}
+
+.eye-icon {
+  color: #9ca3af;
+  font-size: 16px;
+}
+
+/* Options Row */
+.options-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.remember-checkbox {
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.remember-checkbox .ant-checkbox-inner {
+  border-radius: 6px;
+  border-color: #d1d5db;
+}
+
+.forgot-password-link {
+  font-size: 14px;
+  color: #3b82f6;
+  text-decoration: none;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.forgot-password-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Login Button */
+.login-button {
+  height: 48px;
+  border-radius: 12px !important;
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  margin-bottom: 24px;
+}
+
+.login-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px rgba(59, 130, 246, 0.3) !important;
+}
+
+.login-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Divider */
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e5e7eb;
+  transform: translateY(-50%);
+}
+
+.divider-text {
+  position: relative;
+  background: white;
+  padding: 0 16px;
+  font-size: 12px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Social Login */
+.social-login-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.social-button {
+  height: 44px;
+  border-radius: 12px !important;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease !important;
+  border: 1px solid #e5e7eb !important;
+  color: #374151 !important;
+  background: white !important;
+}
+
+.social-button:hover {
+  border-color: #3b82f6 !important;
+  color: #3b82f6 !important;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+}
+
+.social-button nz-icon {
+  font-size: 16px;
+}
+
+/* Register Section */
+.register-section {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.register-text {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.register-link {
+  font-size: 14px;
+  font-weight: 600;
+  color: #3b82f6;
+  text-decoration: none;
+  margin-left: 8px;
+  transition: color 0.2s ease;
+  cursor: pointer;
+}
+
+.register-link:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Footer Section */
+.footer-section {
+  text-align: center;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
+}
+
+.footer-text {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* Error Alert */
+.error-alert-wrapper {
+  width: 100%;
+  max-width: 420px;
+  margin-top: 16px;
+}
+
+.error-alert {
+  border-radius: 12px !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  backdrop-filter: blur(10px);
+  background: rgba(239, 68, 68, 0.05) !important;
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .content-wrapper {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .login-card {
+    padding: 32px 24px;
+    border-radius: 20px;
+  }
+
+  .brand-title {
+    font-size: 24px;
+  }
+
+  .logo-icon {
+    width: 56px;
+    height: 56px;
+  }
+
+  .logo-icon nz-icon {
+    font-size: 24px;
+  }
+
+  .form-title {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    padding: 24px 20px;
+    border-radius: 16px;
+  }
+
+  .options-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .social-login-section {
+    gap: 8px;
+  }
+}
+
+/* Accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .login-card,
+  .login-button,
+  .social-button {
+    transition: none;
+  }
+}
+
+/* Focus styles for better accessibility */
+.input-field:focus,
+.login-button:focus,
+.social-button:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}

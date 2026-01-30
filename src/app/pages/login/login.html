@@ -1,97 +1,148 @@
-<div
-  class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8"
->
-  <div class="w-full max-w-md">
-    <nz-card class="shadow-xl rounded-2xl overflow-hidden relative">
-      <div class="text-center mb-8">
-        <div
-          class="mx-auto w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4"
-        >
-          <span nz-icon nzType="lock" nzTheme="outline" class="text-white text-2xl"></span>
+<div class="login-container">
+  <!-- Background with gradient and decorative elements -->
+  <div class="background-wrapper">
+    <div class="gradient-bg"></div>
+    <div class="decoration-circle circle-1"></div>
+    <div class="decoration-circle circle-2"></div>
+    <div class="decoration-circle circle-3"></div>
+    <div class="decoration-blur blob-1"></div>
+    <div class="decoration-blur blob-2"></div>
+  </div>
+
+  <!-- Main content -->
+  <div class="content-wrapper">
+    <!-- Language switcher -->
+    <div class="lang-selector-wrapper">
+      <app-lang-selector />
+    </div>
+
+    <div class="login-card">
+      <!-- Brand section -->
+      <div class="brand-section">
+        <div class="brand-logo">
+          <div class="logo-icon">
+            <span nz-icon nzType="cloud-server" nzTheme="outline" class="text-white"></span>
+          </div>
         </div>
-        <h2 class="text-3xl font-bold text-gray-900">
-          {{ 'LOGIN.TITLE' | translate }}
-        </h2>
-        <p class="mt-2 text-sm text-gray-600">
-          {{ 'APP.DESCRIPTION' | translate }}
-        </p>
+        <div class="brand-text">
+          <h1 class="brand-title">DevOps Platform</h1>
+          <p class="brand-subtitle">{{ 'APP.DESCRIPTION' | translate }}</p>
+        </div>
       </div>
 
-      <!-- Language switcher in top right corner -->
-      <div class="absolute top-4 right-4">
-        <app-lang-selector />
+      <!-- Login form -->
+      <div class="form-section">
+        <h2 class="form-title">{{ 'LOGIN.TITLE' | translate }}</h2>
+        <p class="form-subtitle">{{ 'LOGIN.SUBTITLE' | translate }}</p>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" nz-form nzLayout="vertical">
+          <!-- Email field -->
+          <nz-form-item class="form-item">
+            <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.EMAIL_REQUIRED' | translate">
+              <nz-input-wrapper nzSize="large" class="input-wrapper">
+                <nz-icon nzInputPrefix nzType="user" class="input-icon" />
+                <input
+                  nz-input
+                  [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate"
+                  formControlName="email"
+                  type="email"
+                  autocomplete="email"
+                  class="input-field"
+                />
+              </nz-input-wrapper>
+            </nz-form-control>
+          </nz-form-item>
+
+          <!-- Password field -->
+          <nz-form-item class="form-item">
+            <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.PASSWORD_REQUIRED' | translate">
+              <nz-input-password nzSize="large" class="password-wrapper">
+                <nz-icon nzInputPrefix nzType="lock" class="input-icon" />
+                <input
+                  nz-input
+                  [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
+                  formControlName="password"
+                  type="password"
+                  autocomplete="current-password"
+                  class="input-field"
+                />
+                <ng-template nzInputPasswordIcon let-visible>
+                  @if (visible) {
+                    <nz-icon nzType="eye" nzTheme="twotone" class="eye-icon" />
+                  } @else {
+                    <nz-icon nzType="eye-invisible" nzTheme="outline" class="eye-icon" />
+                  }
+                </ng-template>
+              </nz-input-password>
+            </nz-form-control>
+          </nz-form-item>
+
+          <!-- Options row -->
+          <div class="options-row">
+            <label nz-checkbox formControlName="rememberMe" class="remember-checkbox">
+              <span>{{ 'LOGIN.REMISTER_ME' | translate }}</span>
+            </label>
+            <a class="forgot-password-link">
+              {{ 'LOGIN.FORGOT_PASSWORD' | translate }}
+            </a>
+          </div>
+
+          <!-- Login button -->
+          <button
+            nz-button
+            nzType="primary"
+            nzBlock
+            nzSize="large"
+            [nzLoading]="isLoading$ | async"
+            [disabled]="loginForm.invalid || (isLoading$ | async)"
+            type="submit"
+            class="login-button"
+          >
+            {{ 'LOGIN.LOGIN_BUTTON' | translate }}
+          </button>
+
+          <!-- Divider -->
+          <div class="divider">
+            <span class="divider-text">{{ 'LOGIN.DIVIDER' | translate }}</span>
+          </div>
+
+          <!-- Social login options -->
+          <div class="social-login-section">
+            <button nz-button nzBlock nzSize="large" class="social-button github-button">
+              <nz-icon nzType="github" nzTheme="outline"></nz-icon>
+              <span>{{ 'LOGIN.SOCIAL.GITHUB' | translate }}</span>
+            </button>
+            <button nz-button nzBlock nzSize="large" class="social-button google-button">
+              <nz-icon nzType="google" nzTheme="outline"></nz-icon>
+              <span>{{ 'LOGIN.SOCIAL.GOOGLE' | translate }}</span>
+            </button>
+          </div>
+
+          <!-- Register link -->
+          <div class="register-section">
+            <span class="register-text">{{ 'LOGIN.REGISTER_TEXT' | translate }}</span>
+            <a class="register-link">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
+          </div>
+        </form>
       </div>
 
-      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" nz-form nzLayout="vertical">
-        <nz-form-item>
-          <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.EMAIL_REQUIRED' | translate">
-            <nz-input-wrapper nzSize="large">
-              <nz-icon nzInputPrefix nzType="user-outlined" />
-              <input
-                nz-input
-                [placeholder]="'LOGIN.EMAIL_PLACEHOLDER' | translate"
-                formControlName="email"
-                type="email"
-                autocomplete="email"
-              />
-            </nz-input-wrapper>
-          </nz-form-control>
-        </nz-form-item>
+      <!-- Footer -->
+      <div class="footer-section">
+        <span class="footer-text">{{ 'LOGIN.FOOTER' | translate }}</span>
+      </div>
+    </div>
 
-        <nz-form-item>
-          <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.PASSWORD_REQUIRED' | translate">
-            <nz-input-password nzSize="large">
-              <nz-icon nzInputPrefix nzType="lock" />
-              <input
-                nz-input
-                [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
-                formControlName="password"
-                type="password"
-                autocomplete="current-password"
-              />
-              <ng-template nzInputPasswordIcon let-visible>
-                @if (visible) {
-                  <nz-icon nzType="eye" nzTheme="twotone" />
-                } @else {
-                  <nz-icon nzType="eye-invisible" nzTheme="outline" />
-                }
-              </ng-template>
-            </nz-input-password>
-          </nz-form-control>
-        </nz-form-item>
-
-        <div class="flex items-center justify-between mb-6">
-          <label nz-checkbox formControlName="rememberMe">
-            <span>{{ 'LOGIN.REMEMBER_ME' | translate }}</span>
-          </label>
-          <a class="text-sm text-blue-600 hover:text-blue-500" href="#">
-            {{ 'LOGIN.FORGOT_PASSWORD' | translate }}
-          </a>
-        </div>
-
-        <button
-          nz-button
-          nzType="primary"
-          nzBlock
-          nzSize="large"
-          [nzLoading]="isLoading$ | async"
-          [disabled]="loginForm.invalid || (isLoading$ | async)"
-          type="submit"
-          class="mb-4"
-        >
-          {{ 'LOGIN.LOGIN_BUTTON' | translate }}
-        </button>
-
-        <div class="text-center">
-          <span class="text-sm text-gray-600">
-            {{ 'LOGIN.REGISTER_LINK' | translate }}
-          </span>
-        </div>
-      </form>
-    </nz-card>
-
+    <!-- Error alert -->
     @if (authError$ | async; as error) {
-      <nz-alert nzType="error" [nzMessage]="error" class="mt-4" nzShowIcon></nz-alert>
+      <div class="error-alert-wrapper">
+        <nz-alert
+          nzType="error"
+          [nzMessage]="error"
+          nzShowIcon
+          nzCloseable
+          class="error-alert"
+        ></nz-alert>
+      </div>
     }
   </div>
 </div>

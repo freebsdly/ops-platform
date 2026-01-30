@@ -1,7 +1,8 @@
 {
   "APP": {
     "TITLE": "运维管理平台",
-    "DESCRIPTION": "企业级运维管理与监控平台"
+    "DESCRIPTION": "企业级运维管理与监控平台",
+    "BRAND_NAME": "DevOps Platform"
   },
   "MENU": {
     "DASHBOARD_MAIN": "仪表板",
@@ -57,6 +58,12 @@
     "LOGIN_BUTTON": "登录",
     "REGISTER_LINK": "新用户？创建账户",
     "SUCCESS": "登录成功",
+    "SUBTITLE": "使用您的账户凭据登录",
+    "REMISTER_ME": "记住登录状态",
+    "DIVIDER": "或使用以下方式登录",
+    "REGISTER_TEXT": "还没有账户？",
+    "REGISTER_LINK": "立即注册",
+    "FOOTER": "© 2024 DevOps Platform. 保留所有权利。",
     "VALIDATION": {
       "EMAIL_REQUIRED": "请输入您的邮箱地址",
       "PASSWORD_REQUIRED": "请输入您的密码"
@@ -64,6 +71,10 @@
     "ERROR": {
       "INVALID_CREDENTIALS": "邮箱或密码错误",
       "SERVER_ERROR": "服务器错误，请稍后重试"
+    },
+    "SOCIAL": {
+      "GITHUB": "使用 GitHub 登录",
+      "GOOGLE": "使用 Google 登录"
     }
   },
   "SIDER": {

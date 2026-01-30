@@ -1,7 +1,8 @@
 {
   "APP": {
     "TITLE": "Ops Management Platform",
-    "DESCRIPTION": "Enterprise-level operations management and monitoring platform"
+    "DESCRIPTION": "Enterprise-level operations management and monitoring platform",
+    "BRAND_NAME": "DevOps Platform"
   },
   "MENU": {
     "DASHBOARD_MAIN": "Dashboard",
@@ -57,6 +58,12 @@
     "LOGIN_BUTTON": "Sign in",
     "REGISTER_LINK": "New here? Create an account",
     "SUCCESS": "Login successful",
+    "SUBTITLE": "Sign in with your account credentials",
+    "REMEMBER_ME": "Remember me",
+    "DIVIDER": "Or continue with",
+    "REGISTER_TEXT": "Don't have an account?",
+    "REGISTER_LINK": "Sign up now",
+    "FOOTER": "© 2024 DevOps Platform. All rights reserved.",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Please enter your email address",
       "PASSWORD_REQUIRED": "Please enter your password"
@@ -64,6 +71,10 @@
     "ERROR": {
       "INVALID_CREDENTIALS": "Invalid email or password",
       "SERVER_ERROR": "Server error, please try again later"
+    },
+    "SOCIAL": {
+      "GITHUB": "Continue with GitHub",
+      "GOOGLE": "Continue with Google"
     }
   },
   "SIDER": {
