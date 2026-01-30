@@ -26,9 +26,6 @@
 <nz-dropdown-menu #moduleMenu="nzDropdownMenu" class="module-dropdown-menu">
   <div class="module-menu-wrapper">
     <div class="module-menu-content">
-      <div class="module-menu-header">
-        <span class="module-menu-title">{{ 'MODULE_SELECTOR.TITLE' | translate }}</span>
-      </div>
       <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex">
         @if (availableModules$ | async; as modules) {
           @if (currentModule$ | async; as currentModuleId) {
