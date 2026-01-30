@@ -49,8 +49,6 @@ export class LoginComponent implements OnInit {
   private translate = inject(TranslateService);
   private storeService = inject(StoreService);
 
-  readonly passwordVisible = signal(false);
-
   loginForm!: FormGroup;
 
   // NgRx state observables

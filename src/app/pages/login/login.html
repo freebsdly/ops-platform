@@ -48,7 +48,10 @@
                   type="email"
                   autocomplete="email"
                   class="input-field"
+                  aria-label="Email address"
+                  aria-describedby="email-description"
                 />
+                <div id="email-description" class="sr-only">Enter your email address to log in</div>
               </nz-input-wrapper>
             </nz-form-control>
           </nz-form-item>
@@ -64,7 +67,10 @@
                   formControlName="password"
                   autocomplete="current-password"
                   class="input-field"
+                  aria-label="Password"
+                  aria-describedby="password-description"
                 />
+                <div id="password-description" class="sr-only">Enter your password. Click the eye icon to show or hide the password</div>
               </nz-input-password>
             </nz-form-control>
           </nz-form-item>
@@ -74,7 +80,7 @@
             <label nz-checkbox formControlName="rememberMe" class="remember-checkbox">
               <span>{{ 'LOGIN.REMEMBER_ME' | translate }}</span>
             </label>
-            <a class="forgot-password-link">
+            <a class="forgot-password-link" role="button" tabindex="0" aria-label="Forgot password?">
               <span>{{ 'LOGIN.FORGOT_PASSWORD' | translate }}</span>
             </a>
           </div>
@@ -113,7 +119,7 @@
           <!-- Register link -->
           <div class="register-section">
             <span class="register-text">{{ 'LOGIN.REGISTER_TEXT' | translate }}</span>
-            <a class="register-link">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
+            <a class="register-link" role="button" tabindex="0" aria-label="Register for an account">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
           </div>
         </form>
       </div>
