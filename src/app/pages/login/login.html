@@ -62,17 +62,9 @@
                   nz-input
                   [placeholder]="'LOGIN.PASSWORD_PLACEHOLDER' | translate"
                   formControlName="password"
-                  type="password"
                   autocomplete="current-password"
                   class="input-field"
                 />
-                <ng-template nzInputPasswordIcon let-visible>
-                  @if (visible) {
-                    <nz-icon nzType="eye" nzTheme="twotone" class="eye-icon" />
-                  } @else {
-                    <nz-icon nzType="eye-invisible" nzTheme="outline" class="eye-icon" />
-                  }
-                </ng-template>
               </nz-input-password>
             </nz-form-control>
           </nz-form-item>
