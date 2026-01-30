@@ -1,14 +1,20 @@
 /* Login Page Styles - Optimized Version */
 
+:host {
+  display: block;
+  min-height: 100vh;
+  width: 100%;
+}
+
 .login-container {
   position: relative;
   min-height: 100vh;
   width: 100%;
   overflow: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* Background Styles */
@@ -36,7 +42,6 @@
   position: relative;
   z-index: 10;
   width: 100%;
-  min-width: 420px;
   max-width: 420px;
   padding: 24px;
   display: flex;
@@ -383,8 +388,8 @@
   .content-wrapper {
     padding: 16px;
     max-width: 100%;
-    min-width: 100%;
     width: 100%;
+    margin: 0 auto;
   }
 
   .login-card {
