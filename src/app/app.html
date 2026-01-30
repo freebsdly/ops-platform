@@ -1,6 +1,6 @@
 <app-route-loading-indicator />
 
-@if (!isLoginPage()) {
+@if (showLayout()) {
   <nz-layout class="app-layout">
     <nz-sider
       class="app-layout-sidebar app-layout-left"
@@ -8,7 +8,7 @@
       [nzWidth]="248"
       [nzCollapsedWidth]="48"
       nzBreakbreakpoint="md"
-      [nzCollapsed]="isSiderCollapsed$ | async"
+      [nzCollapsed]="isSiderCollapsedSig()"
       (nzCollapsedChange)="storeService.setSiderCollapsed($event)"
       [nzTrigger]="null"
     >
@@ -25,7 +25,7 @@
         </div>
         <div class="header-right">
           <app-lang-selector />
-          @if ((isAuthenticated$ | async) && (user$ | async); as user) {
+          @if (isAuthenticatedSig() && userSig(); as user) {
             <app-user-info 
               [user]="{
                 name: user?.name || '',

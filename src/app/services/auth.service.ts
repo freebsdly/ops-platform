@@ -65,6 +65,23 @@ export class AuthService {
     return of({ user, token }).pipe(delay(100));
   }
 
+  // Synchronous check for initial app loading
+  checkAuthSync(): { user: User | null; token: string | null } {
+    const token = localStorage.getItem(this.tokenKey);
+    const userStr = localStorage.getItem(this.userKey);
+
+    let user: User | null = null;
+    if (userStr) {
+      try {
+        user = JSON.parse(userStr);
+      } catch {
+        user = null;
+      }
+    }
+
+    return { user, token };
+  }
+
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
