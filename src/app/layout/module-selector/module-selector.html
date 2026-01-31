@@ -17,9 +17,6 @@
   <div class="module-menu-wrapper">
     <div class="module-menu-content">
       @if (viewModel().length > 0) {
-        <div class="module-menu-header">
-          <span class="module-menu-title">{{ 'layout.modules.selectModule' | translate }}</span>
-        </div>
         <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex" role="list" aria-label="Available modules">
           @for (module of viewModel(); track trackByModuleId($index, module)) {
             <div nz-flex [nzFlex]="'0 0 calc((100% - 24px) / 4)'" role="listitem">
