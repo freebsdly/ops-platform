@@ -8,6 +8,13 @@ export interface MenuItem {
   link?: string;     // 路由链接
   children?: MenuItem[]; // 子菜单
   open?: boolean;    // 是否默认展开
+  // 新增权限控制字段
+  permission?: {
+    resource: string;
+    action: string;
+  };
+  roles?: string[]; // 允许访问的角色ID列表
+  visible?: boolean; // 是否可见，可以通过函数动态计算
 }
 
 export interface ModuleConfig {

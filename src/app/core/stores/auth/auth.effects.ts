@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import * as AuthActions from './auth.actions';
+import * as PermissionActions from './permission.actions';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { MODULES_CONFIG } from '../../../config/menu.config';
@@ -32,10 +33,46 @@ export class AuthEffects {
     )
   );
 
-  loginSuccess$ = createEffect(
+  loginSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.loginSuccess),
+      map(() => PermissionActions.loadPermissions())
+    )
+  );
+
+  checkAuth$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.checkAuth),
+      mergeMap(() =>
+        this.authService.checkAuth().pipe(
+          map((response) =>
+            AuthActions.checkAuthSuccess({
+              user: response.user,
+              token: response.token,
+            })
+          ),
+          catchError(() => of(AuthActions.checkAuthSuccess({ user: null, token: null })))
+        )
+      )
+    )
+  );
+
+  checkAuthSuccess$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.checkAuthSuccess),
+      mergeMap(({ user }) => {
+        if (user) {
+          return of(PermissionActions.loadPermissions());
+        }
+        return of();
+      })
+    )
+  );
+
+  permissionsLoaded$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(AuthActions.loginSuccess),
+        ofType(PermissionActions.loadPermissionsSuccess),
         tap(() => {
           // 登录成功后重定向到第一个模块的默认路径
           if (MODULES_CONFIG.length > 0) {
@@ -72,22 +109,5 @@ export class AuthEffects {
         })
       ),
     { dispatch: false }
-  );
-
-  checkAuth$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(AuthActions.checkAuth),
-      mergeMap(() =>
-        this.authService.checkAuth().pipe(
-          map((response) =>
-            AuthActions.checkAuthSuccess({
-              user: response.user,
-              token: response.token,
-            })
-          ),
-          catchError(() => of(AuthActions.checkAuthSuccess({ user: null, token: null })))
-        )
-      )
-    )
   );
 }

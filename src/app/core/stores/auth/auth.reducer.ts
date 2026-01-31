@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { AuthState } from '../../types/app-state';
 import * as AuthActions from './auth.actions';
+import * as PermissionActions from './permission.actions';
 
 export const initialState: AuthState = {
   user: null,
@@ -8,6 +9,9 @@ export const initialState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
   error: null,
+  // 新增权限相关状态
+  permissions: [],
+  roles: [],
 };
 
 export const authReducer = createReducer(
@@ -59,5 +63,18 @@ export const authReducer = createReducer(
   on(AuthActions.clearAuthError, (state) => ({
     ...state,
     error: null,
+  })),
+  // Permission Actions
+  on(PermissionActions.loadPermissionsSuccess, (state, { permissions }) => ({
+    ...state,
+    permissions,
+  })),
+  on(PermissionActions.updatePermissions, (state, { permissions }) => ({
+    ...state,
+    permissions,
+  })),
+  on(PermissionActions.clearPermissions, (state) => ({
+    ...state,
+    permissions: [],
   }))
 );

@@ -29,6 +29,7 @@ import { AuthEffects } from './core/stores/auth/auth.effects';
 import { LayoutEffects } from './core/stores/layout/layout.effects';
 import { ModuleEffects } from './core/stores/module/module.effects';
 import { ConfigEffects } from './core/stores/config/config.effects';
+import { PermissionEffects } from './core/stores/auth/permission.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -49,7 +50,7 @@ export const appConfig: ApplicationConfig = {
     }),
     // NgRx Store Configuration
     provideStore(rootReducer),
-    provideEffects(AuthEffects, LayoutEffects, ModuleEffects, ConfigEffects),
+    provideEffects(AuthEffects, LayoutEffects, ModuleEffects, ConfigEffects, PermissionEffects),
     provideRouterStore(),
     provideStoreDevtools({
       maxAge: 25,

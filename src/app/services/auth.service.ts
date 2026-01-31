@@ -27,6 +27,7 @@ export class AuthService {
           name: 'Demo User',
           avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
           roles: ['admin'],
+          permissions: [] // 初始为空，后续会通过PermissionService加载
         };
 
         const token = 'mock_jwt_token_' + Date.now();

@@ -1,4 +1,5 @@
 import { User } from '../types/user.interface';
+import { Permission } from '../types/permission.interface';
 
 import { ConfigState } from '../stores/config/config.state';
 
@@ -15,6 +16,9 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  // 新增权限相关状态
+  permissions: Permission[];
+  roles: string[];
 }
 
 export interface LayoutState {
