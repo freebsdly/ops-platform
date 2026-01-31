@@ -10,6 +10,7 @@
   id="module-selector-trigger"
 >
   <span nz-icon [nzType]="currentModuleIcon()" class="module-selector-icon"></span>
+  <span class="module-selector-name">{{ currentModuleName() | translate }}</span>
 </button>
 
 <nz-dropdown-menu #moduleMenu="nzDropdownMenu" class="module-dropdown-menu" id="module-menu">

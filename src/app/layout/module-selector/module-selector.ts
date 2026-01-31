@@ -72,6 +72,13 @@ export class ModuleSelector {
     return current?.icon || 'appstore';
   });
 
+  // Current module name for trigger button display
+  currentModuleName = computed(() => {
+    const viewModel = this.viewModel();
+    const current = viewModel.find(module => module.isSelected);
+    return current?.title || '';
+  });
+
   selectModule(moduleId: string): void {
     this.storeService.setCurrentModule(moduleId);
     this.moduleMenuService.switchModule(moduleId);
