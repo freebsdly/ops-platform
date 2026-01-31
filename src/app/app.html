@@ -24,6 +24,7 @@
           <app-module-selector />
         </div>
         <div class="header-right">
+          <app-search />
           <app-lang-selector />
           @if (isAuthenticatedSig() && userSig(); as user) {
             <app-user-info 

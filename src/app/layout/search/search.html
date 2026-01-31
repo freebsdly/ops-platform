@@ -1,0 +1,23 @@
+<div class="search-container" [class.expanded]="isExpanded()">
+  @if (isExpanded()) {
+    <div class="search-input-wrapper">
+      <input
+        #searchInput
+        type="text"
+        class="search-input"
+        [placeholder]="'SEARCH.PLACEHOLDER' | translate"
+        [(ngModel)]="searchQuery"
+        (keyup.enter)="onSearch()"
+        (blur)="onBlur()"
+      />
+      <span nz-icon nzType="search" class="search-icon" (click)="onSearch()"></span>
+    </div>
+  } @else {
+    <span
+      nz-icon
+      nzType="search"
+      class="search-trigger"
+      (click)="expandSearch()"
+    ></span>
+  }
+</div>

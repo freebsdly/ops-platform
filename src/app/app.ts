@@ -10,6 +10,7 @@ import { LangSelector } from './layout/lang-selector/lang-selector';
 import { ModuleSelector } from './layout/module-selector/module-selector';
 import { StoreService } from './core/stores/store.service';
 import { Loading } from './layout/loading/loading';
+import { Search } from './layout/search/search';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
@@ -25,7 +26,8 @@ import { AuthService } from './services/auth.service';
     UserInfo, 
     LangSelector, 
     ModuleSelector,
-    Loading
+    Loading,
+    Search
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
