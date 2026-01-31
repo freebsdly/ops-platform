@@ -6,34 +6,18 @@
 .search-container {
   display: flex;
   align-items: center;
-  height: 32px;
-  transition: all 0.3s ease;
-}
-
-.search-trigger {
-  font-size: 18px;
-  color: rgba(0, 0, 0, 0.65);
-  cursor: pointer;
-  padding: 6px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-}
-
-.search-trigger:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-  color: #1890ff;
 }
 
 .search-input-wrapper {
   position: relative;
   width: 200px;
   height: 32px;
-  animation: expandWidth 0.3s ease;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.search-input-wrapper:hover {
+  background-color: rgba(0, 0, 0, 0.02);
 }
 
 .search-input {
@@ -43,14 +27,15 @@
   border: 1px solid #d9d9d9;
   border-radius: 4px;
   font-size: 14px;
-  transition: all 0.3s ease;
   box-sizing: border-box;
   outline: none;
+  background-color: white;
+  color: rgba(0, 0, 0, 0.65);
+  cursor: pointer;
 }
 
-.search-input:focus {
+.search-input:hover {
   border-color: #1890ff;
-  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 .search-icon {
@@ -60,88 +45,218 @@
   transform: translateY(-50%);
   font-size: 16px;
   color: rgba(0, 0, 0, 0.45);
-  cursor: pointer;
-  transition: color 0.3s ease;
 }
 
-.search-icon:hover {
-  color: #1890ff;
+/* 对话框样式 */
+.search-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.search-dialog {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 3px 6px -4px rgba(0, 0, 0, 0.12), 0 6px 16px 0 rgba(0, 0, 0, 0.08), 0 9px 28px 8px rgba(0, 0, 0, 0.05);
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dialog-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.close-button {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.close-button:hover {
+  color: rgba(0, 0, 0, 0.85);
+}
+
+.dialog-content {
+  padding: 24px;
+}
+
+.search-section {
+  margin-bottom: 24px;
+}
+
+.section-label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.85);
+  font-size: 14px;
+}
+
+.quick-search-wrapper {
+  display: flex;
+  gap: 8px;
+}
+
+.dialog-search-input {
+  flex: 1;
+  height: 32px;
+  padding: 6px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.dialog-search-input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.search-action-button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.option-group {
+  margin-bottom: 16px;
+}
+
+.option-label {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(0, 0, 0, 0.65);
+  font-size: 14px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 16px;
+}
+
+.time-select,
+.tags-select {
+  width: 100%;
+}
+
+.keywords-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+  resize: vertical;
+  transition: all 0.3s ease;
+}
+
+.keywords-input:focus {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 24px;
+  border-top: 1px solid #f0f0f0;
 }
 
 /* Header-specific styles */
-:host-context(.app-layout-header) .search-container {
-  height: 48px;
-  margin-right: 0;
-}
-
-:host-context(.app-layout-header) .search-trigger {
-  width: 48px;
-  height: 48px;
-  border-radius: 0;
-  font-size: 20px;
-}
-
-:host-context(.app-layout-header) .search-trigger:hover {
-  background-color: rgba(0, 0, 0, 0.04);
-}
-
 :host-context(.app-layout-header) .search-input-wrapper {
   height: 48px;
+  width: 180px;
 }
 
 :host-context(.app-layout-header) .search-input {
   height: 48px;
   padding: 12px 42px 12px 16px;
-  font-size: 16px;
+  font-size: 14px;
   border-radius: 0;
   border: none;
   background-color: rgba(0, 0, 0, 0.02);
+  color: rgba(0, 0, 0, 0.65);
 }
 
-:host-context(.app-layout-header) .search-input:focus {
-  background-color: white;
-  border: 1px solid #1890ff;
-  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.1);
+:host-context(.app-layout-header) .search-input:hover {
+  background-color: rgba(0, 0, 0, 0.04);
 }
 
 :host-context(.app-layout-header) .search-icon {
-  font-size: 20px;
+  font-size: 18px;
   right: 16px;
-}
-
-/* 展开状态动画 */
-.search-container.expanded {
-  background-color: white;
 }
 
 /* 响应式调整 */
 @media (max-width: 768px) {
-  .search-input-wrapper {
-    width: 150px;
+  .search-dialog {
+    width: 90vw;
+    max-height: 90vh;
+  }
+  
+  .radio-group {
+    flex-direction: column;
+    gap: 8px;
   }
   
   :host-context(.app-layout-header) .search-input-wrapper {
-    width: 180px;
+    width: 150px;
   }
 }
 
 @media (max-width: 576px) {
-  .search-input-wrapper {
-    width: 120px;
+  .search-dialog {
+    width: 95vw;
+  }
+  
+  .quick-search-wrapper {
+    flex-direction: column;
   }
   
   :host-context(.app-layout-header) .search-input-wrapper {
-    width: 150px;
+    width: 120px;
   }
 }
 
-@keyframes expandWidth {
+/* 动画 */
+@keyframes fadeIn {
   from {
-    width: 0;
     opacity: 0;
   }
   to {
-    width: 200px;
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
     opacity: 1;
   }
 }

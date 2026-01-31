@@ -218,5 +218,30 @@
     "WORK_ORDER_STATISTICS": "Work Order Statistics",
     "COST_ALLOCATION": "Cost Allocation",
     "SERVICE_IMPROVEMENT": "Service Improvement"
+  },
+  "SEARCH": {
+    "PLACEHOLDER": "Search...",
+    "ADVANCED_TITLE": "Advanced Search",
+    "QUICK_SEARCH": "Quick Search",
+    "QUICK_PLACEHOLDER": "Type keywords to search",
+    "SEARCH_BUTTON": "Search",
+    "ADVANCED_OPTIONS": "Advanced Options",
+    "SEARCH_TYPE": "Search Type",
+    "TYPE_ALL": "All",
+    "TYPE_DOCUMENTS": "Documents",
+    "TYPE_USERS": "Users",
+    "TYPE_TASKS": "Tasks",
+    "TIME_RANGE": "Time Range",
+    "SELECT_TIME_RANGE": "Select time range",
+    "TIME_ALL": "All time",
+    "TIME_TODAY": "Today",
+    "TIME_WEEK": "This week",
+    "TIME_MONTH": "This month",
+    "TIME_YEAR": "This year",
+    "KEYWORDS": "Keywords",
+    "KEYWORDS_PLACEHOLDER": "Enter keywords separated by commas",
+    "TAGS": "Tags",
+    "TAGS_PLACEHOLDER": "Select or type tags",
+    "ADVANCED_SEARCH": "Advanced Search"
   }
 }

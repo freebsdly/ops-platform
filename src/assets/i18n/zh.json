@@ -218,5 +218,30 @@
     "WORK_ORDER_STATISTICS": "工单统计",
     "COST_ALLOCATION": "成本分摊",
     "SERVICE_IMPROVEMENT": "服务改进"
+  },
+  "SEARCH": {
+    "PLACEHOLDER": "搜索...",
+    "ADVANCED_TITLE": "高级搜索",
+    "QUICK_SEARCH": "快速搜索",
+    "QUICK_PLACEHOLDER": "输入关键字进行搜索",
+    "SEARCH_BUTTON": "搜索",
+    "ADVANCED_OPTIONS": "高级选项",
+    "SEARCH_TYPE": "搜索类型",
+    "TYPE_ALL": "全部",
+    "TYPE_DOCUMENTS": "文档",
+    "TYPE_USERS": "用户",
+    "TYPE_TASKS": "任务",
+    "TIME_RANGE": "时间范围",
+    "SELECT_TIME_RANGE": "选择时间范围",
+    "TIME_ALL": "全部时间",
+    "TIME_TODAY": "今天",
+    "TIME_WEEK": "本周",
+    "TIME_MONTH": "本月",
+    "TIME_YEAR": "今年",
+    "KEYWORDS": "关键词",
+    "KEYWORDS_PLACEHOLDER": "输入关键词，用逗号分隔",
+    "TAGS": "标签",
+    "TAGS_PLACEHOLDER": "选择或输入标签",
+    "ADVANCED_SEARCH": "高级搜索"
   }
 }

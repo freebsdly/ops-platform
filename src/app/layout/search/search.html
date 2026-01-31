@@ -1,23 +1,114 @@
-<div class="search-container" [class.expanded]="isExpanded()">
-  @if (isExpanded()) {
-    <div class="search-input-wrapper">
-      <input
-        #searchInput
-        type="text"
-        class="search-input"
-        [placeholder]="'SEARCH.PLACEHOLDER' | translate"
-        [(ngModel)]="searchQuery"
-        (keyup.enter)="onSearch()"
-        (blur)="onBlur()"
-      />
-      <span nz-icon nzType="search" class="search-icon" (click)="onSearch()"></span>
-    </div>
-  } @else {
-    <span
-      nz-icon
-      nzType="search"
-      class="search-trigger"
-      (click)="expandSearch()"
-    ></span>
-  }
+<div class="search-container">
+  <div class="search-input-wrapper" (click)="openSearchDialog()">
+    <input
+      type="text"
+      class="search-input"
+      [placeholder]="'SEARCH.PLACEHOLDER' | translate"
+      readonly
+    />
+    <span nz-icon nzType="search" class="search-icon"></span>
+  </div>
 </div>
+
+@if (isDialogVisible()) {
+  <div class="search-dialog-overlay" (click)="closeSearchDialog()">
+    <div class="search-dialog" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h3 class="dialog-title">{{ 'SEARCH.ADVANCED_TITLE' | translate }}</h3>
+        <button nz-button nzType="text" nzShape="circle" class="close-button" (click)="closeSearchDialog()">
+          <span nz-icon nzType="close"></span>
+        </button>
+      </div>
+      
+      <div class="dialog-content">
+        <!-- 快速搜索 -->
+        <div class="search-section">
+          <label class="section-label">{{ 'SEARCH.QUICK_SEARCH' | translate }}</label>
+          <div class="quick-search-wrapper">
+            <input
+              #quickSearchInput
+              type="text"
+              class="dialog-search-input"
+              [placeholder]="'SEARCH.QUICK_PLACEHOLDER' | translate"
+              [(ngModel)]="quickSearchQuery"
+              (keyup.enter)="onQuickSearch()"
+            />
+            <button nz-button nzType="primary" class="search-action-button" (click)="onQuickSearch()">
+              <span nz-icon nzType="search"></span>
+              {{ 'SEARCH.SEARCH_BUTTON' | translate }}
+            </button>
+          </div>
+        </div>
+        
+        <!-- 高级搜索选项 -->
+        <div class="search-section">
+          <label class="section-label">{{ 'SEARCH.ADVANCED_OPTIONS' | translate }}</label>
+          
+          <!-- 搜索类型 -->
+          <div class="option-group">
+            <label class="option-label">{{ 'SEARCH.SEARCH_TYPE' | translate }}</label>
+            <nz-radio-group [(ngModel)]="searchType" class="radio-group">
+              <label nz-radio nzValue="all">{{ 'SEARCH.TYPE_ALL' | translate }}</label>
+              <label nz-radio nzValue="documents">{{ 'SEARCH.TYPE_DOCUMENTS' | translate }}</label>
+              <label nz-radio nzValue="users">{{ 'SEARCH.TYPE_USERS' | translate }}</label>
+              <label nz-radio nzValue="tasks">{{ 'SEARCH.TYPE_TASKS' | translate }}</label>
+            </nz-radio-group>
+          </div>
+          
+          <!-- 时间范围 -->
+          <div class="option-group">
+            <label class="option-label">{{ 'SEARCH.TIME_RANGE' | translate }}</label>
+            <nz-select
+              [(ngModel)]="timeRange"
+              class="time-select"
+              [nzPlaceHolder]="'SEARCH.SELECT_TIME_RANGE' | translate"
+            >
+              <nz-option nzValue="all" nzLabel="{{ 'SEARCH.TIME_ALL' | translate }}"></nz-option>
+              <nz-option nzValue="today" nzLabel="{{ 'SEARCH.TIME_TODAY' | translate }}"></nz-option>
+              <nz-option nzValue="week" nzLabel="{{ 'SEARCH.TIME_WEEK' | translate }}"></nz-option>
+              <nz-option nzValue="month" nzLabel="{{ 'SEARCH.TIME_MONTH' | translate }}"></nz-option>
+              <nz-option nzValue="year" nzLabel="{{ 'SEARCH.TIME_YEAR' | translate }}"></nz-option>
+            </nz-select>
+          </div>
+          
+          <!-- 关键词 -->
+          <div class="option-group">
+            <label class="option-label">{{ 'SEARCH.KEYWORDS' | translate }}</label>
+            <textarea
+              class="keywords-input"
+              [(ngModel)]="keywords"
+              [placeholder]="'SEARCH.KEYWORDS_PLACEHOLDER' | translate"
+              rows="3"
+            ></textarea>
+          </div>
+          
+          <!-- 标签 -->
+          <div class="option-group">
+            <label class="option-label">{{ 'SEARCH.TAGS' | translate }}</label>
+            <nz-select
+              nzMode="tags"
+              [(ngModel)]="selectedTags"
+              class="tags-select"
+              [nzPlaceHolder]="'SEARCH.TAGS_PLACEHOLDER' | translate"
+            >
+              @for (tag of availableTags(); track tag) {
+                <nz-option [nzLabel]="tag" [nzValue]="tag"></nz-option>
+              }
+            </nz-select>
+          </div>
+        </div>
+        
+        <!-- 操作按钮 -->
+        <div class="dialog-actions">
+          <button nz-button (click)="closeSearchDialog()">
+            {{ 'BUTTONS.CANCEL' | translate }}
+          </button>
+          <button nz-button nzType="primary" (click)="onAdvancedSearch()">
+            <span nz-icon nzType="search"></span>
+            {{ 'SEARCH.ADVANCED_SEARCH' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

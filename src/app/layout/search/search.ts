@@ -1,70 +1,121 @@
 import { Component, signal, viewChild, ElementRef, inject, afterNextRender } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-search',
-  imports: [NzIconModule, FormsModule, TranslateModule],
+  imports: [
+    NzIconModule, 
+    NzButtonModule,
+    NzRadioModule,
+    NzSelectModule,
+    FormsModule, 
+    TranslateModule
+  ],
   templateUrl: './search.html',
   styleUrl: './search.css',
 })
 export class Search {
-  isExpanded = signal(false);
-  searchQuery = signal('');
+  isDialogVisible = signal(false);
+  quickSearchQuery = signal('');
+  searchType = signal('all');
+  timeRange = signal('all');
+  keywords = signal('');
+  selectedTags = signal<string[]>([]);
   
-  private searchInput = viewChild<ElementRef>('searchInput');
+  private quickSearchInput = viewChild<ElementRef>('quickSearchInput');
+
+  // 模拟可用的标签
+  availableTags = signal([
+    'urgent',
+    'documentation',
+    'bug',
+    'feature',
+    'enhancement',
+    'design',
+    'backend',
+    'frontend'
+  ]);
 
   constructor() {
     afterNextRender(() => {
-      // 点击外部关闭搜索框
+      // 点击外部关闭对话框
       document.addEventListener('click', this.handleDocumentClick.bind(this));
     });
   }
 
-  expandSearch(): void {
-    this.isExpanded.set(true);
-    // 延迟聚焦输入框，确保DOM已更新
+  openSearchDialog(): void {
+    this.isDialogVisible.set(true);
+    // 延迟聚焦快速搜索输入框
     setTimeout(() => {
-      const input = this.searchInput()?.nativeElement;
+      const input = this.quickSearchInput()?.nativeElement;
       if (input) {
         input.focus();
       }
-    }, 0);
+    }, 100);
   }
 
-  collapseSearch(): void {
-    if (this.isExpanded()) {
-      this.isExpanded.set(false);
-      this.searchQuery.set('');
-    }
+  closeSearchDialog(): void {
+    this.isDialogVisible.set(false);
   }
 
-  onSearch(): void {
-    const query = this.searchQuery();
+  onQuickSearch(): void {
+    const query = this.quickSearchQuery();
     if (query.trim()) {
-      console.log('Searching for:', query);
-      // 这里可以添加实际的搜索逻辑
-      // 例如：this.storeService.search(query);
+      console.log('Quick searching for:', query);
+      this.performSearch({
+        query,
+        type: 'quick',
+        searchType: this.searchType(),
+        timeRange: this.timeRange(),
+        keywords: this.keywords(),
+        tags: this.selectedTags()
+      });
+      this.closeSearchDialog();
     }
-    // 搜索后保持展开状态，用户可以继续搜索
   }
 
-  onBlur(): void {
-    // 只有输入框为空时才自动收起
-    if (!this.searchQuery().trim()) {
-      setTimeout(() => {
-        this.collapseSearch();
-      }, 200);
-    }
+  onAdvancedSearch(): void {
+    const searchParams = {
+      query: this.quickSearchQuery(),
+      type: 'advanced',
+      searchType: this.searchType(),
+      timeRange: this.timeRange(),
+      keywords: this.keywords(),
+      tags: this.selectedTags()
+    };
+    
+    console.log('Advanced search with params:', searchParams);
+    this.performSearch(searchParams);
+    this.closeSearchDialog();
+  }
+
+  private performSearch(params: any): void {
+    // 这里可以添加实际的搜索逻辑
+    // 例如：this.storeService.search(params);
+    console.log('Performing search:', params);
+    
+    // 重置表单
+    this.quickSearchQuery.set('');
+    this.searchType.set('all');
+    this.timeRange.set('all');
+    this.keywords.set('');
+    this.selectedTags.set([]);
   }
 
   handleDocumentClick(event: MouseEvent): void {
-    const searchContainer = document.querySelector('.search-container');
+    if (!this.isDialogVisible()) return;
+    
+    const dialog = document.querySelector('.search-dialog');
+    const trigger = document.querySelector('.search-input-wrapper');
     const target = event.target as HTMLElement;
     
-    if (searchContainer && !searchContainer.contains(target) && this.isExpanded()) {
-      this.collapseSearch();
+    if (dialog && !dialog.contains(target) && trigger && !trigger.contains(target)) {
+      this.closeSearchDialog();
     }
   }
 }
