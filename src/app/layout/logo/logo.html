@@ -1,4 +1,4 @@
-<div class="logo-container">
+<div class="logo-container" [class.collapsed]="isCollapsed()">
   @if (showIcon()) {
     <span nz-icon [nzType]="iconType()" class="logo-icon"></span>
   }

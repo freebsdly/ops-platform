@@ -1,15 +1,35 @@
+:host {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
 .logo-container {
   display: flex;
   align-items: center;
   gap: 12px;
   overflow: hidden;
   padding: 0 16px;
+  width: 100%;
+  box-sizing: border-box;
+  height: 100%;
+}
+
+.logo-container.collapsed {
+  padding: 0;
+  gap: 0;
+  justify-content: center;
 }
 
 .logo-icon {
   font-size: 24px;
   flex-shrink: 0;
   color: #1890ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 
 .logo-image {
