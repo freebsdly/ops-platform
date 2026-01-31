@@ -1,5 +1,14 @@
 <div class="logo-container">
-  <span nz-icon nzType="bars" class="logo-icon"></span>
+  @if (showIcon()) {
+    <span nz-icon [nzType]="iconType()" class="logo-icon"></span>
+  }
+  @if (showImage() && !isCollapsed()) {
+    <img 
+      [src]="logoSrcSig()" 
+      [alt]="logoAltSig()" 
+      class="logo-image"
+    />
+  }
   @if (showTitle()) {
     <span class="logo-text">{{ title() }}</span>
   }

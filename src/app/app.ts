@@ -52,6 +52,15 @@ export class App implements OnInit {
   userSig = toSignal(this.storeService.user$, { initialValue: this.initialAuthState.user });
   isSiderCollapsedSig = toSignal(this.storeService.isSiderCollapsed$, { initialValue: false });
   
+  // Config signals
+  layoutConfigSig = toSignal(this.storeService.layoutConfig$);
+  appTitleSig = toSignal(this.storeService.appTitle$);
+  logoSrcSig = toSignal(this.storeService.logoSrc$);
+  logoAltSig = toSignal(this.storeService.logoAlt$);
+  logoLinkSig = toSignal(this.storeService.logoLink$);
+  configLoadingSig = toSignal(this.storeService.configLoading$);
+  configLoadedSig = toSignal(this.storeService.configLoaded$);
+  
   // Track if auth check is in progress
   isAuthChecking = signal<boolean>(true);
 
@@ -91,6 +100,9 @@ export class App implements OnInit {
         this.isAuthChecking.set(false);
       }, 2000);
     }
+    
+    // Load configuration
+    this.storeService.loadConfig();
     
     // Load available modules
     this.storeService.loadModules();

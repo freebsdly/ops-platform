@@ -1,9 +1,12 @@
 import { User } from '../types/user.interface';
 
+import { ConfigState } from '../stores/config/config.state';
+
 export interface AppState {
   auth: AuthState;
   layout: LayoutState;
   modules: ModuleState;
+  config: ConfigState;
 }
 
 export interface AuthState {

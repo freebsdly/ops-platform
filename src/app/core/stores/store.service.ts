@@ -8,6 +8,8 @@ import * as LayoutActions from './layout/layout.actions';
 import * as LayoutSelectors from './layout/layout.selectors';
 import * as ModuleActions from './module/module.actions';
 import * as ModuleSelectors from './module/module.selectors';
+import * as ConfigActions from './config/config.actions';
+import * as ConfigSelectors from './config/config.selectors';
 
 @Injectable({ providedIn: 'root' })
 export class StoreService {
@@ -105,5 +107,71 @@ export class StoreService {
 
   selectModule(module: string): void {
     this.store.dispatch(ModuleActions.selectModule({ module }));
+  }
+
+  // Config Selectors
+  get layoutConfig$(): Observable<any> {
+    return this.store.select(ConfigSelectors.selectConfig);
+  }
+
+  get logoConfig$(): Observable<any> {
+    return this.store.select(ConfigSelectors.selectLogoConfig);
+  }
+
+  get appTitle$(): Observable<string> {
+    return this.store.select(ConfigSelectors.selectAppTitle);
+  }
+
+  get logoSrc$(): Observable<string> {
+    return this.store.select(ConfigSelectors.selectLogoSrc);
+  }
+
+  get logoAlt$(): Observable<string> {
+    return this.store.select(ConfigSelectors.selectLogoAlt);
+  }
+
+  get logoLink$(): Observable<string | undefined> {
+    return this.store.select(ConfigSelectors.selectLogoLink);
+  }
+
+  get configLoading$(): Observable<boolean> {
+    return this.store.select(ConfigSelectors.selectConfigLoading);
+  }
+
+  get configLoaded$(): Observable<boolean> {
+    return this.store.select(ConfigSelectors.selectConfigLoaded);
+  }
+
+  get logoCollapsedIcon$(): Observable<string> {
+    return this.store.select(ConfigSelectors.selectLogoCollapsedIcon);
+  }
+
+  get logoExpandedIcon$(): Observable<string> {
+    return this.store.select(ConfigSelectors.selectLogoExpandedIcon);
+  }
+
+  // Config Actions
+  loadConfig(): void {
+    this.store.dispatch(ConfigActions.loadConfig());
+  }
+
+  updateConfig(config: Partial<any>): void {
+    this.store.dispatch(ConfigActions.updateConfig({ config }));
+  }
+
+  saveConfig(config: any): void {
+    this.store.dispatch(ConfigActions.saveConfig({ config }));
+  }
+
+  resetConfig(): void {
+    this.store.dispatch(ConfigActions.resetConfig());
+  }
+
+  updateLogoConfig(logoConfig: Partial<any>): void {
+    this.store.dispatch(ConfigActions.updateLogoConfig({ logoConfig }));
+  }
+
+  updateAppTitle(title: string): void {
+    this.store.dispatch(ConfigActions.updateAppTitle({ title }));
   }
 }

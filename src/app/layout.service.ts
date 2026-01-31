@@ -41,4 +41,23 @@ export class LayoutService {
       }
     };
   }
+
+  // 新增配置相关方法
+  getLayoutConfig() {
+    return {
+      asReadonly: () => this.storeService.layoutConfig$
+    };
+  }
+
+  getLogoConfig() {
+    return {
+      asReadonly: () => this.storeService.logoConfig$
+    };
+  }
+
+  getAppTitle() {
+    return {
+      asReadonly: () => this.storeService.appTitle$
+    };
+  }
 }

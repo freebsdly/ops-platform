@@ -1,4 +1,4 @@
 <app-logo
-  [isCollapsed]="(isSiderCollapsed$ | async) ?? false"
-  [title]="title"
+  [isCollapsed]="isSiderCollapsedSig() ?? false"
+  [title]="appTitleSig() ?? 'Ops Platform'"
 ></app-logo>
