@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay } from 'rxjs/operators';
 import { User } from '../core/types/user.interface';
+import { Router } from '@angular/router';
 
 export interface AuthResponse {
   user: User;
@@ -14,6 +15,7 @@ export interface AuthResponse {
 export class AuthService {
   private readonly tokenKey = 'auth_token';
   private readonly userKey = 'user';
+  private router = inject(Router);
 
   login(username: string, password: string): Observable<AuthResponse> {
     // Simulate API call
@@ -47,6 +49,8 @@ export class AuthService {
       localStorage.removeItem(this.userKey);
       observer.next();
       observer.complete();
+      // 登出后立即重定向到登录页面 - 直接使用window.location确保重定向
+      window.location.href = '/login';
     });
   }
 

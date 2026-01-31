@@ -105,7 +105,8 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.logoutSuccess),
         tap(() => {
-          this.router.navigate(['/login']);
+          // 导航到登录页面 - 现在在AuthService中处理
+          // this.router.navigate(['/login']);
         })
       ),
     { dispatch: false }

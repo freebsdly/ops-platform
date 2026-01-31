@@ -10,10 +10,12 @@ import * as ModuleActions from './module/module.actions';
 import * as ModuleSelectors from './module/module.selectors';
 import * as ConfigActions from './config/config.actions';
 import * as ConfigSelectors from './config/config.selectors';
+import { Router } from '@angular/router';
 
 @Injectable({ providedIn: 'root' })
 export class StoreService {
   private store = inject(Store);
+  private router = inject(Router);
 
   // Auth Selectors
   get user$(): Observable<User | null> {
@@ -60,7 +62,11 @@ export class StoreService {
   }
 
   logout(): void {
+    console.log('StoreService.logout() called');
     this.store.dispatch(AuthActions.logout());
+    // 立即重定向到登录页面
+    console.log('Navigating to /login');
+    this.router.navigate(['/login']);
   }
 
   checkAuth(): void {

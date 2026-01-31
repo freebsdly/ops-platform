@@ -19,6 +19,35 @@
 - ❌ 单元测试编写（待完成）
 - ❌ 演示组件完全集成（待完成）
 
+## RBAC支持情况总结（最新分析）
+
+**项目已实现RBAC核心功能，但菜单数据来自前端静态配置而非后端接口。**
+
+### 已实现的RBAC功能
+1. **用户权限管理** - `PermissionService`提供权限检查和加载功能
+2. **权限守卫** - `PermissionGuard`根据路由配置的权限限制访问  
+3. **角色守卫** - `RoleGuard`根据路由配置的角色限制访问
+4. **菜单权限过滤** - `MenuFilterService`按用户权限过滤菜单项
+5. **权限指令和管道** - `PermissionDirective`、`HasPermissionPipe`、`HasRolePipe`
+
+### 菜单数据来源
+- **静态配置**：`src/app/config/menu.config.ts`定义了所有菜单项
+- **模块化组织**：按模块ID分组，支持权限字段（`permission`、`roles`）
+- **本地过滤**：前端根据用户权限过滤显示菜单
+
+### 缺失的后端集成
+项目目前**没有**从后端接口获取用户菜单数据：
+1. `ModuleMenuService.getModuleMenus()`返回静态配置数据
+2. `PermissionService.getUserPermissions()`返回模拟数据
+3. 需要修改为真实的HTTP API调用
+
+### 扩展建议（后续优化）
+添加后端菜单API集成：
+1. 创建`MenuApiService`调用`GET /api/user/menus`
+2. 在`AuthEffects`登录成功后获取菜单数据
+3. 更新`ModuleMenuService`使用API数据
+4. 添加菜单缓存和刷新机制
+
 ## 修改计划完成情况
 
 ### 第一阶段：基础架构扩展 ✅ **已完成**
