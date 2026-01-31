@@ -1,28 +1,32 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { Component, NO_ERRORS_SCHEMA } from '@angular/core';
-import { provideRouter } from '@angular/router';
 import { ModuleSelector } from './module-selector';
 import { NzDropdownModule } from 'ng-zorro-antd/dropdown';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Observable, Subject } from 'rxjs';
+import { TranslateModule } from '@ngx-translate/core';
+import { StoreService } from '../../core/stores/store.service';
+import { ModuleMenuService } from '../../services/module-menu.service';
+import { of } from 'rxjs';
+import { vi } from 'vitest';
 
-const translations = {
-  MODULE_SELECTOR: {
-    TITLE: 'Select Module',
-    DASHBOARD: 'Dashboard',
-    FORMS: 'Forms',
-    MONITOR: 'Monitor',
-    REPORTS: 'Reports',
-    SETTINGS: 'Settings',
-  },
+// Simple mock services
+const mockStoreService = {
+  currentModule$: of('dashboard'),
+  setCurrentModule: vi.fn()
 };
 
-@Component({
-  template: `<app-module-selector />`,
-  imports: [ModuleSelector],
-})
-class TestHostComponent {}
+const mockModuleMenuService = {
+  getAvailableModules: vi.fn().mockReturnValue(of([
+    {
+      id: 'dashboard',
+      title: 'Dashboard',
+      icon: 'dashboard',
+      color: '#1890ff',
+      defaultPath: '/dashboard',
+      isActive: true
+    }
+  ])),
+  switchModule: vi.fn()
+};
 
 describe('ModuleSelector', () => {
   let component: ModuleSelector;
@@ -30,47 +34,16 @@ describe('ModuleSelector', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      schemas: [NO_ERRORS_SCHEMA],
       imports: [
         ModuleSelector,
         NzDropdownModule,
         NzIconModule,
-        TranslateModule.forChild(),
-        TestHostComponent,
+        TranslateModule.forRoot()
       ],
       providers: [
-        provideRouter([]),
-        {
-          provide: TranslateService,
-          useValue: {
-            get: (key: string | string[]) => {
-              const k = Array.isArray(key) ? key[0] : key;
-              const keys = k.split('.');
-              let value: any = translations;
-              for (const keyPart of keys) {
-                value = value?.[keyPart];
-              }
-              return new Observable((observer) => {
-                observer.next(value || k);
-                observer.complete();
-                return { unsubscribe: () => {} };
-              });
-            },
-            instant: (key: string | string[]) => {
-              const k = Array.isArray(key) ? key[0] : key;
-              const keys = k.split('.');
-              let value: any = translations;
-              for (const keyPart of keys) {
-                value = value?.[keyPart];
-              }
-              return value || k;
-            },
-            onLangChange: new Subject(),
-            onTranslationChange: new Subject(),
-            onDefaultLangChange: new Subject(),
-          },
-        },
-      ],
+        { provide: StoreService, useValue: mockStoreService },
+        { provide: ModuleMenuService, useValue: mockModuleMenuService }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ModuleSelector);
@@ -82,30 +55,18 @@ describe('ModuleSelector', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with dashboard as current module', () => {
-    expect(component.currentModule()).toBe('dashboard');
+  it('should have current module id', () => {
+    expect(component.currentModuleId()).toBe('dashboard');
   });
 
-  it('should have modules data', () => {
-    expect(component.modules().length).toBeGreaterThan(0);
-    expect(component.modules().find(m => m.id === 'dashboard')).toBeDefined();
+  it('should load available modules', () => {
+    expect(component.availableModules()).toHaveLength(1);
+    expect(component.availableModules()[0].id).toBe('dashboard');
   });
 
-  it('should select module and update current module', () => {
-    const testModule = component.modules().find(m => m.id === 'forms');
-    component.selectModule(testModule!);
-    expect(component.currentModule()).toBe('forms');
-  });
-
-  it('should return correct current module data', () => {
-    component.currentModule.set('dashboard');
-    const current = component.currentModuleData();
-    expect(current?.id).toBe('dashboard');
-  });
-
-  it('should track modules by id', () => {
-    const modules = component.modules();
-    const trackId = component.trackByModuleId(0, modules[0]);
-    expect(trackId).toBe(modules[0].id);
+  it('should select module', () => {
+    component.selectModule('dashboard');
+    expect(mockStoreService.setCurrentModule).toHaveBeenCalledWith('dashboard');
+    expect(mockModuleMenuService.switchModule).toHaveBeenCalledWith('dashboard');
   });
 });

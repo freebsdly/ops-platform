@@ -6,53 +6,52 @@
   class="module-selector-trigger"
   aria-label="Module selector"
   aria-haspopup="true"
+  aria-controls="module-menu"
+  id="module-selector-trigger"
 >
-  <!-- We'll need to combine data from service with module ID -->
-  @if (availableModules$ | async; as modules) {
-    @if (currentModule$ | async; as currentModuleId) {
-      @for (module of modules; track module.id) {
-        @if (module.id === currentModuleId) {
-          <span nz-icon [nzType]="module.icon || 'appstore'" class="module-selector-icon"></span>
-        }
-      }
-    } @else {
-      <span nz-icon nzType="appstore" class="module-selector-icon"></span>
-    }
-  } @else {
-    <span nz-icon nzType="appstore" class="module-selector-icon"></span>
-  }
+  <span nz-icon [nzType]="currentModuleIcon()" class="module-selector-icon"></span>
 </button>
 
-<nz-dropdown-menu #moduleMenu="nzDropdownMenu" class="module-dropdown-menu">
+<nz-dropdown-menu #moduleMenu="nzDropdownMenu" class="module-dropdown-menu" id="module-menu">
   <div class="module-menu-wrapper">
     <div class="module-menu-content">
-      <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex">
-        @if (availableModules$ | async; as modules) {
-          @if (currentModule$ | async; as currentModuleId) {
-            @for (module of modules; track module.id) {
-              <div nz-flex [nzFlex]="'0 0 calc((100% - 24px) / 4)'">
-                <button
-                  class="module-card"
-                  [class.module-card-selected]="module.id === currentModuleId"
-                  (click)="selectModule(module.id)"
-                  [attr.aria-pressed]="module.id === currentModuleId"
-                  [style.--module-color]="module.color"
-                >
-                  <div class="module-card-icon">
-                    <span nz-icon [nzType]="module.icon" nzTheme="outline"></span>
-                  </div>
-                  <div class="module-card-content">
-                    <span class="module-card-title">{{ module.title | translate }}</span>
-                  </div>
-                  @if (module.id === currentModuleId) {
-                    <span nz-icon nzType="check" class="module-card-check"></span>
-                  }
-                </button>
-              </div>
-            }
+      @if (viewModel().length > 0) {
+        <div class="module-menu-header">
+          <span class="module-menu-title">{{ 'layout.modules.selectModule' | translate }}</span>
+        </div>
+        <div nz-flex [nzWrap]="'wrap'" [nzGap]="'small'" class="module-flex" role="list" aria-label="Available modules">
+          @for (module of viewModel(); track trackByModuleId($index, module)) {
+            <div nz-flex [nzFlex]="'0 0 calc((100% - 24px) / 4)'" role="listitem">
+              <button
+                class="module-card"
+                [class.module-card-selected]="module.isSelected"
+                (click)="selectModule(module.id)"
+                (keydown.enter)="selectModule(module.id)"
+                (keydown.space)="selectModule(module.id); $event.preventDefault()"
+                [attr.aria-pressed]="module.isSelected"
+                [attr.aria-label]="module.title"
+                [style.--module-color]="module.color"
+                tabindex="0"
+              >
+                <div class="module-card-icon">
+                  <span nz-icon [nzType]="module.icon" nzTheme="outline"></span>
+                </div>
+                <div class="module-card-content">
+                  <span class="module-card-title">{{ module.title | translate }}</span>
+                </div>
+                @if (module.isSelected) {
+                  <span nz-icon nzType="check" class="module-card-check" aria-hidden="true"></span>
+                }
+              </button>
+            </div>
           }
-        }
-      </div>
+        </div>
+      } @else {
+        <div class="module-menu-empty">
+          <span nz-icon nzType="exclamation-circle" class="module-menu-empty-icon"></span>
+          <p class="module-menu-empty-text">{{ 'layout.modules.noModulesAvailable' | translate }}</p>
+        </div>
+      }
     </div>
   </div>
 </nz-dropdown-menu>
