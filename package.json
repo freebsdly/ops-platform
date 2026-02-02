@@ -52,8 +52,14 @@
     "@ant-design/icons-angular": "21.0.0",
     "jsdom": "^27.1.0",
     "less": "^4.2.0",
+    "msw": "^2.12.7",
     "ng-zorro-antd": "21.0.1",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
+  },
+  "msw": {
+    "workerDirectory": [
+      "src/assets"
+    ]
   }
 }
