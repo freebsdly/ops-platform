@@ -34,6 +34,7 @@
                 avatar: user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (user?.name || 'user'),
                 role: user?.roles?.includes('admin') ? 'Administrator' : 'User'
               }" 
+              [fetchFromApi]="true"
               (onLogout)="storeService.logout()"
             />
           }

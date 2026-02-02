@@ -1,5 +1,5 @@
-@if (user()) {
-  @let userInfo = user();
+@if (currentUser) {
+  @let userInfo = currentUser;
   <div
     #userInfoArea
     nz-dropdown
