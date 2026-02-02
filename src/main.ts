@@ -2,5 +2,28 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
 
-bootstrapApplication(App, appConfig)
-  .catch((err) => console.error(err));
+// 开发环境中初始化MSW
+async function initializeApp() {
+  // 只在开发环境初始化MSW
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    try {
+      // 动态导入以避免生产环境打包
+      const { initMsw } = await import('./mocks/init');
+      await initMsw();
+      console.log('✅ 开发环境MSW初始化完成');
+    } catch (error) {
+      console.warn('⚠️ MSW初始化失败:', error);
+      console.warn('应用将继续运行，但API请求不会被Mock');
+    }
+  }
+  
+  // 启动Angular应用
+  try {
+    await bootstrapApplication(App, appConfig);
+  } catch (error) {
+    console.error('Angular应用启动失败:', error);
+  }
+}
+
+// 启动应用
+initializeApp();

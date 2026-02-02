@@ -1,8 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, BehaviorSubject, catchError, tap, throwError } from 'rxjs';
+import { Observable, of, BehaviorSubject, catchError, tap } from 'rxjs';
 import { LayoutConfig, LogoConfig, DEFAULT_LAYOUT_CONFIG } from '../types/layout-config.interface';
-import { ConfigApiService } from './config-api.service';
 
 /**
  * 配置服务 - 负责从后端加载和管理应用配置
@@ -12,7 +11,11 @@ import { ConfigApiService } from './config-api.service';
 })
 export class ConfigService {
   private http = inject(HttpClient);
-  private configApiService = inject(ConfigApiService);
+  
+  /**
+   * API基础URL - 使用相对路径，MSW会拦截
+   */
+  private readonly API_BASE_URL = '/api';
   
   /**
    * 当前布局配置
@@ -52,28 +55,37 @@ export class ConfigService {
     if (!forceRefresh) {
       const cachedConfig = this.getCachedConfig();
       if (cachedConfig) {
+        console.log('ConfigService: 使用缓存配置');
         this.layoutConfigSubject.next(cachedConfig);
         return of(cachedConfig);
       }
     }
     
     // 设置加载状态
+    console.log('ConfigService: 从API加载配置...');
     this.loadingSubject.next(true);
     this.errorSubject.next(null);
     
-    // 使用模拟API服务
-    return this.configApiService.getLayoutConfig().pipe(
+    const apiUrl = `${this.API_BASE_URL}/config/layout`;
+    console.log(`ConfigService: 请求URL: ${apiUrl}`);
+    
+    return this.http.get<LayoutConfig>(apiUrl).pipe(
       tap((config) => {
+        console.log('ConfigService: API响应成功:', {
+          appTitle: config.appTitle,
+          hasData: !!config
+        });
         this.layoutConfigSubject.next(config);
         this.cacheConfig(config);
         this.loadingSubject.next(false);
       }),
       catchError((error) => {
-        console.error('Failed to load layout config:', error);
+        console.error('ConfigService: 加载配置失败:', error);
         this.errorSubject.next(error.message || 'Failed to load configuration');
         this.loadingSubject.next(false);
         
         // 使用默认配置作为回退
+        console.log('ConfigService: 使用默认配置作为回退');
         this.layoutConfigSubject.next(DEFAULT_LAYOUT_CONFIG);
         return of(DEFAULT_LAYOUT_CONFIG);
       })
@@ -105,8 +117,7 @@ export class ConfigService {
    * 保存布局配置到后端
    */
   saveLayoutConfig(config: LayoutConfig): Observable<LayoutConfig> {
-    // 使用模拟API服务
-    return this.configApiService.saveLayoutConfig(config).pipe(
+    return this.http.post<LayoutConfig>(`${this.API_BASE_URL}/config/layout`, config).pipe(
       tap((savedConfig) => {
         this.layoutConfigSubject.next(savedConfig);
         this.cacheConfig(savedConfig);
@@ -161,10 +172,68 @@ export class ConfigService {
   }
   
   /**
-   * 获取页脚配置
+   * 获取应用配置
    */
-  getFooterConfig() {
-    return this.layoutConfigSubject.value.footer;
+  getAppConfig(): Observable<{
+    version: string;
+    environment: string;
+    apiUrl: string;
+    features: Record<string, boolean>;
+  }> {
+    return this.http.get<{
+      version: string;
+      environment: string;
+      apiUrl: string;
+      features: Record<string, boolean>;
+    }>(`${this.API_BASE_URL}/config/app`);
+  }
+
+  /**
+   * 验证配置
+   */
+  validateConfig(config: Partial<LayoutConfig>): Observable<{
+    valid: boolean;
+    errors: string[];
+  }> {
+    return this.http.post<{
+      valid: boolean;
+      errors: string[];
+    }>(`${this.API_BASE_URL}/config/validate`, config);
+  }
+
+  /**
+   * 获取Logo配置（直接API调用）
+   */
+  getLogoConfigFromApi(): Observable<LogoConfig> {
+    return this.http.get<LogoConfig>(`${this.API_BASE_URL}/config/logo`);
+  }
+
+  /**
+   * 获取主题配置（直接API调用）
+   */
+  getThemeConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.theme> {
+    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.theme>(`${this.API_BASE_URL}/config/theme`);
+  }
+
+  /**
+   * 获取侧边栏配置（直接API调用）
+   */
+  getSidebarConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.sidebar> {
+    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.sidebar>(`${this.API_BASE_URL}/config/sidebar`);
+  }
+
+  /**
+   * 获取页头配置（直接API调用）
+   */
+  getHeaderConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.header> {
+    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.header>(`${this.API_BASE_URL}/config/header`);
+  }
+
+  /**
+   * 获取页脚配置（直接API调用）
+   */
+  getFooterConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.footer> {
+    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.footer>(`${this.API_BASE_URL}/config/footer`);
   }
   
   /**
