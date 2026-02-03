@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, OnDestroy } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { delay, catchError, tap, map } from 'rxjs/operators';
 import { User } from '../core/types/user.interface';
@@ -8,11 +8,34 @@ import { UserApiService, AuthResponse } from '../core/services/user-api.service'
 @Injectable({
   providedIn: 'root',
 })
-export class AuthService {
+export class AuthService implements OnDestroy {
   private readonly tokenKey = 'auth_token';
   private readonly userKey = 'user';
   private router = inject(Router);
   private userApiService = inject(UserApiService);
+  private broadcastChannel: BroadcastChannel | null = null;
+
+  constructor() {
+    this.initBroadcastChannel();
+  }
+
+  private initBroadcastChannel() {
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.broadcastChannel = new BroadcastChannel('auth');
+
+      this.broadcastChannel.onmessage = (event) => {
+        if (event.data?.type === 'logout') {
+          this.performLogout();
+        }
+      };
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.broadcastChannel) {
+      this.broadcastChannel.close();
+    }
+  }
 
   login(username: string, password: string): Observable<AuthResponse> {
     return this.userApiService.login(username, password).pipe(
@@ -28,20 +51,27 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
+    if (this.broadcastChannel) {
+      this.broadcastChannel.postMessage({ type: 'logout' });
+    }
+
     return this.userApiService.logout().pipe(
       map(() => undefined),
       tap(() => {
-        localStorage.removeItem(this.tokenKey);
-        localStorage.removeItem(this.userKey);
+        this.performLogout();
       }),
       catchError((error) => {
         console.error('登出API调用失败:', error);
-        // 即使API失败也清除本地状态
-        localStorage.removeItem(this.tokenKey);
-        localStorage.removeItem(this.userKey);
-        throw error;
+        this.performLogout();
+        return of(undefined);
       })
     );
+  }
+
+  private performLogout() {
+    localStorage.removeItem(this.tokenKey);
+    localStorage.removeItem(this.userKey);
+    sessionStorage.clear();
   }
 
   checkAuth(): Observable<{ user: User | null; token: string | null }> {

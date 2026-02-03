@@ -103,7 +103,16 @@ export class AuthEffects {
   logout$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.logout),
-      map(() => AuthActions.logoutSuccess())
+      mergeMap(() =>
+        this.authService.logout().pipe(
+          map(() => AuthActions.logoutSuccess()),
+          catchError((error) => {
+            console.error('Logout failed:', error);
+            // 即使API失败也触发logoutSuccess，确保用户能登出
+            return of(AuthActions.logoutSuccess());
+          })
+        )
+      )
     )
   );
 
@@ -112,8 +121,8 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.logoutSuccess),
         tap(() => {
-          // 导航到登录页面 - 现在在AuthService中处理
-          // this.router.navigate(['/login']);
+          console.log('logoutSuccess effect: logout completed, navigating to /login');
+          this.router.navigate(['/login']);
         })
       ),
     { dispatch: false }

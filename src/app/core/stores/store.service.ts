@@ -63,17 +63,9 @@ export class StoreService {
 
   logout(): void {
     console.log('StoreService.logout() called');
-    
-    // 清除本地存储的认证信息
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user');
-    
-    // Dispatch logout action
+
+    // Dispatch logout action, let effect handle API call and cleanup
     this.store.dispatch(AuthActions.logout());
-    
-    // 导航到登录页面
-    console.log('Navigating to /login');
-    this.router.navigate(['/login']);
   }
 
   checkAuth(): void {
