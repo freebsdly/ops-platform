@@ -4,6 +4,7 @@ import { delay, catchError, tap, map } from 'rxjs/operators';
 import { User } from '../core/types/user.interface';
 import { Router } from '@angular/router';
 import { UserApiService, AuthResponse } from '../core/services/user-api.service';
+import { RequestCancelService } from '../core/services/request-cancel.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,6 +14,7 @@ export class AuthService implements OnDestroy {
   private readonly userKey = 'user';
   private router = inject(Router);
   private userApiService = inject(UserApiService);
+  private requestCancelService = inject(RequestCancelService);
   private broadcastChannel: BroadcastChannel | null = null;
 
   constructor() {
@@ -51,6 +53,8 @@ export class AuthService implements OnDestroy {
   }
 
   logout(): Observable<void> {
+    this.requestCancelService.cancelPendingRequests();
+
     if (this.broadcastChannel) {
       this.broadcastChannel.postMessage({ type: 'logout' });
     }

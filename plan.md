@@ -579,10 +579,23 @@ export class ResourceCleanupService {
 
 ### 待实施
 
-#### ⏳ HTTP请求取消机制
-- 实现全局请求拦截器
-- 添加 takeUntil 模式到组件订阅
-- 登出时取消所有待处理请求
+#### ✅ HTTP请求取消机制（2026-02-03）
+**实现内容：**
+- 创建 `RequestCancelService` 用于管理请求取消
+- 创建 `HttpCancelInterceptor` 拦截器实现全局请求取消
+- 在 `auth.service.ts` 中登出时触发请求取消
+- 在 `app.config.ts` 中注册 HTTP 拦截器
+- 所有 HTTP 请求自动附加 takeUntil 逻辑，登出时自动取消
+
+**改动文件：**
+- `src/app/core/services/request-cancel.service.ts`（新增）
+- `src/app/core/interceptors/http-cancel.interceptor.ts`（新增）
+- `src/app/services/auth.service.ts`
+- `src/app/app.config.ts`
+
+**测试状态：**
+- ✅ 构建通过
+- ⚠️  存在预先存在的测试失败（与本次改动无关）
 
 #### ⏳ RxJS订阅清理
 - 统一使用 takeUntil 模式

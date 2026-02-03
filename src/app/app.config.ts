@@ -1,6 +1,6 @@
 import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { icons } from './icons-provider';
@@ -16,6 +16,7 @@ import { provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideRouterStore } from '@ngrx/router-store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
+import { httpCancelInterceptor } from './core/interceptors/http-cancel.interceptor';
 
 registerLocaleData(zh);
 registerLocaleData(en);
@@ -35,7 +36,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([httpCancelInterceptor])),
     provideNzIcons(icons),
     provideNzI18n(zh_CN),
     provideNzConfig(ngZorroConfig),
