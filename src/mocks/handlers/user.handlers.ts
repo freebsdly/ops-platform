@@ -1,7 +1,8 @@
 import { http, HttpResponse } from 'msw';
 import { User } from '../../app/core/types/user.interface';
 import { Permission } from '../../app/core/types/permission.interface';
-import { MODULES_CONFIG, MENUS_CONFIG } from '../../app/config/menu.config';
+import { MenuPermission } from '../../app/core/types/menu-permission.interface';
+import { MODULES_CONFIG, MENUS_CONFIG, MenuItem } from '../../app/config/menu.config';
 
 // 模拟用户数据
 const mockUsers: User[] = [
@@ -183,6 +184,70 @@ const mockRoles = [
   { id: 'user', name: '普通用户', description: '拥有基础权限' },
   { id: 'viewer', name: '查看者', description: '只拥有查看权限' }
 ];
+
+// 辅助函数：检查用户是否有菜单访问权限
+function checkMenuAccess(user: User, menuItem: MenuItem): boolean {
+  // 如果没有权限要求，允许访问
+  if (!menuItem.permission && (!menuItem.roles || menuItem.roles.length === 0)) {
+    return true;
+  }
+
+  // 检查角色权限
+  if (menuItem.roles && menuItem.roles.length > 0) {
+    const hasRole = menuItem.roles.some((role: string) => user.roles.includes(role));
+    if (!hasRole) {
+      return false;
+    }
+  }
+
+  // 检查细粒度权限
+  if (menuItem.permission) {
+    const hasPermission = user.permissions?.some(permission => 
+      permission.resource === menuItem.permission!.resource &&
+      (Array.isArray(permission.action) 
+        ? permission.action.includes(menuItem.permission!.action)
+        : permission.action === menuItem.permission!.action)
+    );
+    if (!hasPermission) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+// 辅助函数：从路径中提取资源标识
+function extractResourceFromPath(path: string): string {
+  // 从路径中提取资源，如：/configuration/management/model -> configuration
+  const parts = path.split('/').filter(part => part.length > 0);
+  return parts[0] || 'unknown';
+}
+
+// 辅助函数：根据路由路径查找菜单项
+function findMenuByPath(routePath: string): MenuItem | null {
+  for (const menus of Object.values(MENUS_CONFIG)) {
+    const findMenu = (menuList: MenuItem[]): MenuItem | null => {
+      for (const menu of menuList) {
+        if (menu.link && menu.link === routePath) {
+          return menu;
+        }
+        if (menu.children && menu.children.length > 0) {
+          const found = findMenu(menu.children);
+          if (found) {
+            return found;
+          }
+        }
+      }
+      return null;
+    };
+    
+    const found = findMenu(menus);
+    if (found) {
+      return found;
+    }
+  }
+  return null;
+}
 
 // 模拟当前登录用户
 let currentUser = mockUsers[0];
@@ -492,5 +557,125 @@ export const userHandlers = [
     });
 
     return HttpResponse.json({ menus });
+  }),
+
+  // 获取用户菜单权限列表
+  http.get('/api/user/menu-permissions', ({ request }) => {
+    const url = new URL(request.url);
+    const userId = url.searchParams.get('userId') || '1';
+    
+    const user = mockUsers.find(u => u.id === parseInt(userId)) || mockUsers[0];
+    
+    // 根据用户权限和菜单配置生成菜单权限列表
+    const menuPermissions: MenuPermission[] = [];
+    
+    // 检查每个模块的菜单配置
+    Object.entries(MENUS_CONFIG).forEach(([moduleId, menus]) => {
+      const flattenMenus = (menuList: MenuItem[], parentPath = ''): void => {
+        menuList.forEach(menu => {
+          if (menu.link) {
+            // 检查用户是否有访问此菜单的权限
+            const hasAccess = checkMenuAccess(user, menu);
+            if (hasAccess) {
+              menuPermissions.push({
+                menuId: menu.key || menu.link,
+                resource: moduleId,
+                action: menu.permission?.action ? [menu.permission.action] : ['read'],
+                requiredRoles: menu.roles
+              });
+            }
+          }
+          
+          if (menu.children && menu.children.length > 0) {
+            flattenMenus(menu.children, menu.link || '');
+          }
+        });
+      };
+      
+      flattenMenus(menus);
+    });
+    
+    return HttpResponse.json(menuPermissions);
+  }),
+
+  // 检查用户是否有特定路由的权限
+  http.post('/api/permissions/check-route', async ({ request }) => {
+    const { routePath, userId } = await request.json() as { routePath: string; userId?: number };
+    
+    const user = userId ? mockUsers.find(u => u.id === userId) : currentUser;
+    if (!user) {
+      return HttpResponse.json(
+        { error: '用户不存在' },
+        { status: 404 }
+      );
+    }
+    
+    // 查找匹配的路由对应的菜单项
+    const matchingMenu = findMenuByPath(routePath);
+    
+    if (matchingMenu) {
+      // 检查用户是否有访问此菜单的权限
+      const hasPermission = checkMenuAccess(user, matchingMenu);
+      const requiredPermission: MenuPermission = {
+        menuId: matchingMenu.key || matchingMenu.link || '',
+        resource: matchingMenu.permission?.resource || extractResourceFromPath(routePath),
+        action: matchingMenu.permission?.action ? [matchingMenu.permission.action] : ['read']
+      };
+      
+      return HttpResponse.json({
+        hasPermission,
+        requiredPermission: requiredPermission,
+        userPermission: hasPermission ? requiredPermission : undefined
+      });
+    }
+    
+    // 如果没有找到对应的菜单配置，检查用户是否具有默认权限
+    const hasDefaultPermission = user.roles.includes('admin') || 
+                                 user.permissions.some(p => p.id.includes('default'));
+    
+    return HttpResponse.json({
+      hasPermission: hasDefaultPermission,
+      requiredPermission: {
+        menuId: routePath,
+        resource: extractResourceFromPath(routePath),
+        action: ['read']
+      },
+      userPermission: hasDefaultPermission ? {
+        menuId: routePath,
+        resource: extractResourceFromPath(routePath),
+        action: ['read']
+      } : undefined
+    });
+  }),
+
+  // 批量检查路由权限
+  http.post('/api/permissions/check-batch-routes', async ({ request }) => {
+    const { routes, userId } = await request.json() as { routes: string[]; userId?: number };
+    
+    const user = userId ? mockUsers.find(u => u.id === userId) : currentUser;
+    if (!user) {
+      return HttpResponse.json(
+        { error: '用户不存在' },
+        { status: 404 }
+      );
+    }
+    
+    const results = routes.map(routePath => {
+      // 查找匹配的菜单项
+      const matchingMenu = findMenuByPath(routePath);
+      
+      if (matchingMenu) {
+        const hasPermission = checkMenuAccess(user, matchingMenu);
+        return { routePath, hasPermission };
+      }
+      
+      // 默认权限检查
+      const hasDefaultPermission = user.roles.includes('admin') || 
+                                   user.permissions.some(p => p.id.includes('default'));
+      
+      return { routePath, hasPermission: hasDefaultPermission };
+    });
+    
+    return HttpResponse.json({ results });
   })
 ];
