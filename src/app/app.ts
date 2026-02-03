@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, computed, signal } from '@angular/core';
+import { Component, inject, OnInit, computed, signal, OnDestroy } from '@angular/core';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzLayoutModule } from 'ng-zorro-antd/layout';
@@ -15,7 +15,8 @@ import { SiderHeader } from './layout/sider-header/sider-header';
 import { SiderMenu } from './layout/sider-menu/sider-menu';
 import { SiderFooter } from './layout/sider-footer/sider-footer';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { filter } from 'rxjs/operators';
+import { filter, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -38,7 +39,7 @@ import { AuthService } from './services/auth.service';
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App implements OnInit {
+export class App implements OnInit, OnDestroy {
   logoSrc = 'https://ng.ant.design/assets.img/logo.svg';
   logoAlt = 'Logo';
   title = 'Ant Design of Angular';
@@ -76,13 +77,17 @@ export class App implements OnInit {
   // Track if auth check is in progress
   isAuthChecking = signal<boolean>(true);
 
+  // For cleanup
+  private destroy$ = new Subject<void>();
+
   ngOnInit(): void {
     // Initialize current path from router
     this.currentPath.set(this.router.url);
     
     // Subscribe to route changes to track current path
     this.router.events.pipe(
-      filter(event => event instanceof NavigationEnd)
+      filter(event => event instanceof NavigationEnd),
+      takeUntil(this.destroy$)
     ).subscribe((event: NavigationEnd) => {
       this.currentPath.set(event.url);
     });
@@ -98,12 +103,26 @@ export class App implements OnInit {
       // Wait a very short time for any immediate NgRx updates, then mark as done
       setTimeout(() => {
         this.isAuthChecking.set(false);
+        // 用户已认证，加载配置和模块
+        this.loadUserResources();
       }, 50);
     } else {
       // No token, wait for NgRx to confirm not authenticated
-      this.storeService.isLoading$.subscribe(isLoading => {
+      this.storeService.isLoading$.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(isLoading => {
         if (!isLoading) {
           this.isAuthChecking.set(false);
+        }
+      });
+      
+      // 监听认证状态变化，当用户登录成功后加载配置
+      this.storeService.isAuthenticated$.pipe(
+        takeUntil(this.destroy$)
+      ).subscribe(isAuthenticated => {
+        if (isAuthenticated) {
+          // 用户登录成功，加载配置和模块
+          this.loadUserResources();
         }
       });
       
@@ -112,12 +131,6 @@ export class App implements OnInit {
         this.isAuthChecking.set(false);
       }, 2000);
     }
-    
-    // Load configuration
-    this.storeService.loadConfig();
-    
-    // Load available modules
-    this.storeService.loadModules();
     
     // Initialize layout state from localStorage
     const savedTheme = localStorage.getItem('theme');
@@ -132,6 +145,23 @@ export class App implements OnInit {
     
     // Set current module based on initial URL
     this.setInitialModule();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /**
+   * 加载用户相关资源（配置和模块）
+   * 只在用户认证成功后调用
+   */
+  private loadUserResources(): void {
+    // Load configuration
+    this.storeService.loadConfig();
+    
+    // Load available modules
+    this.storeService.loadModules();
   }
 
   // Use computed signal to determine if we should show layout

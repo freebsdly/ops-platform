@@ -32,9 +32,6 @@
 
       <!-- Login form -->
       <div class="form-section">
-        <h2 class="form-title">{{ 'LOGIN.TITLE' | translate }}</h2>
-        <p class="form-subtitle">{{ 'LOGIN.SUBTITLE' | translate }}</p>
-
         <!-- Error alert - 放在表单上方 -->
         @if (authError$ | async; as error) {
           <div class="error-alert-wrapper">
