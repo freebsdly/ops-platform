@@ -65,7 +65,6 @@
                   aria-describedby="email-description"
                   (blur)="loginForm.get('email')?.markAsTouched()"
                 />
-                <div id="email-description" class="sr-only">Enter your email address to log in</div>
               </nz-input-wrapper>
             </nz-form-control>
           </nz-form-item>
@@ -85,7 +84,6 @@
                   aria-describedby="password-description"
                   (blur)="loginForm.get('password')?.markAsTouched()"
                 />
-                <div id="password-description" class="sr-only">Enter your password. Click the eye icon to show or hide the password</div>
               </nz-input-password>
             </nz-form-control>
           </nz-form-item>
@@ -125,16 +123,6 @@
               <nz-icon nzType="github" nzTheme="outline"></nz-icon>
               <span>{{ 'LOGIN.SOCIAL.GITHUB' | translate }}</span>
             </button>
-            <button nz-button nzBlock nzSize="large" class="social-button google-button">
-              <nz-icon nzType="google" nzTheme="outline"></nz-icon>
-              <span>{{ 'LOGIN.SOCIAL.GOOGLE' | translate }}</span>
-            </button>
-          </div>
-
-          <!-- Register link -->
-          <div class="register-section">
-            <span class="register-text">{{ 'LOGIN.REGISTER_TEXT' | translate }}</span>
-            <a class="register-link" role="button" tabindex="0" aria-label="Register for an account">{{ 'LOGIN.REGISTER_LINK' | translate }}</a>
           </div>
         </form>
       </div>

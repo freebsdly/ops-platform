@@ -196,23 +196,23 @@ export const userHandlers = [
   // 用户登录
   http.post('/api/auth/login', async ({ request }) => {
     const { username, password } = await request.json() as { username: string, password: string };
-    
+
     // 模拟登录验证
     const user = mockUsers.find(u => u.username === username);
-    
-    if (!user || password !== 'password123') { // 简单密码验证
+
+    if (!user) { // 简单密码验证
       return HttpResponse.json(
         { error: '用户名或密码错误' },
         { status: 401 }
       );
     }
-    
+
     // 更新当前用户
     currentUser = user;
-    
+
     // 生成模拟token
     const token = `mock_jwt_token_${Date.now()}_${user.id}`;
-    
+
     return HttpResponse.json({
       user,
       token
@@ -231,22 +231,22 @@ export const userHandlers = [
     const search = url.searchParams.get('search') || '';
     const page = parseInt(url.searchParams.get('page') || '1');
     const pageSize = parseInt(url.searchParams.get('pageSize') || '10');
-    
+
     // 模拟搜索
     let filteredUsers = mockUsers;
     if (search) {
-      filteredUsers = mockUsers.filter(user => 
+      filteredUsers = mockUsers.filter(user =>
         user.name.toLowerCase().includes(search.toLowerCase()) ||
         user.username.toLowerCase().includes(search.toLowerCase()) ||
         user.email.toLowerCase().includes(search.toLowerCase())
       );
     }
-    
+
     // 模拟分页
     const startIndex = (page - 1) * pageSize;
     const endIndex = startIndex + pageSize;
     const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
-    
+
     return HttpResponse.json({
       users: paginatedUsers,
       total: filteredUsers.length,
@@ -260,14 +260,14 @@ export const userHandlers = [
   http.get('/api/users/:id', ({ params }) => {
     const id = parseInt(params['id'] as string);
     const user = mockUsers.find(u => u.id === id);
-    
+
     if (!user) {
       return HttpResponse.json(
         { error: '用户不存在' },
         { status: 404 }
       );
     }
-    
+
     return HttpResponse.json(user);
   }),
 
@@ -275,27 +275,27 @@ export const userHandlers = [
   http.put('/api/users/:id', async ({ params, request }) => {
     const id = parseInt(params['id'] as string);
     const userIndex = mockUsers.findIndex(u => u.id === id);
-    
+
     if (userIndex === -1) {
       return HttpResponse.json(
         { error: '用户不存在' },
         { status: 404 }
       );
     }
-    
+
     const updates = await request.json() as Partial<User>;
-    
+
     // 更新用户信息
     mockUsers[userIndex] = {
       ...mockUsers[userIndex],
       ...updates
     };
-    
+
     // 如果更新的是当前用户，同步更新
     if (currentUser.id === id) {
       currentUser = mockUsers[userIndex];
     }
-    
+
     return HttpResponse.json(mockUsers[userIndex]);
   }),
 
@@ -303,14 +303,14 @@ export const userHandlers = [
   http.get('/api/users/:id/permissions', ({ params }) => {
     const id = parseInt(params['id'] as string);
     const user = mockUsers.find(u => u.id === id);
-    
+
     if (!user) {
       return HttpResponse.json(
         { error: '用户不存在' },
         { status: 404 }
       );
     }
-    
+
     return HttpResponse.json(user.permissions);
   }),
 
@@ -318,16 +318,16 @@ export const userHandlers = [
   http.post('/api/permissions/check', async ({ request }) => {
     const { userId, permissionId } = await request.json() as { userId: number, permissionId: string };
     const user = mockUsers.find(u => u.id === userId);
-    
+
     if (!user) {
       return HttpResponse.json(
         { error: '用户不存在' },
         { status: 404 }
       );
     }
-    
+
     const hasPermission = user.permissions.some(p => p.id === permissionId);
-    
+
     return HttpResponse.json({
       hasPermission,
       user: {
@@ -352,10 +352,10 @@ export const userHandlers = [
   http.get('/api/user/menus', ({ request }) => {
     const url = new URL(request.url);
     const userId = url.searchParams.get('userId') || '1';
-    
+
     // 根据用户角色返回不同的菜单
     const user = mockUsers.find(u => u.id === parseInt(userId)) || mockUsers[0];
-    
+
     const baseMenus = [
       {
         id: 'dashboard',
@@ -366,7 +366,7 @@ export const userHandlers = [
         enabled: user.permissions.some(p => p.id === 'dashboard:view')
       }
     ];
-    
+
     if (user.roles.includes('admin')) {
       return HttpResponse.json([
         ...baseMenus,
@@ -453,14 +453,14 @@ export const userHandlers = [
   http.get('/api/system/modules/:moduleId/menus', ({ params }) => {
     const moduleId = params['moduleId'] as string;
     const moduleMenus = MENUS_CONFIG[moduleId];
-    
+
     if (!moduleMenus) {
       return HttpResponse.json(
         { error: '模块不存在' },
         { status: 404 }
       );
     }
-    
+
     // 定义API响应类型
     type ApiMenuItem = {
       id: string;
@@ -469,7 +469,7 @@ export const userHandlers = [
       path: string;
       children?: ApiMenuItem[];
     };
-    
+
     // 将MenuItem格式转换为API响应格式
     const menus: ApiMenuItem[] = moduleMenus.map(menu => {
       const apiMenu: ApiMenuItem = {
@@ -478,7 +478,7 @@ export const userHandlers = [
         icon: menu.icon,
         path: menu.link || `/${moduleId}/${menu.key?.toLowerCase() || menu.text.toLowerCase()}`
       };
-      
+
       if (menu.children && menu.children.length > 0) {
         apiMenu.children = menu.children.map(child => ({
           id: child.key || child.text,
@@ -487,10 +487,10 @@ export const userHandlers = [
           path: child.link || `/${moduleId}/${child.key?.toLowerCase() || child.text.toLowerCase()}`
         }));
       }
-      
+
       return apiMenu;
     });
-    
+
     return HttpResponse.json({ menus });
   })
 ];
