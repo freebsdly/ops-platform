@@ -37,15 +37,10 @@ export const initMsw = async () => {
     
     console.log('✅ MSW已成功启动');
     console.log('MSW: 可以拦截以下API请求:');
-    console.log('  - GET /api/config/layout');
-    console.log('  - POST /api/config/layout');
-    console.log('  - GET /api/config/app');
-    console.log('  - GET /api/config/logo');
-    console.log('  - GET /api/config/theme');
-    console.log('  - GET /api/config/sidebar');
-    console.log('  - GET /api/config/header');
-    console.log('  - GET /api/config/footer');
-    console.log('  - POST /api/config/validate');
+    console.log('  - GET /api/config/layout - 获取完整布局配置');
+    console.log('  - POST /api/config/layout - 保存布局配置');
+    console.log('  - GET /api/config/app - 获取应用配置');
+    console.log('  - POST /api/config/validate - 验证配置');
     
     // 验证MSW是否正常工作
     setTimeout(async () => {

@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
-import { SiderHeader } from '../sider-header/sider-header';
-import { SiderMenu } from '../sider-menu/sider-menu';
-import { SiderFooter } from '../sider-footer/sider-footer';
+import { Component, input } from '@angular/core';
+import { LayoutConfig } from '../../core/types/layout-config.interface';
 
 @Component({
   selector: 'app-sider',
-  imports: [SiderHeader, SiderFooter, SiderMenu],
   templateUrl: './sider.html',
   styleUrl: './sider.css',
 })
-export class Sider {}
+export class Sider {
+  // 从父组件接收配置
+  layoutConfig = input<LayoutConfig>();
+  isSiderCollapsed = input<boolean>(false);
+}

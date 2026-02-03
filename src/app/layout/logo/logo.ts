@@ -1,7 +1,6 @@
-import { Component, input, computed, inject } from '@angular/core';
+import { Component, input, computed } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { StoreService } from '../../core/stores/store.service';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { LogoConfig } from '../../core/types/layout-config.interface';
 
 @Component({
   selector: 'app-logo',
@@ -10,24 +9,23 @@ import { toSignal } from '@angular/core/rxjs-interop';
   styleUrl: './logo.css',
 })
 export class Logo {
-  private storeService = inject(StoreService);
-  
   isCollapsed = input.required<boolean>();
   title = input('');
+  config = input<LogoConfig>();
   
-  // Signals from store
-  logoSrcSig = toSignal(this.storeService.logoSrc$);
-  logoAltSig = toSignal(this.storeService.logoAlt$);
-  logoLinkSig = toSignal(this.storeService.logoLink$);
-  logoCollapsedIconSig = toSignal(this.storeService.logoCollapsedIcon$);
-  logoExpandedIconSig = toSignal(this.storeService.logoExpandedIcon$);
+  // 从配置派生属性
+  logoSrc = computed(() => this.config()?.src || 'https://ng.ant.design/assets.img/logo.svg');
+  logoAlt = computed(() => this.config()?.alt || 'Logo');
+  logoLink = computed(() => this.config()?.link || 'https://ng.ant.design/');
+  logoCollapsedIcon = computed(() => this.config()?.collapsedIcon || 'bars');
+  logoExpandedIcon = computed(() => this.config()?.expandedIcon || 'bars');
   
   showTitle = computed(() => !this.isCollapsed() && !!this.title());
-  showImage = computed(() => !!this.logoSrcSig());
-  showIcon = computed(() => !this.logoSrcSig() || this.isCollapsed());
+  showImage = computed(() => !!this.logoSrc());
+  showIcon = computed(() => !this.logoSrc() || this.isCollapsed());
   iconType = computed(() => 
     this.isCollapsed() 
-      ? this.logoCollapsedIconSig() || 'bars'
-      : this.logoExpandedIconSig() || 'bars'
+      ? this.logoCollapsedIcon() || 'bars'
+      : this.logoExpandedIcon() || 'bars'
   );
 }

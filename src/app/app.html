@@ -12,7 +12,20 @@
       (nzCollapsedChange)="storeService.setSiderCollapsed($event)"
       [nzTrigger]="null"
     >
-      <app-sider class="app-layout-sider-inner" />
+      <app-sider class="app-layout-sider-inner">
+        <app-sider-header 
+          [layoutConfig]="layoutConfigSig()"
+          [isSiderCollapsed]="isSiderCollapsedSig()"
+        />
+        <app-sider-menu 
+          class="app-layout-sider-content" 
+          [layoutConfig]="layoutConfigSig()"
+        />
+        <app-sider-footer 
+          class="app-layout-sider-footer" 
+          [layoutConfig]="layoutConfigSig()"
+        />
+      </app-sider>
     </nz-sider>
 
     <!-- 折叠按钮放在侧边栏外部，定位在侧边栏右侧 -->

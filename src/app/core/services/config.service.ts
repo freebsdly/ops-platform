@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, BehaviorSubject, catchError, tap } from 'rxjs';
+import { Observable, of, BehaviorSubject, catchError, tap, map } from 'rxjs';
 import { LayoutConfig, LogoConfig, DEFAULT_LAYOUT_CONFIG } from '../types/layout-config.interface';
 
 /**
@@ -202,38 +202,58 @@ export class ConfigService {
   }
 
   /**
-   * 获取Logo配置（直接API调用）
+   * 获取布局配置中的Logo配置
+   * @deprecated 请直接使用布局配置中的logo字段
    */
   getLogoConfigFromApi(): Observable<LogoConfig> {
-    return this.http.get<LogoConfig>(`${this.API_BASE_URL}/config/logo`);
+    console.warn('ConfigService.getLogoConfigFromApi() is deprecated. Use the layout config directly.');
+    return this.loadLayoutConfig().pipe(
+      map(config => config.logo)
+    );
   }
 
   /**
-   * 获取主题配置（直接API调用）
+   * 获取布局配置中的主题配置
+   * @deprecated 请直接使用布局配置中的theme字段
    */
   getThemeConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.theme> {
-    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.theme>(`${this.API_BASE_URL}/config/theme`);
+    console.warn('ConfigService.getThemeConfigFromApi() is deprecated. Use the layout config directly.');
+    return this.loadLayoutConfig().pipe(
+      map(config => config.theme)
+    );
   }
 
   /**
-   * 获取侧边栏配置（直接API调用）
+   * 获取布局配置中的侧边栏配置
+   * @deprecated 请直接使用布局配置中的sidebar字段
    */
   getSidebarConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.sidebar> {
-    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.sidebar>(`${this.API_BASE_URL}/config/sidebar`);
+    console.warn('ConfigService.getSidebarConfigFromApi() is deprecated. Use the layout config directly.');
+    return this.loadLayoutConfig().pipe(
+      map(config => config.sidebar)
+    );
   }
 
   /**
-   * 获取页头配置（直接API调用）
+   * 获取布局配置中的页头配置
+   * @deprecated 请直接使用布局配置中的header字段
    */
   getHeaderConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.header> {
-    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.header>(`${this.API_BASE_URL}/config/header`);
+    console.warn('ConfigService.getHeaderConfigFromApi() is deprecated. Use the layout config directly.');
+    return this.loadLayoutConfig().pipe(
+      map(config => config.header)
+    );
   }
 
   /**
-   * 获取页脚配置（直接API调用）
+   * 获取布局配置中的页脚配置
+   * @deprecated 请直接使用布局配置中的footer字段
    */
   getFooterConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.footer> {
-    return this.http.get<typeof DEFAULT_LAYOUT_CONFIG.footer>(`${this.API_BASE_URL}/config/footer`);
+    console.warn('ConfigService.getFooterConfigFromApi() is deprecated. Use the layout config directly.');
+    return this.loadLayoutConfig().pipe(
+      map(config => config.footer)
+    );
   }
   
   /**

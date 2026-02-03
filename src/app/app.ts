@@ -11,6 +11,9 @@ import { ModuleSelector } from './layout/module-selector/module-selector';
 import { StoreService } from './core/stores/store.service';
 import { Loading } from './layout/loading/loading';
 import { Search } from './layout/search/search';
+import { SiderHeader } from './layout/sider-header/sider-header';
+import { SiderMenu } from './layout/sider-menu/sider-menu';
+import { SiderFooter } from './layout/sider-footer/sider-footer';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
 import { AuthService } from './services/auth.service';
@@ -27,7 +30,10 @@ import { AuthService } from './services/auth.service';
     LangSelector, 
     ModuleSelector,
     Loading,
-    Search
+    Search,
+    SiderHeader,
+    SiderMenu,
+    SiderFooter
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -54,14 +60,18 @@ export class App implements OnInit {
   userSig = toSignal(this.storeService.user$, { initialValue: this.initialAuthState.user });
   isSiderCollapsedSig = toSignal(this.storeService.isSiderCollapsed$, { initialValue: false });
   
-  // Config signals
+  // Config signals - 单次获取完整配置
   layoutConfigSig = toSignal(this.storeService.layoutConfig$);
-  appTitleSig = toSignal(this.storeService.appTitle$);
-  logoSrcSig = toSignal(this.storeService.logoSrc$);
-  logoAltSig = toSignal(this.storeService.logoAlt$);
-  logoLinkSig = toSignal(this.storeService.logoLink$);
   configLoadingSig = toSignal(this.storeService.configLoading$);
   configLoadedSig = toSignal(this.storeService.configLoaded$);
+  
+  // 派生配置信号 - 从完整配置中提取
+  appTitleSig = computed(() => this.layoutConfigSig()?.appTitle || 'Ops Platform');
+  logoSrcSig = computed(() => this.layoutConfigSig()?.logo?.src || 'https://ng.ant.design/assets.img/logo.svg');
+  logoAltSig = computed(() => this.layoutConfigSig()?.logo?.alt || 'Logo');
+  logoLinkSig = computed(() => this.layoutConfigSig()?.logo?.link || 'https://ng.ant.design/');
+  logoCollapsedIconSig = computed(() => this.layoutConfigSig()?.logo?.collapsedIcon || 'bars');
+  logoExpandedIconSig = computed(() => this.layoutConfigSig()?.logo?.expandedIcon || 'bars');
   
   // Track if auth check is in progress
   isAuthChecking = signal<boolean>(true);

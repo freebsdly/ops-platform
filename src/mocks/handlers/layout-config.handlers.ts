@@ -43,7 +43,7 @@ const mockConfig: LayoutConfig = {
 };
 
 export const layoutConfigHandlers = [
-  // 获取布局配置
+  // 获取完整布局配置 - 单次API调用获取所有配置
   http.get('/api/config/layout', () => {
     return HttpResponse.json(mockConfig);
   }),
@@ -56,31 +56,6 @@ export const layoutConfigHandlers = [
     Object.assign(mockConfig, config);
     
     return HttpResponse.json(mockConfig);
-  }),
-
-  // 获取Logo配置
-  http.get('/api/config/logo', () => {
-    return HttpResponse.json(mockConfig.logo);
-  }),
-
-  // 获取主题配置
-  http.get('/api/config/theme', () => {
-    return HttpResponse.json(mockConfig.theme);
-  }),
-
-  // 获取侧边栏配置
-  http.get('/api/config/sidebar', () => {
-    return HttpResponse.json(mockConfig.sidebar);
-  }),
-
-  // 获取页头配置
-  http.get('/api/config/header', () => {
-    return HttpResponse.json(mockConfig.header);
-  }),
-
-  // 获取页脚配置
-  http.get('/api/config/footer', () => {
-    return HttpResponse.json(mockConfig.footer);
   }),
 
   // 验证配置
@@ -103,7 +78,7 @@ export const layoutConfigHandlers = [
     });
   }),
 
-  // 获取应用配置
+  // 获取应用配置（独立配置，不属于布局配置）
   http.get('/api/config/app', () => {
     return HttpResponse.json({
       version: '1.2.0',

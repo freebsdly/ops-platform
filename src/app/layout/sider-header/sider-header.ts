@@ -1,7 +1,6 @@
-import { Component, inject } from '@angular/core';
-import { StoreService } from '../../core/stores/store.service';
+import { Component, input, computed } from '@angular/core';
 import { Logo } from '../logo/logo';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { LayoutConfig } from '../../core/types/layout-config.interface';
 
 @Component({
   selector: 'app-sider-header',
@@ -10,9 +9,13 @@ import { toSignal } from '@angular/core/rxjs-interop';
   styleUrl: './sider-header.css',
 })
 export class SiderHeader {
-  protected storeService = inject(StoreService);
+  // 从父组件接收完整配置
+  layoutConfig = input.required<LayoutConfig>();
   
-  // Signals from store
-  isSiderCollapsedSig = toSignal(this.storeService.isSiderCollapsed$);
-  appTitleSig = toSignal(this.storeService.appTitle$);
+  // 从父组件接收侧边栏状态
+  isSiderCollapsed = input.required<boolean>();
+  
+  // 派生配置
+  appTitle = computed(() => this.layoutConfig()?.appTitle || 'Ops Platform');
+  logoConfig = computed(() => this.layoutConfig()?.logo);
 }

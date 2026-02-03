@@ -69,9 +69,12 @@ export class ConfigApiService {
 
   /**
    * 获取Logo配置
+   * @deprecated 请直接从完整配置中获取logo字段
    */
   getLogoConfig(): Observable<typeof DEFAULT_LAYOUT_CONFIG.logo> {
-    return this.configService.getLogoConfigFromApi().pipe(
+    console.warn('ConfigApiService.getLogoConfig() is deprecated. Use the layout config directly.');
+    return this.getLayoutConfig().pipe(
+      map(config => config.logo),
       catchError(error => {
         console.error('获取Logo配置失败:', error);
         // 返回默认Logo配置作为回退
@@ -82,9 +85,12 @@ export class ConfigApiService {
 
   /**
    * 获取主题配置
+   * @deprecated 请直接从完整配置中获取theme字段
    */
   getThemeConfig(): Observable<typeof DEFAULT_LAYOUT_CONFIG.theme> {
-    return this.configService.getThemeConfigFromApi().pipe(
+    console.warn('ConfigApiService.getThemeConfig() is deprecated. Use the layout config directly.');
+    return this.getLayoutConfig().pipe(
+      map(config => config.theme),
       catchError(error => {
         console.error('获取主题配置失败:', error);
         // 返回默认主题配置作为回退
@@ -95,9 +101,12 @@ export class ConfigApiService {
 
   /**
    * 获取侧边栏配置
+   * @deprecated 请直接从完整配置中获取sidebar字段
    */
   getSidebarConfig(): Observable<typeof DEFAULT_LAYOUT_CONFIG.sidebar> {
-    return this.configService.getSidebarConfigFromApi().pipe(
+    console.warn('ConfigApiService.getSidebarConfig() is deprecated. Use the layout config directly.');
+    return this.getLayoutConfig().pipe(
+      map(config => config.sidebar),
       catchError(error => {
         console.error('获取侧边栏配置失败:', error);
         // 返回默认侧边栏配置作为回退
@@ -108,9 +117,12 @@ export class ConfigApiService {
 
   /**
    * 获取页头配置
+   * @deprecated 请直接从完整配置中获取header字段
    */
   getHeaderConfig(): Observable<typeof DEFAULT_LAYOUT_CONFIG.header> {
-    return this.configService.getHeaderConfigFromApi().pipe(
+    console.warn('ConfigApiService.getHeaderConfig() is deprecated. Use the layout config directly.');
+    return this.getLayoutConfig().pipe(
+      map(config => config.header),
       catchError(error => {
         console.error('获取页头配置失败:', error);
         // 返回默认页头配置作为回退
