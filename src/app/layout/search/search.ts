@@ -1,4 +1,4 @@
-import { Component, signal, viewChild, ElementRef, inject, afterNextRender } from '@angular/core';
+import { Component, signal, viewChild, ElementRef, inject, afterNextRender, OnDestroy } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
@@ -6,6 +6,8 @@ import { NzSelectModule } from 'ng-zorro-antd/select';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { UserApiService } from '../../core/services/user-api.service';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-search',
@@ -20,7 +22,7 @@ import { UserApiService } from '../../core/services/user-api.service';
   templateUrl: './search.html',
   styleUrl: './search.css',
 })
-export class Search {
+export class Search implements OnDestroy {
   isDialogVisible = signal(false);
   quickSearchQuery = signal('');
   searchType = signal('all');
@@ -29,6 +31,7 @@ export class Search {
   selectedTags = signal<string[]>([]);
   
   private quickSearchInput = viewChild<ElementRef>('quickSearchInput');
+  private destroy$ = new Subject<void>();
 
   // 可用的标签 - 从API获取
   availableTags = signal<string[]>([]);
@@ -57,7 +60,9 @@ export class Search {
   }
 
   loadTags(): void {
-    this.userApiService.getSearchTags().subscribe({
+    this.userApiService.getSearchTags().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
       next: (response) => {
         this.availableTags.set(response.tags);
       },
@@ -147,5 +152,10 @@ export class Search {
     if (dialog && !dialog.contains(target) && trigger && !trigger.contains(target)) {
       this.closeSearchDialog();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -6,6 +6,8 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { TranslateModule } from '@ngx-translate/core';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-generic-page',
@@ -21,9 +23,10 @@ import { TranslateModule } from '@ngx-translate/core';
   templateUrl: './generic-page.html',
   styleUrl: './generic-page.css'
 })
-export class GenericPageComponent {
+export class GenericPageComponent implements OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private destroy$ = new Subject<void>();
 
   // 路由参数信号
   private routeParams = signal<any>({});
@@ -71,7 +74,9 @@ export class GenericPageComponent {
 
   constructor() {
     // 监听路由参数变化
-    this.route.params.subscribe(params => {
+    this.route.params.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
       this.routeParams.set(params);
     });
   }
@@ -173,5 +178,10 @@ export class GenericPageComponent {
   simulateAction(action: string): void {
     console.log(`执行操作: ${action}`);
     // 这里可以添加实际的业务逻辑
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 }

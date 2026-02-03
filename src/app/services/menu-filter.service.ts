@@ -5,6 +5,7 @@ import { PermissionService } from './permission.service';
 import { Store } from '@ngrx/store';
 import { AppState } from '../core/types/app-state';
 import * as AuthSelectors from '../core/stores/auth/auth.selectors';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({
   providedIn: 'root',
@@ -12,6 +13,10 @@ import * as AuthSelectors from '../core/stores/auth/auth.selectors';
 export class MenuFilterService {
   private permissionService = inject(PermissionService);
   private store = inject(Store<AppState>);
+
+  // 使用 toSignal 将 store 选择器转换为信号
+  private userRolesSig = toSignal(this.store.select(AuthSelectors.selectUserRoles), { initialValue: [] });
+  private permissionsSig = toSignal(this.store.select(AuthSelectors.selectPermissions), { initialValue: [] });
 
   /**
    * 根据用户权限过滤菜单
@@ -31,11 +36,11 @@ export class MenuFilterService {
   private filterMenuItem(menu: MenuItem, permissions: Permission[]): MenuItem | null {
     // 检查菜单项本身是否有权限要求
     if (menu.permission) {
-      const hasPermission = permissions.some(perm => 
-        perm.resource === menu.permission!.resource && 
+      const hasPermission = permissions.some(perm =>
+        perm.resource === menu.permission!.resource &&
         perm.action.includes(menu.permission!.action)
       );
-      
+
       if (!hasPermission) {
         return null;
       }
@@ -45,7 +50,7 @@ export class MenuFilterService {
     if (menu.roles && menu.roles.length > 0) {
       const userRoles = this.getCurrentUserRoles();
       const hasRequiredRole = menu.roles.some(role => userRoles.includes(role));
-      
+
       if (!hasRequiredRole) {
         return null;
       }
@@ -83,11 +88,14 @@ export class MenuFilterService {
    * 从Store获取当前用户角色
    */
   private getCurrentUserRoles(): string[] {
-    let roles: string[] = [];
-    this.store.select(AuthSelectors.selectUserRoles).subscribe(userRoles => {
-      roles = userRoles;
-    });
-    return roles;
+    return this.userRolesSig();
+  }
+
+  /**
+   * 从Store获取当前用户权限
+   */
+  private getCurrentPermissions(): Permission[] {
+    return this.permissionsSig();
   }
 
   /**
@@ -95,10 +103,10 @@ export class MenuFilterService {
    */
   hasMenuAccess(menu: MenuItem): boolean {
     const permissions = this.getCurrentPermissions();
-    
+
     if (menu.permission) {
-      return permissions.some(perm => 
-        perm.resource === menu.permission!.resource && 
+      return permissions.some(perm =>
+        perm.resource === menu.permission!.resource &&
         perm.action.includes(menu.permission!.action)
       );
     }
@@ -113,21 +121,9 @@ export class MenuFilterService {
   }
 
   /**
-   * 获取当前用户权限（从PermissionService）
-   */
-  private getCurrentPermissions(): Permission[] {
-    let perms: Permission[] = [];
-    this.permissionService.permissionsChanged$.subscribe(permissions => {
-      perms = permissions;
-    });
-    return perms;
-  }
-
-  /**
    * 根据权限过滤并返回扁平化的可访问菜单项
    */
   getAccessibleMenuItems(menus: MenuItem[]): MenuItem[] {
-    const permissions = this.getCurrentPermissions();
     const accessibleItems: MenuItem[] = [];
 
     const traverseMenu = (menuItems: MenuItem[]) => {
@@ -135,7 +131,7 @@ export class MenuFilterService {
         if (this.hasMenuAccess(menu)) {
           accessibleItems.push(menu);
         }
-        
+
         if (menu.children && menu.children.length > 0) {
           traverseMenu(menu.children);
         }

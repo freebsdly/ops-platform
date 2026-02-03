@@ -1,7 +1,6 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  input,
   output,
   signal,
   ViewChild,
@@ -20,8 +19,8 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { TranslateModule } from '@ngx-translate/core';
 import { UserApiService } from '../../core/services/user-api.service';
-import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { catchError, of, switchMap, tap } from 'rxjs';
+import { catchError, of, tap, takeUntil } from 'rxjs';
+import { Subject } from 'rxjs';
 
 export interface UserInfoData {
   name: string;
@@ -57,6 +56,7 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
 
   private resizeObserver: ResizeObserver | null = null;
   dropdownStyle = signal<{ [key: string]: string }>({});
+  private destroy$ = new Subject<void>();
 
   private userApiService = inject(UserApiService);
 
@@ -83,6 +83,8 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private loadUserFromApi() {
@@ -116,6 +118,7 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
           });
           return of(null);
         }),
+        takeUntil(this.destroy$)
       )
       .subscribe();
   }

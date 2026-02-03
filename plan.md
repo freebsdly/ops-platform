@@ -597,10 +597,22 @@ export class ResourceCleanupService {
 - ✅ 构建通过
 - ⚠️  存在预先存在的测试失败（与本次改动无关）
 
-#### ⏳ RxJS订阅清理
-- 统一使用 takeUntil 模式
-- 创建资源清理服务（参考方案2）
-- 确保所有组件订阅正确取消
+#### ✅ RxJS订阅清理（2026-02-03）
+**实现内容：**
+- 为 user-info.ts 组件添加 takeUntil 模式和清理逻辑
+- 为 search.ts 组件添加 takeUntil 模式和清理逻辑
+- 为 generic-page.component.ts 组件添加 takeUntil 模式和清理逻辑
+- 重构 menu-filter.service.ts 使用 toSignal 替代错误的同步订阅模式
+- 确保所有组件订阅在销毁时正确取消
+
+**改动文件：**
+- `src/app/layout/user-info/user-info.ts`
+- `src/app/layout/search/search.ts`
+- `src/app/pages/generic-page/generic-page.component.ts`
+- `src/app/services/menu-filter.service.ts`
+
+**测试状态：**
+- ✅ 构建通过
 
 #### ⏳ 定时器/轮询清理
 - 查找项目中所有定时器
