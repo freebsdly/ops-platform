@@ -23,25 +23,25 @@ export const initMsw = async () => {
   try {
     // 动态导入以避免生产环境打包
     const { worker } = await import('./browser');
-    
+
     console.log('MSW: Worker加载成功，准备启动...');
-    
+
     // 启动worker
     await worker.start({
       onUnhandledRequest: 'bypass', // 对于未处理的请求，绕过MSW
       serviceWorker: {
-        url: '/mockServiceWorker.js' // 现在在public根目录
+        url: '/mockServiceWorker.js'
       },
       quiet: false, // 显示MSW启动日志
     });
-    
+
     console.log('✅ MSW已成功启动');
     console.log('MSW: 可以拦截以下API请求:');
     console.log('  - GET /api/config/layout - 获取完整布局配置');
     console.log('  - POST /api/config/layout - 保存布局配置');
     console.log('  - GET /api/config/app - 获取应用配置');
     console.log('  - POST /api/config/validate - 验证配置');
-    
+
     // 验证MSW是否正常工作
     setTimeout(async () => {
       try {
@@ -56,7 +56,7 @@ export const initMsw = async () => {
         console.warn('⚠️ MSW验证: 测试请求失败:', error);
       }
     }, 500);
-    
+
   } catch (error) {
     console.error('❌ MSW初始化失败:', error);
     console.warn('这可能是因为:');
