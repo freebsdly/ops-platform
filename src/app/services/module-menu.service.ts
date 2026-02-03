@@ -4,9 +4,10 @@
 import { Injectable, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { filter, map, delay } from 'rxjs/operators';
+import { filter, map, catchError, delay } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MODULES_CONFIG, MENUS_CONFIG, MenuItem, ModuleConfig } from '../config/menu.config';
+import { UserApiService } from '../core/services/user-api.service';
 
 export interface ModuleOption {
   id: string;
@@ -22,16 +23,44 @@ export interface ModuleOption {
 })
 export class ModuleMenuService {
   private router = inject(Router);
+  private userApiService = inject(UserApiService);
 
   getModules(): Observable<string[]> {
-    // Return module IDs from MODULES_CONFIG
-    const modules = MODULES_CONFIG.map(module => module.id);
-    return of(modules).pipe(delay(100));
+    return this.userApiService.getSystemModules().pipe(
+      map(response => response.modules.map(module => module.id)),
+      catchError(error => {
+        console.error('获取系统模块失败:', error);
+        // 回退到本地配置
+        const modules = MODULES_CONFIG.map(module => module.id);
+        return of(modules);
+      })
+    );
   }
 
   getModuleMenus(moduleId: string): Observable<MenuItem[]> {
-    const menus = MENUS_CONFIG[moduleId] || [];
-    return of(menus).pipe(delay(100));
+    return this.userApiService.getModuleMenus(moduleId).pipe(
+      map(response => {
+        // 将API响应转换为MenuItem格式
+        return response.menus.map(menu => ({
+          key: menu.id,
+          text: menu.title,
+          icon: menu.icon,
+          link: menu.path,
+          children: menu.children?.map(child => ({
+            key: child.id,
+            text: child.title,
+            icon: child.icon,
+            link: child.path
+          }))
+        }));
+      }),
+      catchError(error => {
+        console.error(`获取模块${moduleId}菜单失败:`, error);
+        // 回退到本地配置
+        const menus = MENUS_CONFIG[moduleId] || [];
+        return of(menus);
+      })
+    );
   }
 
   switchModule(moduleId: string): void {

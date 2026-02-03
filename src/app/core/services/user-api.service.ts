@@ -131,6 +131,73 @@ export class UserApiService {
   }
   
   /**
+   * 获取系统模块列表
+   */
+  getSystemModules(): Observable<{
+    modules: Array<{
+      id: string;
+      title: string;
+      icon: string;
+      color: string;
+      defaultPath: string;
+    }>;
+  }> {
+    return this.http.get<{
+      modules: Array<{
+        id: string;
+        title: string;
+        icon: string;
+        color: string;
+        defaultPath: string;
+      }>;
+    }>(`${this.API_BASE_URL}/system/modules`);
+  }
+
+  /**
+   * 获取模块菜单
+   */
+  getModuleMenus(moduleId: string): Observable<{
+    menus: Array<{
+      id: string;
+      title: string;
+      icon: string;
+      path: string;
+      children?: Array<{
+        id: string;
+        title: string;
+        icon: string;
+        path: string;
+      }>;
+    }>;
+  }> {
+    return this.http.get<{
+      menus: Array<{
+        id: string;
+        title: string;
+        icon: string;
+        path: string;
+        children?: Array<{
+          id: string;
+          title: string;
+          icon: string;
+          path: string;
+        }>;
+      }>;
+    }>(`${this.API_BASE_URL}/system/modules/${moduleId}/menus`);
+  }
+
+  /**
+   * 获取可用的搜索标签
+   */
+  getSearchTags(): Observable<{
+    tags: string[];
+  }> {
+    return this.http.get<{
+      tags: string[];
+    }>(`${this.API_BASE_URL}/system/search/tags`);
+  }
+
+  /**
    * 获取用户菜单
    */
   getUserMenus(userId?: number): Observable<any[]> {

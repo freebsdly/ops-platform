@@ -1,13 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, catchError, tap } from 'rxjs/operators';
 import { User } from '../core/types/user.interface';
 import { Router } from '@angular/router';
-
-export interface AuthResponse {
-  user: User;
-  token: string;
-}
+import { UserApiService, AuthResponse } from '../core/services/user-api.service';
 
 @Injectable({
   providedIn: 'root',
@@ -16,41 +12,42 @@ export class AuthService {
   private readonly tokenKey = 'auth_token';
   private readonly userKey = 'user';
   private router = inject(Router);
+  private userApiService = inject(UserApiService);
 
   login(username: string, password: string): Observable<AuthResponse> {
-    // Simulate API call
-    return new Observable<AuthResponse>((observer) => {
-      setTimeout(() => {
-        // Mock successful login
-        const user: User = {
-          id: 1,
-          username,
-          email: `${username}@example.com`,
-          name: 'Demo User',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
-          roles: ['admin'],
-          permissions: [] // 初始为空，后续会通过PermissionService加载
-        };
-
-        const token = 'mock_jwt_token_' + Date.now();
-
-        localStorage.setItem(this.tokenKey, token);
-        localStorage.setItem(this.userKey, JSON.stringify(user));
-
-        observer.next({ user, token });
-        observer.complete();
-      }, 500);
-    });
+    return this.userApiService.login(username, password).pipe(
+      tap(response => {
+        localStorage.setItem(this.tokenKey, response.token);
+        localStorage.setItem(this.userKey, JSON.stringify(response.user));
+      }),
+      catchError(error => {
+        console.error('登录失败:', error);
+        throw error;
+      })
+    );
   }
 
   logout(): Observable<void> {
     return new Observable<void>((observer) => {
-      localStorage.removeItem(this.tokenKey);
-      localStorage.removeItem(this.userKey);
-      observer.next();
-      observer.complete();
-      // 登出后立即重定向到登录页面 - 直接使用window.location确保重定向
-      window.location.href = '/login';
+      this.userApiService.logout().subscribe({
+        next: () => {
+          localStorage.removeItem(this.tokenKey);
+          localStorage.removeItem(this.userKey);
+          observer.next();
+          observer.complete();
+          // 登出后立即重定向到登录页面 - 直接使用window.location确保重定向
+          window.location.href = '/login';
+        },
+        error: (error) => {
+          console.error('登出API调用失败:', error);
+          // 即使API失败也清除本地状态
+          localStorage.removeItem(this.tokenKey);
+          localStorage.removeItem(this.userKey);
+          observer.next();
+          observer.complete();
+          window.location.href = '/login';
+        }
+      });
     });
   }
 

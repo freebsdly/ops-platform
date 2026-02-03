@@ -5,6 +5,7 @@ import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { UserApiService } from '../../core/services/user-api.service';
 
 @Component({
   selector: 'app-search',
@@ -29,22 +30,51 @@ export class Search {
   
   private quickSearchInput = viewChild<ElementRef>('quickSearchInput');
 
+  // 可用的标签 - 从API获取
+  availableTags = signal<string[]>([]);
+  private userApiService = inject(UserApiService);
+
   // 模拟可用的标签
-  availableTags = signal([
-    'urgent',
-    'documentation',
-    'bug',
-    'feature',
-    'enhancement',
-    'design',
-    'backend',
-    'frontend'
-  ]);
+  // availableTags = signal([
+  //   'urgent',
+  //   'documentation',
+  //   'bug',
+  //   'feature',
+  //   'enhancement',
+  //   'design',
+  //   'backend',
+  //   'frontend'
+  // ]);
 
   constructor() {
     afterNextRender(() => {
       // 点击外部关闭对话框
       document.addEventListener('click', this.handleDocumentClick.bind(this));
+    });
+
+    // 加载标签
+    this.loadTags();
+  }
+
+  loadTags(): void {
+    this.userApiService.getSearchTags().subscribe({
+      next: (response) => {
+        this.availableTags.set(response.tags);
+      },
+      error: (error) => {
+        console.error('获取标签失败:', error);
+        // 使用默认标签作为回退
+        this.availableTags.set([
+          'urgent',
+          'documentation',
+          'bug',
+          'feature',
+          'enhancement',
+          'design',
+          'backend',
+          'frontend'
+        ]);
+      }
     });
   }
 

@@ -1,8 +1,9 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, catchError } from 'rxjs/operators';
 import { Permission } from '../core/types/permission.interface';
 import { User } from '../core/types/user.interface';
+import { UserApiService } from '../core/services/user-api.service';
 
 export interface PermissionCheck {
   resource: string;
@@ -13,61 +14,23 @@ export interface PermissionCheck {
   providedIn: 'root',
 })
 export class PermissionService {
+  private userApiService = inject(UserApiService);
   private currentPermissions: Permission[] = [];
   private permissionsSubject = new BehaviorSubject<Permission[]>([]);
-  
+
   readonly permissionsChanged$ = this.permissionsSubject.asObservable();
 
   /**
-   * 获取用户权限列表（模拟API调用）
-   * 实际项目中应替换为真实的API调用
+   * 获取用户权限列表
    */
   getUserPermissions(userId: number): Observable<Permission[]> {
-    // 模拟API调用延迟
-    return new Observable<Permission[]>((observer) => {
-      setTimeout(() => {
-        // 模拟权限数据
-        const mockPermissions: Permission[] = [
-          {
-            id: 'config_read',
-            name: '配置读取',
-            type: 'menu',
-            resource: 'configuration',
-            action: ['read'],
-            description: '查看配置管理模块'
-          },
-          {
-            id: 'config_write',
-            name: '配置写入',
-            type: 'operation',
-            resource: 'configuration',
-            action: ['create', 'update'],
-            description: '创建和修改配置'
-          },
-          {
-            id: 'monitoring_view',
-            name: '监控查看',
-            type: 'menu',
-            resource: 'monitoring',
-            action: ['read'],
-            description: '查看监控模块'
-          },
-          {
-            id: 'user_manage',
-            name: '用户管理',
-            type: 'operation',
-            resource: 'user',
-            action: ['read', 'create', 'update', 'delete'],
-            description: '管理用户信息'
-          }
-        ];
-        
-        this.currentPermissions = mockPermissions;
-        this.permissionsSubject.next(mockPermissions);
-        observer.next(mockPermissions);
-        observer.complete();
-      }, 300);
-    });
+    return this.userApiService.getUserPermissions(userId).pipe(
+      catchError(error => {
+        console.error('获取用户权限失败:', error);
+        // 返回空权限数组作为回退
+        return of([]);
+      })
+    );
   }
 
   /**
@@ -82,8 +45,8 @@ export class PermissionService {
    * 检查是否拥有指定权限
    */
   hasPermission(resource: string, action: string): boolean {
-    return this.currentPermissions.some(permission => 
-      permission.resource === resource && 
+    return this.currentPermissions.some(permission =>
+      permission.resource === resource &&
       permission.action.includes(action)
     );
   }
@@ -100,7 +63,7 @@ export class PermissionService {
    * 检查是否拥有任意一个指定权限
    */
   hasAnyPermission(permissions: PermissionCheck[]): boolean {
-    return permissions.some(({ resource, action }) => 
+    return permissions.some(({ resource, action }) =>
       this.hasPermission(resource, action)
     );
   }
@@ -109,7 +72,7 @@ export class PermissionService {
    * 检查是否拥有所有指定权限
    */
   hasAllPermissions(permissions: PermissionCheck[]): boolean {
-    return permissions.every(({ resource, action }) => 
+    return permissions.every(({ resource, action }) =>
       this.hasPermission(resource, action)
     );
   }

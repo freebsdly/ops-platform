@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw';
 import { User } from '../../app/core/types/user.interface';
 import { Permission } from '../../app/core/types/permission.interface';
+import { MODULES_CONFIG, MENUS_CONFIG } from '../../app/config/menu.config';
 
 // 模拟用户数据
 const mockUsers: User[] = [
@@ -417,5 +418,79 @@ export const userHandlers = [
     } else {
       return HttpResponse.json(baseMenus);
     }
+  }),
+
+  // 获取可用的搜索标签
+  http.get('/api/system/search/tags', () => {
+    return HttpResponse.json({
+      tags: [
+        'urgent',
+        'documentation',
+        'bug',
+        'feature',
+        'enhancement',
+        'design',
+        'backend',
+        'frontend'
+      ]
+    });
+  }),
+
+  // 获取系统模块列表
+  http.get('/api/system/modules', () => {
+    return HttpResponse.json({
+      modules: MODULES_CONFIG.map(module => ({
+        id: module.id,
+        title: module.title,
+        icon: module.icon,
+        color: module.color,
+        defaultPath: module.defaultPath
+      }))
+    });
+  }),
+
+  // 获取指定模块的菜单
+  http.get('/api/system/modules/:moduleId/menus', ({ params }) => {
+    const moduleId = params['moduleId'] as string;
+    const moduleMenus = MENUS_CONFIG[moduleId];
+    
+    if (!moduleMenus) {
+      return HttpResponse.json(
+        { error: '模块不存在' },
+        { status: 404 }
+      );
+    }
+    
+    // 定义API响应类型
+    type ApiMenuItem = {
+      id: string;
+      title: string;
+      icon: string;
+      path: string;
+      children?: ApiMenuItem[];
+    };
+    
+    // 将MenuItem格式转换为API响应格式
+    const menus: ApiMenuItem[] = moduleMenus.map(menu => {
+      const apiMenu: ApiMenuItem = {
+        id: menu.key || menu.text,
+        title: menu.text,
+        icon: menu.icon,
+        path: menu.link || `/${moduleId}/${menu.key?.toLowerCase() || menu.text.toLowerCase()}`
+      };
+      
+      if (menu.children && menu.children.length > 0) {
+        apiMenu.children = menu.children.map(child => ({
+          id: child.key || child.text,
+          title: child.text,
+          icon: child.icon,
+          path: child.link || `/${moduleId}/${child.key?.toLowerCase() || child.text.toLowerCase()}`
+        }));
+      }
+      
+      return apiMenu;
+    });
+    
+    return HttpResponse.json({ menus });
   })
 ];
