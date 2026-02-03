@@ -12,7 +12,15 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 // Icons
-import { LockOutline, UserOutline, EyeOutline, EyeInvisibleOutline, CloudServerOutline, GithubOutline, GoogleOutline } from '@ant-design/icons-angular/icons';
+import {
+  LockOutline,
+  UserOutline,
+  EyeOutline,
+  EyeInvisibleOutline,
+  CloudServerOutline,
+  GithubOutline,
+  GoogleOutline,
+} from '@ant-design/icons-angular/icons';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LangSelector } from '../../layout/lang-selector/lang-selector';
@@ -39,8 +47,19 @@ import { combineLatest, take } from 'rxjs';
   templateUrl: './login.html',
   styleUrl: './login.css',
   providers: [
-    { provide: NZ_ICONS, useValue: [LockOutline, UserOutline, EyeOutline, EyeInvisibleOutline, CloudServerOutline, GithubOutline, GoogleOutline] }
-  ]
+    {
+      provide: NZ_ICONS,
+      useValue: [
+        LockOutline,
+        UserOutline,
+        EyeOutline,
+        EyeInvisibleOutline,
+        CloudServerOutline,
+        GithubOutline,
+        GoogleOutline,
+      ],
+    },
+  ],
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);
@@ -68,11 +87,11 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     // 标记所有字段为已触摸以显示验证错误
-    Object.keys(this.loginForm.controls).forEach(key => {
+    Object.keys(this.loginForm.controls).forEach((key) => {
       const control = this.loginForm.get(key);
       control?.markAsTouched();
     });
-    
+
     if (this.loginForm.invalid) {
       // 显示表单验证错误提示
       this.message.warning(this.translate.instant('LOGIN.VALIDATION.FORM_INVALID'));
@@ -114,7 +133,7 @@ export class LoginComponent implements OnInit {
   getEmailErrorMessage(): string {
     const control = this.loginForm.get('email');
     if (!control || !control.errors) return '';
-    
+
     if (control.errors['required']) {
       return this.translate.instant('LOGIN.VALIDATION.EMAIL_REQUIRED');
     }
@@ -127,7 +146,7 @@ export class LoginComponent implements OnInit {
   getPasswordErrorMessage(): string {
     const control = this.loginForm.get('password');
     if (!control || !control.errors) return '';
-    
+
     if (control.errors['required']) {
       return this.translate.instant('LOGIN.VALIDATION.PASSWORD_REQUIRED');
     }
