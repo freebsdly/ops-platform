@@ -47,8 +47,8 @@ export interface UserInfoData {
   styleUrl: './user-info.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
-    class: 'app-user-info'
-  }
+    class: 'app-user-info',
+  },
 })
 export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   onLogout = output<void>();
@@ -59,7 +59,7 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   dropdownStyle = signal<{ [key: string]: string }>({});
 
   private userApiService = inject(UserApiService);
-  
+
   // 从API获取的用户数据
   apiUserData = signal<UserInfoData | null>(null);
   isLoading = signal(true);
@@ -90,30 +90,34 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.userApiService.getCurrentUser().pipe(
-      tap(user => {
-        console.log('UserInfo: 用户数据加载成功:', user.name);
-        this.apiUserData.set({
-          name: user.name,
-          email: user.email,
-          avatar: user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`,
-          role: user.roles?.includes('admin') ? 'Administrator' : 'User'
-        });
-        this.isLoading.set(false);
-      }),
-      catchError(err => {
-        console.error('UserInfo: 加载用户数据失败:', err);
-        this.error.set('无法加载用户信息');
-        this.isLoading.set(false);
-        // 返回默认用户数据
-        this.apiUserData.set({
-          name: 'Guest User',
-          avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest',
-          role: 'Guest'
-        });
-        return of(null);
-      })
-    ).subscribe();
+    this.userApiService
+      .getCurrentUser()
+      .pipe(
+        tap((user) => {
+          console.log('UserInfo: 用户数据加载成功:', user.name);
+          this.apiUserData.set({
+            name: user.name,
+            email: user.email,
+            avatar:
+              user.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`,
+            role: user.roles?.includes('admin') ? 'Administrator' : 'User',
+          });
+          this.isLoading.set(false);
+        }),
+        catchError((err) => {
+          console.error('UserInfo: 加载用户数据失败:', err);
+          this.error.set('无法加载用户信息');
+          this.isLoading.set(false);
+          // 返回默认用户数据
+          this.apiUserData.set({
+            name: 'Guest User',
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest',
+            role: 'Guest',
+          });
+          return of(null);
+        }),
+      )
+      .subscribe();
   }
 
   private updateDropdownWidth() {
@@ -131,21 +135,12 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
         console.error('UserInfo: API登出失败:', err);
         // 即使API失败，也触发本地登出
         this.onLogout.emit();
-      }
+      },
     });
   }
 
   // 获取当前显示的用户数据
   get currentUser(): UserInfoData {
-    if (this.apiUserData()) {
-      return this.apiUserData()!;
-    }
-    
-    // 使用默认数据
-    return {
-      name: 'Guest User',
-      avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=guest',
-      role: 'Guest'
-    };
+    return this.apiUserData()!;
   }
 }

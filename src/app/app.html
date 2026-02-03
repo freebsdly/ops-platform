@@ -14,10 +14,10 @@
     >
       <app-sider class="app-layout-sider-inner" />
     </nz-sider>
-    
+
     <!-- 折叠按钮放在侧边栏外部，定位在侧边栏右侧 -->
     <app-collapse-button />
-    
+
     <nz-layout class="app-layout-right">
       <nz-header class="app-layout-header">
         <div class="header-left">
@@ -27,16 +27,7 @@
           <app-search />
           <app-lang-selector />
           @if (isAuthenticatedSig() && userSig(); as user) {
-            <app-user-info 
-              [user]="{
-                name: user?.name || '',
-                email: user?.email || '',
-                avatar: user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (user?.name || 'user'),
-                role: user?.roles?.includes('admin') ? 'Administrator' : 'User'
-              }" 
-              [fetchFromApi]="true"
-              (onLogout)="storeService.logout()"
-            />
+            <app-user-info (onLogout)="storeService.logout()" />
           }
         </div>
       </nz-header>
