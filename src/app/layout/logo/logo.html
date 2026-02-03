@@ -6,10 +6,12 @@
     <img 
       [src]="logoSrc()" 
       [alt]="logoAlt()" 
+      [style.width]="logoWidth()"
+      [style.height]="logoHeight()"
       class="logo-image"
     />
   }
   @if (showTitle()) {
-    <span class="logo-text">{{ title() }}</span>
+    <span class="logo-text">{{ logoTitle() }}</span>
   }
 </div>
