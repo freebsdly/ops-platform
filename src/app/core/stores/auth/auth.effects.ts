@@ -25,9 +25,23 @@ export class AuthEffects {
               token: response.token,
             })
           ),
-          catchError((error) =>
-            of(AuthActions.loginFailure({ error: error.message }))
-          )
+          catchError((error) =>{
+            // 提供更友好的错误消息
+            let errorMessage = '登录失败，请检查用户名和密码';
+            
+            if (error.status === 401) {
+              errorMessage = '用户名或密码错误';
+            } else if (error.status === 0 || error.status === 500) {
+              errorMessage = '服务器错误，请稍后重试';
+            } else if (error.error?.error) {
+              // 使用服务器返回的错误消息
+              errorMessage = error.error.error;
+            } else if (error.message) {
+              errorMessage = error.message;
+            }
+            
+            return of(AuthActions.loginFailure({ error: errorMessage }));
+          })
         )
       )
     )

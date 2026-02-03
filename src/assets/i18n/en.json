@@ -56,7 +56,6 @@
     "REMEMBER_ME": "Remember me",
     "FORGOT_PASSWORD": "Forgot password?",
     "LOGIN_BUTTON": "Sign in",
-    "REGISTER_LINK": "New here? Create an account",
     "SUCCESS": "Login successful",
     "SUBTITLE": "Sign in with your account credentials",
     "DIVIDER": "Or continue with",
@@ -65,7 +64,10 @@
     "FOOTER": "© 2024 DevOps Platform. All rights reserved.",
     "VALIDATION": {
       "EMAIL_REQUIRED": "Please enter your email address",
-      "PASSWORD_REQUIRED": "Please enter your password"
+      "EMAIL_INVALID": "Please enter a valid email address",
+      "PASSWORD_REQUIRED": "Please enter your password",
+      "PASSWORD_MIN_LENGTH": "Password must be at least 6 characters",
+      "FORM_INVALID": "Please fill in all required fields correctly"
     },
     "ERROR": {
       "INVALID_CREDENTIALS": "Invalid email or password",

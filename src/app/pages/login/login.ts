@@ -67,7 +67,15 @@ export class LoginComponent implements OnInit {
   }
 
   onSubmit(): void {
+    // 标记所有字段为已触摸以显示验证错误
+    Object.keys(this.loginForm.controls).forEach(key => {
+      const control = this.loginForm.get(key);
+      control?.markAsTouched();
+    });
+    
     if (this.loginForm.invalid) {
+      // 显示表单验证错误提示
+      this.message.warning(this.translate.instant('LOGIN.VALIDATION.FORM_INVALID'));
       return;
     }
 
@@ -85,8 +93,47 @@ export class LoginComponent implements OnInit {
           const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/';
           this.router.navigateByUrl(returnUrl);
         } else if (error) {
-          this.message.error(error);
+          // 错误提示已经在模板中显示，这里只记录
+          console.error('登录失败:', error);
         }
       });
+  }
+
+  // 添加表单字段验证状态跟踪
+  get emailInvalid(): boolean {
+    const control = this.loginForm.get('email');
+    return control ? control.invalid && (control.dirty || control.touched) : false;
+  }
+
+  get passwordInvalid(): boolean {
+    const control = this.loginForm.get('password');
+    return control ? control.invalid && (control.dirty || control.touched) : false;
+  }
+
+  // 获取具体的错误消息
+  getEmailErrorMessage(): string {
+    const control = this.loginForm.get('email');
+    if (!control || !control.errors) return '';
+    
+    if (control.errors['required']) {
+      return this.translate.instant('LOGIN.VALIDATION.EMAIL_REQUIRED');
+    }
+    if (control.errors['email']) {
+      return this.translate.instant('LOGIN.VALIDATION.EMAIL_INVALID');
+    }
+    return '';
+  }
+
+  getPasswordErrorMessage(): string {
+    const control = this.loginForm.get('password');
+    if (!control || !control.errors) return '';
+    
+    if (control.errors['required']) {
+      return this.translate.instant('LOGIN.VALIDATION.PASSWORD_REQUIRED');
+    }
+    if (control.errors['minlength']) {
+      return this.translate.instant('LOGIN.VALIDATION.PASSWORD_MIN_LENGTH');
+    }
+    return '';
   }
 }

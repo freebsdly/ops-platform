@@ -65,7 +65,10 @@
     "FOOTER": "© 2024 DevOps Platform. 保留所有权利。",
     "VALIDATION": {
       "EMAIL_REQUIRED": "请输入您的邮箱地址",
-      "PASSWORD_REQUIRED": "请输入您的密码"
+      "EMAIL_INVALID": "请输入有效的邮箱地址",
+      "PASSWORD_REQUIRED": "请输入您的密码",
+      "PASSWORD_MIN_LENGTH": "密码长度至少为6个字符",
+      "FORM_INVALID": "请正确填写所有必填字段"
     },
     "ERROR": {
       "INVALID_CREDENTIALS": "邮箱或密码错误",

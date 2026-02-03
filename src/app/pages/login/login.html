@@ -35,10 +35,23 @@
         <h2 class="form-title">{{ 'LOGIN.TITLE' | translate }}</h2>
         <p class="form-subtitle">{{ 'LOGIN.SUBTITLE' | translate }}</p>
 
+        <!-- Error alert - 放在表单上方 -->
+        @if (authError$ | async; as error) {
+          <div class="error-alert-wrapper">
+            <nz-alert
+              nzType="error"
+              [nzMessage]="error"
+              nzShowIcon
+              nzCloseable
+              class="error-alert"
+            ></nz-alert>
+          </div>
+        }
+
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" nz-form nzLayout="vertical">
           <!-- Email field -->
           <nz-form-item class="form-item">
-            <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.EMAIL_REQUIRED' | translate">
+            <nz-form-control [nzErrorTip]="getEmailErrorMessage()" [nzValidateStatus]="emailInvalid ? 'error' : ''">
               <nz-input-wrapper nzSize="large" class="input-wrapper">
                 <nz-icon nzInputPrefix nzType="user" class="input-icon" />
                 <input
@@ -50,6 +63,7 @@
                   class="input-field"
                   aria-label="Email address"
                   aria-describedby="email-description"
+                  (blur)="loginForm.get('email')?.markAsTouched()"
                 />
                 <div id="email-description" class="sr-only">Enter your email address to log in</div>
               </nz-input-wrapper>
@@ -58,7 +72,7 @@
 
           <!-- Password field -->
           <nz-form-item class="form-item">
-            <nz-form-control [nzErrorTip]="'LOGIN.VALIDATION.PASSWORD_REQUIRED' | translate">
+            <nz-form-control [nzErrorTip]="getPasswordErrorMessage()" [nzValidateStatus]="passwordInvalid ? 'error' : ''">
               <nz-input-password nzSize="large" class="password-wrapper">
                 <nz-icon nzInputPrefix nzType="lock" class="input-icon" />
                 <input
@@ -69,6 +83,7 @@
                   class="input-field"
                   aria-label="Password"
                   aria-describedby="password-description"
+                  (blur)="loginForm.get('password')?.markAsTouched()"
                 />
                 <div id="password-description" class="sr-only">Enter your password. Click the eye icon to show or hide the password</div>
               </nz-input-password>
@@ -129,18 +144,5 @@
         <span class="footer-text">{{ 'LOGIN.FOOTER' | translate }}</span>
       </div>
     </div>
-
-    <!-- Error alert -->
-    @if (authError$ | async; as error) {
-      <div class="error-alert-wrapper">
-        <nz-alert
-          nzType="error"
-          [nzMessage]="error"
-          nzShowIcon
-          nzCloseable
-          class="error-alert"
-        ></nz-alert>
-      </div>
-    }
   </div>
 </div>

@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { delay, catchError } from 'rxjs/operators';
+import { delay, catchError, map } from 'rxjs/operators';
 import { LayoutConfig, DEFAULT_LAYOUT_CONFIG } from '../types/layout-config.interface';
 import { ConfigService } from './config.service';
 

@@ -172,6 +172,31 @@
   border-color: #3b82f6 !important;
 }
 
+/* 错误状态下的输入框样式 */
+.input-wrapper.ant-form-item-has-error,
+.password-wrapper.ant-form-item-has-error {
+  border-color: #ef4444 !important;
+  background: transparent !important;
+  animation: none;
+}
+
+.input-wrapper.ant-form-item-has-error:hover,
+.password-wrapper.ant-form-item-has-error:hover {
+  border-color: #dc2626 !important;
+}
+
+.input-wrapper.ant-form-item-has-error:focus-within,
+.password-wrapper.ant-form-item-has-error:focus-within {
+  border-color: #dc2626 !important;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2) !important;
+}
+
+/* 错误图标样式 */
+.input-wrapper.ant-form-item-has-error .input-icon,
+.password-wrapper.ant-form-item-has-error .input-icon {
+  color: #dc2626 !important;
+}
+
 .input-icon {
   color: #9ca3af;
   font-size: 16px;
@@ -369,21 +394,79 @@
   white-space: nowrap;
 }
 
-/* Error Alert */
+/* Error Alert - 无外框简洁样式 */
 .error-alert-wrapper {
   width: 100%;
-  max-width: 420px;
-  min-width: 420px;
-  margin-top: 16px;
+  margin-bottom: 16px;
+  animation: slideIn 0.3s ease-out;
 }
 
 .error-alert {
-  border-radius: 12px !important;
-  border: 1px solid rgba(239, 68, 68, 0.2) !important;
-  backdrop-filter: blur(10px);
-  background: rgba(239, 68, 68, 0.05) !important;
+  background: transparent !important;
+  border: none !important;
+  backdrop-filter: none !important;
   width: 100%;
   box-sizing: border-box;
+  padding: 0 !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+}
+
+.error-alert::before {
+  content: none;
+}
+
+.error-alert .ant-alert-message {
+  font-weight: 500;
+  color: #dc2626 !important;
+  font-size: 14px;
+  line-height: 1.5;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, rgba(254, 226, 226, 0.1) 0%, rgba(254, 202, 202, 0.1) 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-alert .ant-alert-icon {
+  color: #dc2626 !important;
+  font-size: 14px;
+  margin-right: 0;
+}
+
+.error-alert .ant-alert-close-icon {
+  color: #9ca3af !important;
+  transition: color 0.2s ease;
+  font-size: 12px;
+}
+
+.error-alert .ant-alert-close-icon:hover {
+  color: #dc2626 !important;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.error-alert.alert-fade {
+  animation: fadeIn 0.3s ease-out;
 }
 
 /* Responsive Design */
