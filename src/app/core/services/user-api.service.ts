@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, catchError, tap } from 'rxjs';
 import { User } from '../types/user.interface';
+import { MenuPermission, ApiMenuResponse } from '../types/menu-permission.interface';
 
 export interface AuthResponse {
   user: User;
@@ -32,7 +33,8 @@ export class UserApiService {
           name: 'Admin User',
           avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
           roles: ['admin'],
-          permissions: []
+          permissions: [],
+          menuPermissions: []
         });
       })
     );
@@ -114,7 +116,73 @@ export class UserApiService {
   getUserPermissions(userId: number): Observable<any[]> {
     return this.http.get<any[]>(`${this.API_BASE_URL}/users/${userId}/permissions`);
   }
-  
+
+  /**
+   * 获取用户菜单权限
+   */
+  getUserMenuPermissions(userId?: number): Observable<MenuPermission[]> {
+    const params: any = {};
+    if (userId) {
+      params.userId = userId.toString();
+    }
+    
+    return this.http.get<MenuPermission[]>(`${this.API_BASE_URL}/user/menu-permissions`, { params });
+  }
+
+  /**
+   * 获取用户可访问的菜单（带权限信息）
+   */
+  getUserAccessibleMenus(userId?: number): Observable<ApiMenuResponse> {
+    const params: any = {};
+    if (userId) {
+      params.userId = userId.toString();
+    }
+    
+    return this.http.get<ApiMenuResponse>(`${this.API_BASE_URL}/user/accessible-menus`, { params });
+  }
+
+  /**
+   * 检查用户是否有特定路由的权限
+   */
+  checkRoutePermission(routePath: string, userId?: number): Observable<{
+    hasPermission: boolean;
+    requiredPermission?: MenuPermission;
+    userPermission?: MenuPermission;
+  }> {
+    const body: any = { routePath };
+    if (userId) {
+      body.userId = userId;
+    }
+    
+    return this.http.post<{
+      hasPermission: boolean;
+      requiredPermission?: MenuPermission;
+      userPermission?: MenuPermission;
+    }>(`${this.API_BASE_URL}/permissions/check-route`, body);
+  }
+
+  /**
+   * 批量检查路由权限
+   */
+  checkBatchRoutePermissions(routes: string[], userId?: number): Observable<{
+    results: Array<{
+      routePath: string;
+      hasPermission: boolean;
+    }>;
+  }> {
+    const body: any = { routes };
+    if (userId) {
+      body.userId = userId;
+    }
+    
+    return this.http.post<{
+      results: Array<{
+        routePath: string;
+        hasPermission: boolean;
+      }>;
+    }>(`${this.API_BASE_URL}/permissions/check-batch-routes`, body);
+  }
+
   /**
    * 检查用户权限
    */
@@ -198,7 +266,7 @@ export class UserApiService {
   }
 
   /**
-   * 获取用户菜单
+   * 获取用户菜单（旧接口，保持兼容）
    */
   getUserMenus(userId?: number): Observable<any[]> {
     const params: any = {};

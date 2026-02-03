@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
 import { RootRedirectGuard } from './guards/root-redirect.guard';
 import { EmptyComponent } from './components/empty.component';
+import { NoPermissionComponent } from './pages/no-permission/no-permission.component';
 
 /**
  * 主应用路由配置
@@ -10,6 +11,7 @@ import { EmptyComponent } from './components/empty.component';
  * 1. 根路径重定向到适当页面（由RootRedirectGuard处理）
  * 2. 登录页面使用懒加载
  * 3. 各个功能模块使用懒加载并应用AuthGuard
+ * 4. 无权限页面
  * 
  * 新增服务说明：
  * - RouteConfigService: 集中管理所有路由配置，用于Tab管理、菜单生成等
@@ -25,6 +27,11 @@ export const routes: Routes = [
   { 
     path: 'login', 
     loadChildren: () => import('./pages/login/login.routes').then(m => m.LOGIN_ROUTES) 
+  },
+  // 无权限页面
+  {
+    path: 'no-permission',
+    component: NoPermissionComponent
   },
   // 配置管理模块 - 懒加载
   { 
