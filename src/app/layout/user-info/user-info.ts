@@ -125,18 +125,9 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   }
 
   logout() {
-    // 调用API登出
-    this.userApiService.logout().subscribe({
-      next: () => {
-        console.log('UserInfo: API登出成功');
-        this.onLogout.emit();
-      },
-      error: (err) => {
-        console.error('UserInfo: API登出失败:', err);
-        // 即使API失败，也触发本地登出
-        this.onLogout.emit();
-      },
-    });
+    // 只emit logout事件，让store处理完整的logout流程
+    console.log('UserInfo: 触发logout事件');
+    this.onLogout.emit();
   }
 
   // 获取当前显示的用户数据

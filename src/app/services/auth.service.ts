@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { delay, catchError, tap } from 'rxjs/operators';
+import { delay, catchError, tap, map } from 'rxjs/operators';
 import { User } from '../core/types/user.interface';
 import { Router } from '@angular/router';
 import { UserApiService, AuthResponse } from '../core/services/user-api.service';
@@ -28,27 +28,20 @@ export class AuthService {
   }
 
   logout(): Observable<void> {
-    return new Observable<void>((observer) => {
-      this.userApiService.logout().subscribe({
-        next: () => {
-          localStorage.removeItem(this.tokenKey);
-          localStorage.removeItem(this.userKey);
-          observer.next();
-          observer.complete();
-          // 登出后立即重定向到登录页面 - 直接使用window.location确保重定向
-          window.location.href = '/login';
-        },
-        error: (error) => {
-          console.error('登出API调用失败:', error);
-          // 即使API失败也清除本地状态
-          localStorage.removeItem(this.tokenKey);
-          localStorage.removeItem(this.userKey);
-          observer.next();
-          observer.complete();
-          window.location.href = '/login';
-        }
-      });
-    });
+    return this.userApiService.logout().pipe(
+      map(() => undefined),
+      tap(() => {
+        localStorage.removeItem(this.tokenKey);
+        localStorage.removeItem(this.userKey);
+      }),
+      catchError((error) => {
+        console.error('登出API调用失败:', error);
+        // 即使API失败也清除本地状态
+        localStorage.removeItem(this.tokenKey);
+        localStorage.removeItem(this.userKey);
+        throw error;
+      })
+    );
   }
 
   checkAuth(): Observable<{ user: User | null; token: string | null }> {
