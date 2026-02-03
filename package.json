@@ -57,8 +57,5 @@
     "ng-zorro-antd": "21.0.1",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"
-  },
-  "msw": {
-    "workerDirectory": "src/assets"
   }
 }

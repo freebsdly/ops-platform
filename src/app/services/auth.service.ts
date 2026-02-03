@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { UserApiService, AuthResponse } from '../core/services/user-api.service';
 import { RequestCancelService } from '../core/services/request-cancel.service';
 import { TimerCleanupService } from '../core/services/timer-cleanup.service';
+import { WebSocketCleanupService } from '../core/services/websocket-cleanup.service';
+import { ServiceWorkerCleanupService } from '../core/services/service-worker-cleanup.service';
 
 @Injectable({
   providedIn: 'root',
@@ -17,6 +19,8 @@ export class AuthService implements OnDestroy {
   private userApiService = inject(UserApiService);
   private requestCancelService = inject(RequestCancelService);
   private timerCleanupService = inject(TimerCleanupService);
+  private webSocketCleanupService = inject(WebSocketCleanupService);
+  private serviceWorkerCleanupService = inject(ServiceWorkerCleanupService);
   private broadcastChannel: BroadcastChannel | null = null;
 
   constructor() {
@@ -80,6 +84,8 @@ export class AuthService implements OnDestroy {
     sessionStorage.clear();
 
     this.timerCleanupService.cleanup();
+    this.webSocketCleanupService.cleanup();
+    this.serviceWorkerCleanupService.cleanup();
   }
 
   checkAuth(): Observable<{ user: User | null; token: string | null }> {

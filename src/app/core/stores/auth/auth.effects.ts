@@ -7,12 +7,14 @@ import * as PermissionActions from './permission.actions';
 import { AuthService } from '../../../services/auth.service';
 import { Router } from '@angular/router';
 import { MODULES_CONFIG } from '../../../config/menu.config';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Injectable()
 export class AuthEffects {
   private actions$ = inject(Actions);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private message = inject(NzMessageService);
 
   login$ = createEffect(() =>
     this.actions$.pipe(
@@ -106,8 +108,21 @@ export class AuthEffects {
       mergeMap(() =>
         this.authService.logout().pipe(
           map(() => AuthActions.logoutSuccess()),
+          tap(() => {
+            this.message.success('登出成功');
+          }),
           catchError((error) => {
             console.error('Logout failed:', error);
+            
+            let errorMessage = '登出成功，但网络请求失败';
+            if (error.status === 0 || error.status === 500) {
+              errorMessage = '登出成功，但服务器连接失败';
+            } else if (error.message) {
+              errorMessage = `登出成功，但发生错误: ${error.message}`;
+            }
+            
+            this.message.warning(errorMessage);
+            
             // 即使API失败也触发logoutSuccess，确保用户能登出
             return of(AuthActions.logoutSuccess());
           })

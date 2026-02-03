@@ -49,8 +49,8 @@
 - ❌ ~~缺少HTTP请求取消机制~~（已完成）
 - ❌ ~~缺少RxJS订阅清理~~（已完成）
 - ❌ ~~缺少定时器/轮询清理~~（已完成）
-- ❌ 缺少WebSocket连接清理
-- ❌ 缺少Service Worker缓存清理
+- ❌ ~~缺少WebSocket连接清理~~（已完成）
+- ❌ ~~缺少Service Worker缓存清理~~（已完成）
 - ✅ ~~缺少跨标签页同步~~（已完成）
 - ✅ ~~缺少错误处理和重试机制~~（部分完成）
 
@@ -537,9 +537,10 @@ export class ResourceCleanupService {
 1. **HTTP请求取消**：✅ ~~需要实现请求取消机制~~（已完成）
 2. **RxJS订阅清理**：✅ ~~确保所有订阅正确取消~~（已完成）
 3. **定时器清理**：✅ ~~查找并清除所有定时器~~（已完成，提供集中管理服务）
-4. **WebSocket清理**：❌ 如果有的话需要清理
-5. **跨标签页同步**：✅ ~~实现BroadcastChannel机制~~（已完成）
-6. **错误处理**：✅ ~~完善错误处理和重试机制~~（部分完成）
+4. **WebSocket清理**：✅ ~~如果有的话需要清理~~（已完成，提供集中管理服务）
+5. **Service Worker清理**：✅ ~~清除缓存和注册~~（已完成，提供集中管理服务）
+6. **跨标签页同步**：✅ ~~实现BroadcastChannel机制~~（已完成）
+7. **错误处理**：✅ ~~完善错误处理和重试机制~~（部分完成，API失败时也能登出）
 
 ### 推荐实施步骤
 1. **立即实施**：基础完整版（方案1）
@@ -629,14 +630,35 @@ export class ResourceCleanupService {
 **测试状态：**
 - ✅ 构建通过
 
-#### ⏳ WebSocket连接清理
-- 检查是否存在 WebSocket 连接
-- 实现连接状态管理
-- 登出时关闭连接
+#### ✅ WebSocket连接清理（2026-02-03）
+**实现内容：**
+- 创建 `WebSocketCleanupService` 集中管理应用中的所有 WebSocket 连接
+- 提供 `registerConnection` 和 `closeConnection` 方法管理连接
+- 在 `auth.service.ts` 中登出时调用 `webSocketCleanupService.cleanup()`
+- 项目分析：目前项目没有使用 WebSocket 连接
+- 为未来的 WebSocket 功能（实时通知、在线协作等）预留了管理机制
 
-#### ⏳ Service Worker缓存清理
-- 清除 Service Worker 注册
-- 清除所有浏览器缓存
+**改动文件：**
+- `src/app/core/services/websocket-cleanup.service.ts`（新增）
+- `src/app/services/auth.service.ts`
+
+**测试状态：**
+- ✅ 构建通过
+
+#### ✅ Service Worker缓存清理（2026-02-03）
+**实现内容：**
+- 创建 `ServiceWorkerCleanupService` 集中管理 Service Worker 和缓存
+- 提供 `cleanupServiceWorkers` 和 `cleanupCache` 方法
+- 在 `auth.service.ts` 中登出时调用 `serviceWorkerCleanupService.cleanup()`
+- 项目分析：目前项目没有启用 Service Worker（PWA 功能）
+- 为未来的 PWA 功能（离线支持、后台同步等）预留了管理机制
+
+**改动文件：**
+- `src/app/core/services/service-worker-cleanup.service.ts`（新增）
+- `src/app/services/auth.service.ts`
+
+**测试状态：**
+- ✅ 构建通过
 
 #### ⏳ 错误处理和重试机制
 - 完善错误提示
