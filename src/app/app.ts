@@ -83,18 +83,26 @@ export class App implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Initialize current path from router
     this.currentPath.set(this.router.url);
-    
+
     // Subscribe to route changes to track current path
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd),
       takeUntil(this.destroy$)
     ).subscribe((event: NavigationEnd) => {
-      this.currentPath.set(event.url);
+      const oldPath = this.currentPath();
+      const newPath = event.url;
+
+      this.currentPath.set(newPath);
+
+      // If user navigates away from login page and is authenticated, load resources
+      if (this.isLoginPage(oldPath) && !this.isLoginPage(newPath) && this.isAuthenticatedSig()) {
+        this.loadUserResources();
+      }
     });
-    
+
     // Check authentication status on app initialization
     this.storeService.checkAuth();
-    
+
     // Determine initial auth checking state
     // If we have a token from localStorage, we can mark auth check as complete quickly
     // This prevents the flash when refreshing authenticated pages
@@ -103,8 +111,10 @@ export class App implements OnInit, OnDestroy {
       // Wait a very short time for any immediate NgRx updates, then mark as done
       setTimeout(() => {
         this.isAuthChecking.set(false);
-        // 用户已认证，加载配置和模块
-        this.loadUserResources();
+        // 用户已认证且不在登录页，才加载配置和模块
+        if (!this.isLoginPage(this.router.url)) {
+          this.loadUserResources();
+        }
       }, 50);
     } else {
       // No token, wait for NgRx to confirm not authenticated
@@ -115,7 +125,7 @@ export class App implements OnInit, OnDestroy {
           this.isAuthChecking.set(false);
         }
       });
-      
+
       // 监听认证状态变化，当用户登录成功后加载配置
       this.storeService.isAuthenticated$.pipe(
         takeUntil(this.destroy$)
@@ -125,27 +135,30 @@ export class App implements OnInit, OnDestroy {
           this.loadUserResources();
         }
       });
-      
+
       // Set a fallback timeout to prevent hanging
       setTimeout(() => {
         this.isAuthChecking.set(false);
       }, 2000);
     }
-    
+
     // Initialize layout state from localStorage
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme && (savedTheme === 'light' || savedTheme === 'dark')) {
       this.storeService.setTheme(savedTheme);
     }
-    
+
     const savedSiderCollapsed = localStorage.getItem('siderCollapsed');
     if (savedSiderCollapsed) {
       this.storeService.setSiderCollapsed(savedSiderCollapsed === 'true');
     }
-    
+
     // Set current module based on initial URL
     this.setInitialModule();
   }
+
+  // Flag to track if user resources have been loaded
+  private resourcesLoaded = false;
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -155,13 +168,20 @@ export class App implements OnInit, OnDestroy {
   /**
    * 加载用户相关资源（配置和模块）
    * 只在用户认证成功后调用
+   * 避免重复加载
    */
   private loadUserResources(): void {
+    if (this.resourcesLoaded) {
+      return;
+    }
+
     // Load configuration
     this.storeService.loadConfig();
-    
+
     // Load available modules
     this.storeService.loadModules();
+
+    this.resourcesLoaded = true;
   }
 
   // Use computed signal to determine if we should show layout

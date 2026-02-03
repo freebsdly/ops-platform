@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, NgZone } from '@angular/core';
 import { NavigationCancel, NavigationEnd, NavigationError, NavigationStart, Router, Event } from '@angular/router';
 
 @Injectable({
@@ -11,7 +11,10 @@ export class RouteLoadingService {
   // Public read-only signal
   readonly loading = this.isLoading.asReadonly();
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private ngZone: NgZone
+  ) {
     this.setupRouterEvents();
   }
 
@@ -27,9 +30,14 @@ export class RouteLoadingService {
         event instanceof NavigationError
       ) {
         // Small delay to prevent flicker for fast route changes
-        setTimeout(() => {
-          this.endLoading();
-        }, 50);
+        // Use ngZone.run to ensure signal updates happen within Angular's change detection cycle
+        this.ngZone.runOutsideAngular(() => {
+          setTimeout(() => {
+            this.ngZone.run(() => {
+              this.endLoading();
+            });
+          }, 50);
+        });
       }
     });
   }
