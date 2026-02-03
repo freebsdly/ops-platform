@@ -107,12 +107,19 @@ export class AuthEffects {
       ofType(AuthActions.logout),
       mergeMap(() =>
         this.authService.logout().pipe(
-          map(() => AuthActions.logoutSuccess()),
           tap(() => {
+            console.log('AuthEffects: 登出成功，导航到/login');
             this.message.success('登出成功');
+            
+            // 使用window.location.href强制页面重载，确保路由守卫能重新验证
+            setTimeout(() => {
+              console.log('AuthEffects: 使用window.location.href重定向到/login');
+              window.location.href = '/login';
+            }, 0);
           }),
+          map(() => AuthActions.logoutSuccess()),
           catchError((error) => {
-            console.error('Logout failed:', error);
+            console.error('AuthEffects: 登出失败:', error);
             
             let errorMessage = '登出成功，但网络请求失败';
             if (error.status === 0 || error.status === 500) {
@@ -123,7 +130,15 @@ export class AuthEffects {
             
             this.message.warning(errorMessage);
             
-            // 即使API失败也触发logoutSuccess，确保用户能登出
+            // 即使API失败也导航到login并触发logoutSuccess
+            console.log('AuthEffects: API失败，但仍然导航到/login');
+            
+            // 使用window.location.href强制页面重载
+            setTimeout(() => {
+              console.log('AuthEffects: API失败，使用window.location.href重定向到/login');
+              window.location.href = '/login';
+            }, 0);
+            
             return of(AuthActions.logoutSuccess());
           })
         )
@@ -136,8 +151,8 @@ export class AuthEffects {
       this.actions$.pipe(
         ofType(AuthActions.logoutSuccess),
         tap(() => {
-          console.log('logoutSuccess effect: logout completed, navigating to /login');
-          this.router.navigate(['/login']);
+          console.log('AuthEffects: logoutSuccess action处理完成');
+          // 导航已经在logout$ effect中处理了
         })
       ),
     { dispatch: false }

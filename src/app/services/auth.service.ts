@@ -59,20 +59,25 @@ export class AuthService implements OnDestroy {
   }
 
   logout(): Observable<void> {
+    console.log('auth.service: 开始登出流程');
+    
+    // 先清除本地状态，确保LoginGuard能正确工作
+    this.performLogout();
+    
     this.requestCancelService.cancelPendingRequests();
-
     if (this.broadcastChannel) {
       this.broadcastChannel.postMessage({ type: 'logout' });
     }
-
+    
+    // 调用API登出，但不等待它完成（fire-and-forget）
     return this.userApiService.logout().pipe(
       map(() => undefined),
       tap(() => {
-        this.performLogout();
+        console.log('auth.service: API登出成功');
       }),
       catchError((error) => {
-        console.error('登出API调用失败:', error);
-        this.performLogout();
+        console.error('auth.service: 登出API调用失败:', error);
+        // 已经清除了本地状态，所以忽略API错误
         return of(undefined);
       })
     );

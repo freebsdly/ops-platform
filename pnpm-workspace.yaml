@@ -4,3 +4,4 @@ onlyBuiltDependencies:
   - less
   - lmdb
   - msgpackr-extract
+  - msw

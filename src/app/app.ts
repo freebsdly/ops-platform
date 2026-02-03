@@ -92,6 +92,7 @@ export class App implements OnInit, OnDestroy {
       const oldPath = this.currentPath();
       const newPath = event.url;
 
+      console.log(`路由变化: ${oldPath} -> ${newPath}`);
       this.currentPath.set(newPath);
 
       // If user navigates away from login page and is authenticated, load resources
@@ -191,17 +192,23 @@ export class App implements OnInit, OnDestroy {
     const isLoginPage = this.isLoginPage(path);
     const isAuthChecking = this.isAuthChecking();
     
+    console.log(`showLayout计算: isAuthenticated=${isAuthenticated}, path=${path}, isLoginPage=${isLoginPage}, isAuthChecking=${isAuthChecking}`);
+    
     // If we're checking auth, only show layout if we're definitely authenticated
     // This prevents flash for unauthenticated users
     if (isAuthChecking) {
       // While checking, only show layout if we have a token AND not on login page
       // This prevents the flash where layout appears then disappears
       const hasToken = this.initialAuthState.token;
-      return hasToken && !isLoginPage;
+      const result = hasToken && !isLoginPage;
+      console.log(`Auth检查中: hasToken=${hasToken}, 返回${result}`);
+      return result;
     }
     
     // When auth check is complete, use the NgRx state
-    return isAuthenticated && !isLoginPage;
+    const result = isAuthenticated && !isLoginPage;
+    console.log(`Auth检查完成: 返回${result}`);
+    return result;
   });
 
   isLoginPage(path?: string): boolean {

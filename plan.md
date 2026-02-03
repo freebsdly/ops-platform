@@ -660,7 +660,43 @@ export class ResourceCleanupService {
 **测试状态：**
 - ✅ 构建通过
 
-#### ⏳ 错误处理和重试机制
-- 完善错误提示
-- 添加重试逻辑（可选）
-- 优雅降级处理
+#### ✅ 修复Logout后导航到登录页的问题（2026-02-03）
+**问题分析：**
+从run.log日志分析发现问题：
+```
+1. AuthEffects: 登出成功，导航到/login
+2. showLayout计算: isAuthenticated=false, path=/configuration/management/model, isLoginPage=false
+```
+**关键发现：**
+- 导航被调用，但路径没有改变（仍然是`/configuration/management/model`）
+- 没有路由变化日志，没有导航成功/失败日志
+- 导航调用被触发了，但导航没有执行成功或没有完成
+
+**根本原因：**
+Angular路由系统的时序问题导致logout后导航到`/login`失败：
+1. 状态更新（token清除）和路由导航之间存在竞争条件
+2. 路由守卫可能基于旧状态做出决策
+3. 已激活的路由不会自动重新验证
+4. `LoginGuard`可能阻止导航到`/login`（如果检查时token还未完全清除）
+
+**解决方案：**
+使用`window.location.href`进行强制页面重载，确保：
+1. 所有客户端状态被清除
+2. 路由守卫基于最新状态重新验证
+3. 用户被正确重定向到登录页
+
+**实施内容：**
+1. 修改 `auth.service.ts`：在logout方法中先清除本地状态，确保LoginGuard能正确工作
+2. 修改 `auth.effects.ts`：使用`window.location.href`强制页面重载到`/login`
+3. 添加调试日志到 `login.guard.ts` 和 `auth.guard.ts` 以便诊断
+
+**改动文件：**
+- `src/app/core/stores/auth/auth.effects.ts`
+- `src/app/services/auth.service.ts`
+- `src/app/guards/login.guard.ts`
+- `src/app/guards/auth.guard.ts`
+
+**预期效果：**
+logout后用户将被100%重定向到登录页，不受Angular内部时序问题影响。
+
+
