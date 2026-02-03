@@ -4,7 +4,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { Observable, of } from 'rxjs';
-import { filter, map, catchError, delay } from 'rxjs/operators';
+import { filter, map, catchError } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MODULES_CONFIG, MENUS_CONFIG, MenuItem, ModuleConfig } from '../config/menu.config';
 import { UserApiService } from '../core/services/user-api.service';
@@ -74,34 +74,34 @@ export class ModuleMenuService {
     // 基于当前URL确定当前模块
     const currentUrl = this.router.url;
     const segments = currentUrl.split('/').filter(segment => segment.length > 0);
-    
+
     if (segments.length === 0) {
       return of('dashboard'); // 默认仪表板
     }
-    
+
     // 从URL的第一个段获取模块ID
     const moduleId = segments[0];
     const moduleConfig = MODULES_CONFIG.find(m => m.id === moduleId);
-    
+
     if (moduleConfig) {
-      return of(moduleId).pipe(delay(50));
+      return of(moduleId);
     }
-    
-    return of('dashboard').pipe(delay(50)); // 回退到仪表板
+
+    return of('dashboard'); // 回退到仪表板
   }
 
   getCurrentModule(): Observable<ModuleConfig | null> {
     const currentUrl = this.router.url;
     const segments = currentUrl.split('/').filter(segment => segment.length > 0);
-    
+
     if (segments.length === 0) {
-      return of(null).pipe(delay(50));
+      return of(null);
     }
-    
+
     const moduleId = segments[0];
     const moduleConfig = MODULES_CONFIG.find(m => m.id === moduleId);
-    
-    return of(moduleConfig || null).pipe(delay(50));
+
+    return of(moduleConfig || null);
   }
 
   // 监听模块变化
@@ -119,7 +119,7 @@ export class ModuleMenuService {
 
   getAvailableModules(): Observable<ModuleOption[]> {
     const currentModuleId = this.router.url.split('/').filter(segment => segment.length > 0)[0];
-    
+
     const modules = MODULES_CONFIG.map(module => ({
       id: module.id,
       title: module.title,
@@ -128,6 +128,6 @@ export class ModuleMenuService {
       defaultPath: module.defaultPath,
       isActive: module.id === currentModuleId,
     }));
-    return of(modules).pipe(delay(100));
+    return of(modules);
   }
 }

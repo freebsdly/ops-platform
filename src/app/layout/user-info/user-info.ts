@@ -9,6 +9,8 @@ import {
   OnDestroy,
   inject,
   OnInit,
+  afterNextRender,
+  DestroyRef,
 } from '@angular/core';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -57,6 +59,7 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   private resizeObserver: ResizeObserver | null = null;
   dropdownStyle = signal<{ [key: string]: string }>({});
   private destroy$ = new Subject<void>();
+  private destroyRef = inject(DestroyRef);
 
   private userApiService = inject(UserApiService);
 
@@ -70,19 +73,26 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.updateDropdownWidth();
-
-    this.resizeObserver = new ResizeObserver(() => {
+    // 使用 afterNextRender 避免变化检测冲突
+    afterNextRender(() => {
       this.updateDropdownWidth();
-    });
 
-    this.resizeObserver.observe(this.userInfoArea.nativeElement);
+      this.resizeObserver = new ResizeObserver(() => {
+        this.updateDropdownWidth();
+      });
+
+      this.resizeObserver.observe(this.userInfoArea.nativeElement);
+
+      // 清理 resizeObserver
+      this.destroyRef.onDestroy(() => {
+        if (this.resizeObserver) {
+          this.resizeObserver.disconnect();
+        }
+      });
+    });
   }
 
   ngOnDestroy() {
-    if (this.resizeObserver) {
-      this.resizeObserver.disconnect();
-    }
     this.destroy$.next();
     this.destroy$.complete();
   }
