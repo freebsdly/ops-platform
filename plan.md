@@ -46,9 +46,9 @@
 - ✅ localStorage清理正确
 
 **缺点：**
-- ❌ 缺少HTTP请求取消机制
-- ❌ 缺少RxJS订阅清理
-- ❌ 缺少定时器/轮询清理
+- ❌ ~~缺少HTTP请求取消机制~~（已完成）
+- ❌ ~~缺少RxJS订阅清理~~（已完成）
+- ❌ ~~缺少定时器/轮询清理~~（已完成）
 - ❌ 缺少WebSocket连接清理
 - ❌ 缺少Service Worker缓存清理
 - ✅ ~~缺少跨标签页同步~~（已完成）
@@ -534,10 +534,10 @@ export class ResourceCleanupService {
 ## 总结
 
 ### 当前项目需要改进的地方
-1. **HTTP请求取消**：需要实现请求取消机制
-2. **RxJS订阅清理**：确保所有订阅正确取消
-3. **定时器清理**：查找并清除所有定时器
-4. **WebSocket清理**：如果有的话需要清理
+1. **HTTP请求取消**：✅ ~~需要实现请求取消机制~~（已完成）
+2. **RxJS订阅清理**：✅ ~~确保所有订阅正确取消~~（已完成）
+3. **定时器清理**：✅ ~~查找并清除所有定时器~~（已完成，提供集中管理服务）
+4. **WebSocket清理**：❌ 如果有的话需要清理
 5. **跨标签页同步**：✅ ~~实现BroadcastChannel机制~~（已完成）
 6. **错误处理**：✅ ~~完善错误处理和重试机制~~（部分完成）
 
@@ -614,10 +614,20 @@ export class ResourceCleanupService {
 **测试状态：**
 - ✅ 构建通过
 
-#### ⏳ 定时器/轮询清理
-- 查找项目中所有定时器
-- 集中管理定时器生命周期
-- 登出时清除所有定时器
+#### ✅ 定时器/轮询清理（2026-02-03）
+**实现内容：**
+- 创建 `TimerCleanupService` 集中管理应用中的所有定时器
+- 提供 `registerTimer` 和 `registerInterval` 方法注册定时器
+- 在 `auth.service.ts` 中登出时调用 `timerCleanupService.cleanup()`
+- 项目分析：现有定时器都是短生命周期的 UI 操作定时器，不需要修改组件
+- 为未来的长生命周期定时器（如轮询）提供了管理机制
+
+**改动文件：**
+- `src/app/core/services/timer-cleanup.service.ts`（新增）
+- `src/app/services/auth.service.ts`
+
+**测试状态：**
+- ✅ 构建通过
 
 #### ⏳ WebSocket连接清理
 - 检查是否存在 WebSocket 连接
