@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
 import { Observable, of, combineLatest } from 'rxjs';
-import { map, catchError, switchMap, take } from 'rxjs/operators';
+import { map, catchError, switchMap, take, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../core/types/app-state';
 import * as AuthSelectors from '../core/stores/auth/auth.selectors';
@@ -29,25 +29,42 @@ export class PermissionGuard implements CanActivate {
       resource: string;
       action: string;
     };
-    
+
     // 2. 从路由数据获取角色要求
     const requiredRoles = route.data['roles'] as string[];
-    
+
     // 3. 获取当前路由路径
     const routePath = state.url.split('?')[0]; // 移除查询参数
 
-    // 如果有明确的权限要求，检查特定权限
-    if (requiredPermission) {
-      return this.checkSpecificPermission(requiredPermission, routePath, state);
-    }
+    // 首先等待认证状态加载完成
+    return this.waitForAuthCheck().pipe(
+      switchMap(() => {
+        // 如果有明确的权限要求，检查特定权限
+        if (requiredPermission) {
+          return this.checkSpecificPermission(requiredPermission, routePath, state);
+        }
 
-    // 如果有角色要求，检查角色
-    if (requiredRoles && requiredRoles.length > 0) {
-      return this.checkRoles(requiredRoles, routePath, state);
-    }
+        // 如果有角色要求，检查角色
+        if (requiredRoles && requiredRoles.length > 0) {
+          return this.checkRoles(requiredRoles, routePath, state);
+        }
 
-    // 如果没有明确要求，检查菜单权限
-    return this.checkMenuPermission(routePath, state);
+        // 如果没有明确要求，检查菜单权限
+        return this.checkMenuPermission(routePath, state);
+      })
+    );
+  }
+
+  /**
+   * 等待认证检查完成
+   * 确保在检查权限前，用户状态已经加载完毕
+   */
+  private waitForAuthCheck(): Observable<boolean> {
+    return this.store.select(AuthSelectors.selectIsLoading).pipe(
+      filter(isLoading => !isLoading),
+      take(1),
+      map(() => true)
+    );
   }
 
   /**
