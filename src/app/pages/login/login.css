@@ -346,8 +346,11 @@
   min-width: 100%;
 }
 
-.social-button nz-icon {
+.social-button nz-icon,
+.social-button svg.github-icon {
   font-size: 16px;
+  width: 16px;
+  height: 16px;
 }
 
 /* Register Section */

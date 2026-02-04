@@ -11,17 +11,6 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 
-// Icons
-import {
-  LockOutline,
-  UserOutline,
-  EyeOutline,
-  EyeInvisibleOutline,
-  CloudServerOutline,
-  GithubOutline,
-  GoogleOutline,
-} from '@ant-design/icons-angular/icons';
-import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LangSelector } from '../../layout/lang-selector/lang-selector';
 import { StoreService } from '../../core/stores/store.service';
@@ -44,20 +33,6 @@ import { StoreService } from '../../core/stores/store.service';
   templateUrl: './login.html',
   styleUrl: './login.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    {
-      provide: NZ_ICONS,
-      useValue: [
-        LockOutline,
-        UserOutline,
-        EyeOutline,
-        EyeInvisibleOutline,
-        CloudServerOutline,
-        GithubOutline,
-        GoogleOutline,
-      ],
-    },
-  ],
 })
 export class LoginComponent implements OnInit {
   private fb = inject(FormBuilder);

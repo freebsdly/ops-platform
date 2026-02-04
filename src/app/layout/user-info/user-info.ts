@@ -9,6 +9,7 @@ import {
   OnDestroy,
   inject,
   OnInit,
+  effect,
 } from '@angular/core';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -65,21 +66,29 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   isLoading = signal(true);
   error = signal<string | null>(null);
 
+  constructor() {
+    // 监听用户数据变化，当用户数据加载完成后设置 ResizeObserver
+    effect(() => {
+      const userData = this.apiUserData();
+      if (userData && this.userInfoArea?.nativeElement) {
+        // 用户数据已加载且元素已渲染，设置观察者
+        if (!this.resizeObserver) {
+          this.resizeObserver = new ResizeObserver(() => {
+            this.updateDropdownWidth();
+          });
+          this.resizeObserver.observe(this.userInfoArea.nativeElement);
+        }
+      }
+    });
+  }
+
   ngOnInit() {
     this.loadUserFromApi();
   }
 
   ngAfterViewInit() {
-    // 使用 setTimeout 避免变化检测冲突
-    setTimeout(() => {
-      this.updateDropdownWidth();
-
-      this.resizeObserver = new ResizeObserver(() => {
-        this.updateDropdownWidth();
-      });
-
-      this.resizeObserver.observe(this.userInfoArea.nativeElement);
-    }, 0);
+    // 初始化下拉宽度
+    this.updateDropdownWidth();
   }
 
   ngOnDestroy() {
