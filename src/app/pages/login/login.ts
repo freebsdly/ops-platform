@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, inject, signal, computed, effect, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NzFormModule } from 'ng-zorro-antd/form';
@@ -25,8 +25,6 @@ import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { LangSelector } from '../../layout/lang-selector/lang-selector';
 import { StoreService } from '../../core/stores/store.service';
-import { AsyncPipe } from '@angular/common';
-import { combineLatest, take } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -42,10 +40,10 @@ import { combineLatest, take } from 'rxjs';
     NzAlertModule,
     TranslateModule,
     LangSelector,
-    AsyncPipe,
   ],
   templateUrl: './login.html',
   styleUrl: './login.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
   providers: [
     {
       provide: NZ_ICONS,
@@ -70,9 +68,10 @@ export class LoginComponent implements OnInit {
 
   loginForm!: FormGroup;
 
-  // NgRx state observables
-  isLoading$ = this.storeService.isLoading$;
-  authError$ = this.storeService.authError$;
+  // Signal-based state from StoreService
+  readonly isLoading = this.storeService.isLoading;
+  readonly authError = this.storeService.authError;
+  readonly isAuthenticated = this.storeService.isAuthenticated;
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -84,6 +83,15 @@ export class LoginComponent implements OnInit {
     // Clear any previous auth errors
     this.storeService.clearAuthError();
   }
+
+  // Handle navigation on successful login using effect
+  private loginEffect = effect(() => {
+    if (this.isAuthenticated()) {
+      const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/';
+      this.message.success(this.translate.instant('LOGIN.SUCCESS'));
+      this.router.navigateByUrl(returnUrl);
+    }
+  });
 
   onSubmit(): void {
     // 标记所有字段为已触摸以显示验证错误
@@ -101,37 +109,27 @@ export class LoginComponent implements OnInit {
     const { email, password } = this.loginForm.value;
 
     // Dispatch login action
+    // Navigation is handled by effect
     this.storeService.login(email, password);
-
-    // Subscribe to login success/failure
-    combineLatest([this.storeService.isAuthenticated$, this.storeService.authError$])
-      .pipe(take(1))
-      .subscribe(([isAuthenticated, error]) => {
-        if (isAuthenticated) {
-          this.message.success(this.translate.instant('LOGIN.SUCCESS'));
-          const returnUrl = this.router.routerState.snapshot.root.queryParams['returnUrl'] || '/';
-          this.router.navigateByUrl(returnUrl);
-        } else if (error) {
-          // 错误提示已经在模板中显示，这里只记录
-          console.error('登录失败:', error);
-        }
-      });
   }
 
   // 添加表单字段验证状态跟踪
-  get emailInvalid(): boolean {
-    const control = this.loginForm.get('email');
+  readonly emailInvalid = computed(() => {
+    const control = this.loginForm?.get('email');
     return control ? control.invalid && (control.dirty || control.touched) : false;
-  }
+  });
 
-  get passwordInvalid(): boolean {
-    const control = this.loginForm.get('password');
+  readonly passwordInvalid = computed(() => {
+    const control = this.loginForm?.get('password');
     return control ? control.invalid && (control.dirty || control.touched) : false;
-  }
+  });
+
+  readonly emailInvalidFlag = computed(() => this.emailInvalid());
+  readonly passwordInvalidFlag = computed(() => this.passwordInvalid());
 
   // 获取具体的错误消息
   getEmailErrorMessage(): string {
-    const control = this.loginForm.get('email');
+    const control = this.loginForm?.get('email');
     if (!control || !control.errors) return '';
 
     if (control.errors['required']) {
@@ -144,7 +142,7 @@ export class LoginComponent implements OnInit {
   }
 
   getPasswordErrorMessage(): string {
-    const control = this.loginForm.get('password');
+    const control = this.loginForm?.get('password');
     if (!control || !control.errors) return '';
 
     if (control.errors['required']) {

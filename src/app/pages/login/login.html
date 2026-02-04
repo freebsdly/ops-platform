@@ -33,7 +33,7 @@
       <!-- Login form -->
       <div class="form-section">
         <!-- Error alert - 放在表单上方 -->
-        @if (authError$ | async; as error) {
+        @if (authError(); as error) {
           <div class="error-alert-wrapper">
             <nz-alert
               nzType="error"
@@ -48,7 +48,7 @@
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" nz-form nzLayout="vertical">
           <!-- Email field -->
           <nz-form-item class="form-item">
-            <nz-form-control [nzErrorTip]="getEmailErrorMessage()" [nzValidateStatus]="emailInvalid ? 'error' : ''">
+            <nz-form-control [nzErrorTip]="getEmailErrorMessage()" [nzValidateStatus]="emailInvalid() ? 'error' : ''">
               <nz-input-wrapper nzSize="large" class="input-wrapper">
                 <nz-icon nzInputPrefix nzType="user" class="input-icon" />
                 <input
@@ -68,7 +68,7 @@
 
           <!-- Password field -->
           <nz-form-item class="form-item">
-            <nz-form-control [nzErrorTip]="getPasswordErrorMessage()" [nzValidateStatus]="passwordInvalid ? 'error' : ''">
+            <nz-form-control [nzErrorTip]="getPasswordErrorMessage()" [nzValidateStatus]="passwordInvalid() ? 'error' : ''">
               <nz-input-password nzSize="large" class="password-wrapper">
                 <nz-icon nzInputPrefix nzType="lock" class="input-icon" />
                 <input
@@ -101,8 +101,8 @@
             nzType="primary"
             nzBlock
             nzSize="large"
-            [nzLoading]="isLoading$ | async"
-            [disabled]="loginForm.invalid || (isLoading$ | async)"
+            [nzLoading]="isLoading()"
+            [disabled]="loginForm.invalid || isLoading()"
             type="submit"
             class="login-button"
           >

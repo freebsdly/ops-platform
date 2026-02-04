@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, Injector, runInInjectionContext } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { User } from '../types/user.interface';
@@ -11,13 +11,35 @@ import * as ModuleSelectors from './module/module.selectors';
 import * as ConfigActions from './config/config.actions';
 import * as ConfigSelectors from './config/config.selectors';
 import { Router } from '@angular/router';
+import { signal, Signal, computed } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Injectable({ providedIn: 'root' })
 export class StoreService {
   private store = inject(Store);
   private router = inject(Router);
+  private injector = inject(Injector);
 
-  // Auth Selectors
+  // ============ Auth Signals ============
+  // Signal-based properties (preferred for new code)
+  // These are computed signals that wrap NgRx selectors
+  readonly isLoading: Signal<boolean> = runInInjectionContext(this.injector, () => 
+    toSignal(this.store.select(AuthSelectors.selectIsLoading), { initialValue: false })
+  );
+  readonly authError: Signal<string | null> = runInInjectionContext(this.injector, () => 
+    toSignal(this.store.select(AuthSelectors.selectAuthError), { initialValue: null })
+  );
+  readonly isAuthenticated: Signal<boolean> = runInInjectionContext(this.injector, () => 
+    toSignal(this.store.select(AuthSelectors.selectIsAuthenticated), { initialValue: false })
+  );
+  readonly user: Signal<User | null> = runInInjectionContext(this.injector, () => 
+    toSignal(this.store.select(AuthSelectors.selectUser), { initialValue: null })
+  );
+  readonly token: Signal<string | null> = runInInjectionContext(this.injector, () => 
+    toSignal(this.store.select(AuthSelectors.selectToken), { initialValue: null })
+  );
+
+  // ============ Auth Selectors (Observable - legacy) ============
   get user$(): Observable<User | null> {
     return this.store.select(AuthSelectors.selectUser);
   }
