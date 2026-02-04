@@ -13,6 +13,8 @@ import * as ConfigSelectors from './config/config.selectors';
 import { Router } from '@angular/router';
 import { signal, Signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { DEFAULT_LAYOUT_CONFIG } from '../types/layout-config.interface';
+import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class StoreService {
@@ -142,7 +144,9 @@ export class StoreService {
   }
 
   get logoConfig$(): Observable<any> {
-    return this.store.select(ConfigSelectors.selectLogoConfig);
+    return this.store.select(ConfigSelectors.selectLogoConfig).pipe(
+      map(logoConfig => logoConfig || DEFAULT_LAYOUT_CONFIG.logo)
+    );
   }
 
   get appTitle$(): Observable<string> {

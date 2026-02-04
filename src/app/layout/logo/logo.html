@@ -2,10 +2,10 @@
   @if (showIcon()) {
     <span nz-icon [nzType]="iconType()" class="logo-icon"></span>
   }
-  @if (showImage() && !isCollapsed()) {
-    <img 
-      [src]="logoSrc()" 
-      [alt]="logoAlt()" 
+  @if (showImage()) {
+    <img
+      [src]="logoSrc()"
+      [alt]="logoAlt()"
       [style.width]="logoWidth()"
       [style.height]="logoHeight()"
       class="logo-image"
