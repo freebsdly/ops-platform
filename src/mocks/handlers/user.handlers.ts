@@ -254,7 +254,36 @@ let currentUser = mockUsers[0];
 
 export const userHandlers = [
   // 获取当前用户信息
-  http.get('/api/user/me', () => {
+  http.get('/api/user/me', ({ request }) => {
+    // 从请求头获取 token
+    const authHeader = request.headers.get('Authorization');
+    const token = authHeader?.replace('Bearer ', '') || localStorage.getItem('auth_token');
+
+    if (!token) {
+      return HttpResponse.json(
+        { error: '未授权' },
+        { status: 401 }
+      );
+    }
+
+    // 从 token 中提取用户 ID 或从 localStorage 获取用户信息
+    const userStr = localStorage.getItem('user');
+    if (userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        // 验证 token 是否匹配
+        const storedToken = localStorage.getItem('auth_token');
+        if (storedToken === token) {
+          // 同步更新 currentUser
+          currentUser = user;
+          return HttpResponse.json(currentUser);
+        }
+      } catch (e) {
+        console.error('解析用户信息失败:', e);
+      }
+    }
+
+    // 如果无法从 localStorage 获取，返回当前用户或默认用户
     return HttpResponse.json(currentUser);
   }),
 
@@ -286,7 +315,11 @@ export const userHandlers = [
 
   // 用户登出
   http.post('/api/auth/logout', () => {
-    currentUser = mockUsers[0]; // 重置为默认用户
+    // 重置为默认用户
+    currentUser = mockUsers[0];
+    // 清除 localStorage 中的认证信息
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user');
     return HttpResponse.json({ success: true });
   }),
 
