@@ -50,12 +50,18 @@ export class ConfigService {
    * 从后端加载布局配置
    * @param forceRefresh 是否强制刷新（忽略缓存）
    */
-  loadLayoutConfig(forceRefresh: boolean = false): Observable<LayoutConfig> {
+  loadLayoutConfig(forceRefresh: boolean = false): Observable<LayoutConfig> {   
+    // 检查是否有认证token，如果没有token，直接返回默认配置
+    const token = localStorage.getItem('auth_token');
+    if (!token) {
+      this.layoutConfigSubject.next(DEFAULT_LAYOUT_CONFIG);
+      return of(DEFAULT_LAYOUT_CONFIG);
+    }
+    
     // 检查缓存
     if (!forceRefresh) {
       const cachedConfig = this.getCachedConfig();
       if (cachedConfig) {
-        console.log('ConfigService: 使用缓存配置');
         this.layoutConfigSubject.next(cachedConfig);
         return of(cachedConfig);
       }
@@ -71,21 +77,15 @@ export class ConfigService {
     
     return this.http.get<LayoutConfig>(apiUrl).pipe(
       tap((config) => {
-        console.log('ConfigService: API响应成功:', {
-          appTitle: config.appTitle,
-          hasData: !!config
-        });
         this.layoutConfigSubject.next(config);
         this.cacheConfig(config);
         this.loadingSubject.next(false);
       }),
       catchError((error) => {
-        console.error('ConfigService: 加载配置失败:', error);
         this.errorSubject.next(error.message || 'Failed to load configuration');
         this.loadingSubject.next(false);
         
         // 使用默认配置作为回退
-        console.log('ConfigService: 使用默认配置作为回退');
         this.layoutConfigSubject.next(DEFAULT_LAYOUT_CONFIG);
         return of(DEFAULT_LAYOUT_CONFIG);
       })
@@ -206,7 +206,6 @@ export class ConfigService {
    * @deprecated 请直接使用布局配置中的logo字段
    */
   getLogoConfigFromApi(): Observable<LogoConfig> {
-    console.warn('ConfigService.getLogoConfigFromApi() is deprecated. Use the layout config directly.');
     return this.loadLayoutConfig().pipe(
       map(config => config.logo)
     );
@@ -217,7 +216,6 @@ export class ConfigService {
    * @deprecated 请直接使用布局配置中的theme字段
    */
   getThemeConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.theme> {
-    console.warn('ConfigService.getThemeConfigFromApi() is deprecated. Use the layout config directly.');
     return this.loadLayoutConfig().pipe(
       map(config => config.theme)
     );
@@ -228,7 +226,6 @@ export class ConfigService {
    * @deprecated 请直接使用布局配置中的sidebar字段
    */
   getSidebarConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.sidebar> {
-    console.warn('ConfigService.getSidebarConfigFromApi() is deprecated. Use the layout config directly.');
     return this.loadLayoutConfig().pipe(
       map(config => config.sidebar)
     );
@@ -239,7 +236,6 @@ export class ConfigService {
    * @deprecated 请直接使用布局配置中的header字段
    */
   getHeaderConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.header> {
-    console.warn('ConfigService.getHeaderConfigFromApi() is deprecated. Use the layout config directly.');
     return this.loadLayoutConfig().pipe(
       map(config => config.header)
     );
@@ -250,7 +246,6 @@ export class ConfigService {
    * @deprecated 请直接使用布局配置中的footer字段
    */
   getFooterConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.footer> {
-    console.warn('ConfigService.getFooterConfigFromApi() is deprecated. Use the layout config directly.');
     return this.loadLayoutConfig().pipe(
       map(config => config.footer)
     );

@@ -86,6 +86,14 @@ export class AuthService implements OnDestroy {
   private performLogout() {
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
+    // 清除配置缓存
+    localStorage.removeItem('app_layout_config');
+    localStorage.removeItem('app_layout_config_timestamp');
+    // 清除布局状态
+    localStorage.removeItem('theme');
+    localStorage.removeItem('siderCollapsed');
+    // 清除语言偏好
+    localStorage.removeItem('preferredLanguage');
     sessionStorage.clear();
 
     this.timerCleanupService.cleanup();

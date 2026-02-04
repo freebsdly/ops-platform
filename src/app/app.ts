@@ -15,8 +15,8 @@ import { SiderHeader } from './layout/sider-header/sider-header';
 import { SiderMenu } from './layout/sider-menu/sider-menu';
 import { SiderFooter } from './layout/sider-footer/sider-footer';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { filter, takeUntil } from 'rxjs/operators';
-import { Subject } from 'rxjs';
+import { filter, takeUntil, map } from 'rxjs/operators';
+import { Subject, Subscription, combineLatest } from 'rxjs';
 import { AuthService } from './services/auth.service';
 
 @Component({
@@ -61,18 +61,57 @@ export class App implements OnInit, OnDestroy {
   userSig = toSignal(this.storeService.user$, { initialValue: this.initialAuthState.user });
   isSiderCollapsedSig = toSignal(this.storeService.isSiderCollapsed$, { initialValue: false });
   
-  // Config signals - 单次获取完整配置
-  layoutConfigSig = toSignal(this.storeService.layoutConfig$);
-  configLoadingSig = toSignal(this.storeService.configLoading$);
-  configLoadedSig = toSignal(this.storeService.configLoaded$);
+  // Config state signals
+  private configSubscription: Subscription | null = null;
+  private layoutConfigSignal = signal<any>(null);
+  private configLoadingSignal = signal<boolean>(false);
+  private configLoadedSignal = signal<boolean>(false);
   
-  // 派生配置信号 - 从完整配置中提取
-  appTitleSig = computed(() => this.layoutConfigSig()?.appTitle || 'Ops Platform');
-  logoSrcSig = computed(() => this.layoutConfigSig()?.logo?.src || 'https://ng.ant.design/assets.img/logo.svg');
-  logoAltSig = computed(() => this.layoutConfigSig()?.logo?.alt || 'Logo');
-  logoLinkSig = computed(() => this.layoutConfigSig()?.logo?.link || 'https://ng.ant.design/');
-  logoCollapsedIconSig = computed(() => this.layoutConfigSig()?.logo?.collapsedIcon || 'bars');
-  logoExpandedIconSig = computed(() => this.layoutConfigSig()?.logo?.expandedIcon || 'bars');
+  // Public config signals
+  layoutConfigSig = this.layoutConfigSignal.asReadonly();
+  configLoadingSig = this.configLoadingSignal.asReadonly();
+  configLoadedSig = this.configLoadedSignal.asReadonly();
+  
+  // Use computed signal to determine if we should show layout
+  showLayout = computed(() => {
+    const isAuthenticated = this.isAuthenticatedSig();
+    const path = this.currentPath();
+    const isLoginPage = this.isLoginPage(path);
+    
+    // 始终使用NgRx状态，不使用initialAuthState
+    return isAuthenticated && !isLoginPage;
+  });
+  
+  // 派生配置信号 - 使用safe computed
+  appTitleSig = computed(() => {
+    const config = this.layoutConfigSig();
+    return config?.appTitle || 'Ops Platform';
+  });
+  
+  logoSrcSig = computed(() => {
+    const config = this.layoutConfigSig();
+    return config?.logo?.src || 'https://ng.ant.design/assets.img/logo.svg';
+  });
+  
+  logoAltSig = computed(() => {
+    const config = this.layoutConfigSig();
+    return config?.logo?.alt || 'Logo';
+  });
+  
+  logoLinkSig = computed(() => {
+    const config = this.layoutConfigSig();
+    return config?.logo?.link || 'https://ng.ant.design/';
+  });
+  
+  logoCollapsedIconSig = computed(() => {
+    const config = this.layoutConfigSig();
+    return config?.logo?.collapsedIcon || 'bars';
+  });
+  
+  logoExpandedIconSig = computed(() => {
+    const config = this.layoutConfigSig();
+    return config?.logo?.expandedIcon || 'bars';
+  });
   
   // Track if auth check is in progress
   isAuthChecking = signal<boolean>(true);
@@ -94,9 +133,18 @@ export class App implements OnInit, OnDestroy {
 
       console.log(`路由变化: ${oldPath} -> ${newPath}`);
       this.currentPath.set(newPath);
+      
+      // 管理config订阅
+      this.manageConfigSubscription();
 
       // If user navigates away from login page and is authenticated, load resources
-      if (this.isLoginPage(oldPath) && !this.isLoginPage(newPath) && this.isAuthenticatedSig()) {
+      // 只有当认证检查完成且用户认证有效且不在登录页时才加载资源
+      const isAuthChecking = this.isAuthChecking();
+      const isAuthenticated = this.isAuthenticatedSig();
+      const isLoginPageOld = this.isLoginPage(oldPath);
+      const isLoginPageNew = this.isLoginPage(newPath);
+           
+      if (isLoginPageOld && !isLoginPageNew && !isAuthChecking && isAuthenticated) {
         this.loadUserResources();
       }
     });
@@ -107,18 +155,19 @@ export class App implements OnInit, OnDestroy {
     // Determine initial auth checking state
     // If we have a token from localStorage, we can mark auth check as complete quickly
     // This prevents the flash when refreshing authenticated pages
-    if (this.initialAuthState.token) {
-      // We have a token, so user is authenticated
-      // Wait a very short time for any immediate NgRx updates, then mark as done
+    const initialPath = this.currentPath();
+    const isInitiallyOnLoginPage = this.isLoginPage(initialPath);
+    
+    
+    if (this.initialAuthState.token && !isInitiallyOnLoginPage) {
       setTimeout(() => {
         this.isAuthChecking.set(false);
-        // 用户已认证且不在登录页，才加载配置和模块
-        if (!this.isLoginPage(this.router.url)) {
+        const currentPath = this.currentPath();
+        if (this.isAuthenticatedSig() && !this.isLoginPage(currentPath)) {
           this.loadUserResources();
         }
       }, 50);
     } else {
-      // No token, wait for NgRx to confirm not authenticated
       this.storeService.isLoading$.pipe(
         takeUntil(this.destroy$)
       ).subscribe(isLoading => {
@@ -127,13 +176,21 @@ export class App implements OnInit, OnDestroy {
         }
       });
 
-      // 监听认证状态变化，当用户登录成功后加载配置
+      // 监听认证状态变化
       this.storeService.isAuthenticated$.pipe(
         takeUntil(this.destroy$)
       ).subscribe(isAuthenticated => {
+       // 管理config订阅
+        this.manageConfigSubscription();
+        
         if (isAuthenticated) {
-          // 用户登录成功，加载配置和模块
-          this.loadUserResources();
+          // 用户登录成功，检查是否在登录页
+          if (!this.isLoginPage(this.currentPath())) {
+            this.loadUserResources();
+          }
+        } else {
+          // 用户登出，重置资源加载状态
+          this.resourcesLoaded = false;
         }
       });
 
@@ -164,6 +221,74 @@ export class App implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    this.unsubscribeConfig();
+  }
+
+  /**
+   * 订阅config observables
+   * 只在需要时调用（认证用户访问非登录页）
+   */
+  private subscribeConfig(): void {
+    if (this.configSubscription) {
+      // 已订阅
+      return;
+    }
+    
+    // 组合订阅多个observables
+    this.configSubscription = new Subscription();
+    
+    // 订阅layout配置
+    this.configSubscription.add(
+      this.storeService.layoutConfig$.subscribe(config => {
+        this.layoutConfigSignal.set(config);
+      })
+    );
+    
+    // 订阅配置加载状态
+    this.configSubscription.add(
+      this.storeService.configLoading$.subscribe(loading => {
+        this.configLoadingSignal.set(loading);
+      })
+    );
+    
+    // 订阅配置加载完成状态
+    this.configSubscription.add(
+      this.storeService.configLoaded$.subscribe(loaded => {
+        this.configLoadedSignal.set(loaded);
+      })
+    );
+  }
+
+  /**
+   * 取消订阅config observables
+   * 在登出或导航到登录页时调用
+   */
+  private unsubscribeConfig(): void {
+    if (this.configSubscription) {
+      this.configSubscription.unsubscribe();
+      this.configSubscription = null;
+      
+      // 重置信号
+      this.layoutConfigSignal.set(null);
+      this.configLoadingSignal.set(false);
+      this.configLoadedSignal.set(false);
+    }
+  }
+
+  /**
+   * 管理config订阅
+   * 根据认证状态和当前页面决定是否需要订阅
+   */
+  private manageConfigSubscription(): void {
+    const shouldHaveLayout = this.showLayout();
+    
+    if (shouldHaveLayout) {
+      // 应该显示layout，确保订阅了config
+      this.subscribeConfig();
+    } else {
+      // 不应该显示layout，取消订阅config
+      this.unsubscribeConfig();
+    }
   }
 
   /**
@@ -171,11 +296,20 @@ export class App implements OnInit, OnDestroy {
    * 只在用户认证成功后调用
    * 避免重复加载
    */
-  private loadUserResources(): void {
+  private loadUserResources(): void {   
+    // 再次检查是否在登录页，作为最后一道防线
+    if (this.isLoginPage(this.currentPath())) {
+      return;
+    }
+    
+    if (!this.isAuthenticatedSig()) {
+      return; // 用户未认证，不加载资源
+    }
+    
     if (this.resourcesLoaded) {
       return;
     }
-
+    
     // Load configuration
     this.storeService.loadConfig();
 
@@ -185,35 +319,10 @@ export class App implements OnInit, OnDestroy {
     this.resourcesLoaded = true;
   }
 
-  // Use computed signal to determine if we should show layout
-  showLayout = computed(() => {
-    const isAuthenticated = this.isAuthenticatedSig();
-    const path = this.currentPath();
-    const isLoginPage = this.isLoginPage(path);
-    const isAuthChecking = this.isAuthChecking();
-    
-    console.log(`showLayout计算: isAuthenticated=${isAuthenticated}, path=${path}, isLoginPage=${isLoginPage}, isAuthChecking=${isAuthChecking}`);
-    
-    // If we're checking auth, only show layout if we're definitely authenticated
-    // This prevents flash for unauthenticated users
-    if (isAuthChecking) {
-      // While checking, only show layout if we have a token AND not on login page
-      // This prevents the flash where layout appears then disappears
-      const hasToken = this.initialAuthState.token;
-      const result = hasToken && !isLoginPage;
-      console.log(`Auth检查中: hasToken=${hasToken}, 返回${result}`);
-      return result;
-    }
-    
-    // When auth check is complete, use the NgRx state
-    const result = isAuthenticated && !isLoginPage;
-    console.log(`Auth检查完成: 返回${result}`);
-    return result;
-  });
-
   isLoginPage(path?: string): boolean {
     const url = path || this.currentPath();
-    return url === '/login' || url.startsWith('/login?');
+    const isLogin = url === '/login' || url.startsWith('/login?');
+    return isLogin;
   }
 
   private setInitialModule(): void {
