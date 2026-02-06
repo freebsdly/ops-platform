@@ -72,14 +72,23 @@ export class App implements OnInit, OnDestroy {
   configLoadingSig = this.configLoadingSignal.asReadonly();
   configLoadedSig = this.configLoadedSignal.asReadonly();
   
+  // 是否应该初始显示布局（避免闪烁）
+  shouldShowLayoutInitially = computed(() => {
+    // 如果有本地token，我们假设用户是认证的，直到异步验证完成
+    const hasLocalToken = !!this.initialAuthState.token;
+    return hasLocalToken;
+  });
+  
   // Use computed signal to determine if we should show layout
   showLayout = computed(() => {
     const isAuthenticated = this.isAuthenticatedSig();
     const path = this.currentPath();
     const isLoginPage = this.isLoginPage(path);
+    const initiallyShow = this.shouldShowLayoutInitially();
     
-    // 始终使用NgRx状态，不使用initialAuthState
-    return isAuthenticated && !isLoginPage;
+    // 如果用户认证成功，或者有本地token且不在登录页，就显示布局
+    // 这样可以避免刷新时的闪烁
+    return (isAuthenticated || initiallyShow) && !isLoginPage;
   });
   
   // 派生配置信号 - 使用safe computed
