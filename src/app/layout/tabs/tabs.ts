@@ -32,114 +32,7 @@ export interface TabItem {
 @Component({
   selector: 'app-tabbar',
   imports: [TranslateModule, NzIconModule, NzDropdownModule, NzButtonModule, NzSpaceModule],
-  template: `
-    <div class="tabbar-container">
-      <div
-        #tabContainer
-        class="tab-container"
-      >
-        <div #tabsWrapper class="tabs-wrapper">
-          @for (tab of visibleTabs(); track tab.key; let i = $index) {
-          <button
-            class="tab-button"
-            [class.active]="i === selectedIndex()"
-            [class.inactive]="i !== selectedIndex()"
-            (click)="onTabClick(i)"
-            (contextmenu)="onTabContextMenu(i, $event, tabManagementMenu)"
-          >
-            <div class="tab-content">
-              @if (tab.icon) {
-              <nz-icon 
-                [nzType]="tab.icon" 
-                [class.active]="i === selectedIndex()"
-                [class.inactive]="i !== selectedIndex()"
-                class="tab-icon"
-              />
-              }
-              <span
-                class="tab-label"
-                [attr.title]="tab.label | translate"
-              >
-                {{ tab.label | translate }}
-              </span>
-            </div>
-            <button
-              class="close-button"
-              [class.hidden]="tab.closable === false"
-              (click)="tab.closable !== false ? closeTab(i, $event) : null"
-            >
-              ×
-            </button>
-          </button>
-          }
-        </div>
-        
-        @if (overflowTabs().length > 0) {
-        <button
-          nz-dropdown
-          [nzDropdownMenu]="overflowMenu"
-          nzPlacement="bottomRight"
-          class="overflow-dropdown-button"
-        >
-          <nz-icon nzType="ellipsis" />
-        </button>
-        }
-      </div>
-    </div>
-
-    <!-- Overflow Tabs Dropdown Menu -->
-    <nz-dropdown-menu #overflowMenu="nzDropdownMenu">
-      <ul nz-menu>
-        @for (tab of overflowTabs(); track tab.key; let i = $index) {
-        <li nz-menu-item
-          [class.selected]="tab.key === tabs()[selectedIndex()]?.key"
-          (click)="onOverflowTabClick(tab)"
-          class="menu-item"
-        >
-          <span class="tab-content">
-            @if (tab.icon) {
-            <nz-icon [nzType]="tab.icon" class="tab-icon" />
-            }
-            <span>{{ tab.label | translate }}</span>
-          </span>
-        </li>
-        }
-      </ul>
-    </nz-dropdown-menu>
-
-    <!-- Tab Management Dropdown Menu -->
-    <nz-dropdown-menu #tabManagementMenu="nzDropdownMenu">
-      <ul nz-menu>
-        <li nz-menu-item 
-          (click)="closeCurrentTab()" 
-          [nzDisabled]="!isTabClosable()">
-          <span>{{ 'TABS.MANAGEMENT.CLOSE_CURRENT_TAB' | translate }}</span>
-        </li>
-        <li nz-menu-item 
-          (click)="closeOtherTabs()">
-          <span>{{ 'TABS.MANAGEMENT.CLOSE_OTHER_TABS' | translate }}</span>
-        </li>
-        <li nz-menu-item (click)="closeAllTabs()">
-          <span>{{ 'TABS.MANAGEMENT.CLOSE_ALL_TABS' | translate }}</span>
-        </li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item (click)="reloadCurrentTab()">
-          <span>{{ 'TABS.MANAGEMENT.RELOAD_CURRENT_TAB' | translate }}</span>
-        </li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item 
-          (click)="pinCurrentTab()" 
-          [nzDisabled]="isTabPinned() || isTabDefault()">
-          <span>{{ 'TABS.MANAGEMENT.PIN_CURRENT_TAB' | translate }}</span>
-        </li>
-        <li nz-menu-item 
-          (click)="unpinCurrentTab()" 
-          [nzDisabled]="!isTabPinned()">
-          <span>{{ 'TABS.MANAGEMENT.UNPIN_CURRENT_TAB' | translate }}</span>
-        </li>
-      </ul>
-    </nz-dropdown-menu>
-  `,
+  templateUrl: './tabs.html',
   styleUrl: './tabs.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -394,7 +287,7 @@ export class AppTabBar {
     this.tabs.set(currentTabs);
 
     const currentSelectedIndex = this.selectedIndex();
-    
+
     // Update selected index if closed tab was before the selected tab
     if (index < currentSelectedIndex) {
       // Selected tab moves left
@@ -417,7 +310,7 @@ export class AppTabBar {
     event.preventDefault();
     event.stopPropagation();
     this.contextMenuIndex.set(index);
-    
+
     // Show the context menu using the service
     this.contextMenuService.create(event, menu);
   }

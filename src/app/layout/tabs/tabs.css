@@ -4,7 +4,6 @@
 
 .tabbar-container {
   background-color: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
 }
 
 .tab-container {
@@ -37,6 +36,7 @@
   min-width: 7rem;
   height: 100%;
   border: 1px solid #d1d5db;
+  border-top: 0;
   border-bottom: 0;
   position: relative;
   margin-left: -1px;
