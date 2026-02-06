@@ -14,6 +14,7 @@ import { Search } from './layout/search/search';
 import { SiderHeader } from './layout/sider-header/sider-header';
 import { SiderMenu } from './layout/sider-menu/sider-menu';
 import { SiderFooter } from './layout/sider-footer/sider-footer';
+import { AppTabBar } from './layout/tabs/tabs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { Subject, Subscription, combineLatest } from 'rxjs';
@@ -34,7 +35,8 @@ import { AuthService } from './services/auth.service';
     Search,
     SiderHeader,
     SiderMenu,
-    SiderFooter
+    SiderFooter,
+    AppTabBar
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',
