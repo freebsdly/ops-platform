@@ -11,6 +11,7 @@ import {
   AfterViewInit,
   OnDestroy,
 } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { TranslateModule } from '@ngx-translate/core';
@@ -20,6 +21,7 @@ import { NzDropdownModule, NzContextMenuService, NzDropdownMenuComponent } from 
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { RouteConfigService } from '../../services/route-config.service';
+import { StoreService } from '../../core/stores/store.service';
 
 export interface TabItem {
   key: string;
@@ -41,12 +43,15 @@ export class AppTabBar {
   private readonly destroyRef = inject(DestroyRef);
   private readonly routeConfigService = inject(RouteConfigService);
   private readonly contextMenuService = inject(NzContextMenuService);
+  private readonly storeService = inject(StoreService);
   private readonly tabsStorageKey = 'app_tabs';
 
   @ViewChild('tabContainer') tabContainer!: ElementRef<HTMLDivElement>;
   @ViewChild('tabsWrapper') tabsWrapper!: ElementRef<HTMLDivElement>;
 
   private resizeObserver: ResizeObserver | null = null;
+  private siderCollapsedSubscription: Subscription | null = null;
+  private isViewInitialized = false;
 
   // Initialize tabs from localStorage or with default dashboard tab
   tabs = signal<TabItem[]>(this.loadTabsFromStorage());
@@ -77,6 +82,14 @@ export class AppTabBar {
         this.handleRouteChange();
       });
 
+    // Monitor sider collapsed state changes
+    this.siderCollapsedSubscription = this.storeService.isSiderCollapsed$.subscribe(() => {
+      // When sider state changes, recalculate visible tabs after DOM updates
+      requestAnimationFrame(() => {
+        this.calculateVisibleTabs();
+      });
+    });
+
     // Save tabs to localStorage when they change
     effect(() => {
       const currentTabs = this.tabs();
@@ -89,6 +102,8 @@ export class AppTabBar {
   }
 
   ngAfterViewInit() {
+    this.isViewInitialized = true;
+    
     // Observe container size to adjust visible tabs
     this.resizeObserver = new ResizeObserver(() => {
       this.calculateVisibleTabs();
@@ -97,16 +112,23 @@ export class AppTabBar {
     if (this.tabContainer) {
       this.resizeObserver.observe(this.tabContainer.nativeElement);
     }
+    
+    // Initial calculation
+    this.calculateVisibleTabs();
   }
 
   ngOnDestroy() {
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
+    if (this.siderCollapsedSubscription) {
+      this.siderCollapsedSubscription.unsubscribe();
+    }
   }
 
   private calculateVisibleTabs(): void {
-    if (!this.tabContainer || !this.tabsWrapper) {
+    // Wait for view to be initialized
+    if (!this.isViewInitialized || !this.tabContainer || !this.tabsWrapper) {
       return;
     }
 
