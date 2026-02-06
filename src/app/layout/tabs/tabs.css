@@ -8,17 +8,21 @@
 }
 
 .tab-container {
-  border-bottom: 1px solid #e5e7eb;
   display: flex;
   align-items: center;
   height: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: relative;
   overflow: hidden;
 }
 
 .tabs-wrapper {
   display: flex;
+  flex: 1;
+  overflow: hidden;
   align-items: center;
-  border-bottom: 1px solid #d1d5db;
+  height: 100%;
+  position: relative;
 }
 
 .tab-button {
@@ -30,7 +34,8 @@
   font-weight: 500;
   transition: all 150ms ease;
   width: 7rem;
-  height: 2rem;
+  min-width: 7rem;
+  height: 100%;
   border: 1px solid #d1d5db;
   border-bottom: 0;
   position: relative;
@@ -38,6 +43,7 @@
   background-color: #f9fafb;
   color: #374151;
   cursor: pointer;
+  flex-shrink: 0;
 }
 
 .tab-button:hover {
@@ -100,11 +106,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 2rem;
+  height: 100%;
+  min-width: 2.5rem;
   padding: 0 0.5rem;
   border-left: 1px solid #d1d5db;
   background-color: #ffffff;
   cursor: pointer;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: 20;
 }
 
 .overflow-dropdown-button:hover {
@@ -133,5 +144,6 @@
 @media (max-width: 768px) {
   .tab-button {
     width: 6rem;
+    min-width: 6rem;
   }
 }
