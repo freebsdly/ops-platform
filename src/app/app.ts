@@ -40,10 +40,10 @@ import { AuthService } from './services/auth.service';
   styleUrl: './app.css',
 })
 export class App implements OnInit, OnDestroy {
-  logoSrc = 'https://ng.ant.design/assets.img/logo.svg';
-  logoAlt = 'Logo';
-  title = 'Ant Design of Angular';
-  logoLink = 'https://ng.ant.design/';
+  logoSrc = 'https://img.icons8.com/color/96/000000/administrative-tools.png';
+  logoAlt = 'DevOps Platform';
+  title = 'DevOps Platform';
+  logoLink = '/';
 
   layoutService = inject(LayoutService);
   private router = inject(Router);
@@ -85,32 +85,32 @@ export class App implements OnInit, OnDestroy {
   // 派生配置信号 - 使用safe computed
   appTitleSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.appTitle || 'Ops Platform';
+    return config?.appTitle || 'DevOps Platform';
   });
   
   logoSrcSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.src || 'https://ng.ant.design/assets.img/logo.svg';
+    return config?.logo?.src || 'https://img.icons8.com/color/96/000000/administrative-tools.png';
   });
   
   logoAltSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.alt || 'Logo';
+    return config?.logo?.alt || 'DevOps Platform';
   });
   
   logoLinkSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.link || 'https://ng.ant.design/';
+    return config?.logo?.link || '/';
   });
   
   logoCollapsedIconSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.collapsedIcon || 'bars';
+    return config?.logo?.collapsedIcon || 'tool';
   });
   
   logoExpandedIconSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.expandedIcon || 'bars';
+    return config?.logo?.expandedIcon || 'tool';
   });
   
   // Track if auth check is in progress
@@ -210,6 +210,9 @@ export class App implements OnInit, OnDestroy {
     if (savedSiderCollapsed) {
       this.storeService.setSiderCollapsed(savedSiderCollapsed === 'true');
     }
+
+    // Load config from cache if available
+    this.loadConfigFromCache();
 
     // Set current module based on initial URL
     this.setInitialModule();
@@ -317,6 +320,19 @@ export class App implements OnInit, OnDestroy {
     this.storeService.loadModules();
 
     this.resourcesLoaded = true;
+  }
+
+  // 在应用初始化时从缓存加载配置
+  private loadConfigFromCache(): void {
+    try {
+      const cached = localStorage.getItem('app_layout_config');
+      if (cached) {
+        const config = JSON.parse(cached);
+        this.layoutConfigSignal.set(config);
+      }
+    } catch (error) {
+      console.warn('Failed to load config from cache:', error);
+    }
   }
 
   isLoginPage(path?: string): boolean {

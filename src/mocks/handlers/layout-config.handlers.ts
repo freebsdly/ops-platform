@@ -4,11 +4,11 @@ import { LayoutConfig, DEFAULT_LAYOUT_CONFIG } from '../../app/core/types/layout
 // 模拟配置数据
 const mockConfig: LayoutConfig = {
   ...DEFAULT_LAYOUT_CONFIG,
-  appTitle: 'DevOps Ops Platform',
+  appTitle: 'DevOps Platform',
   logo: {
     ...DEFAULT_LAYOUT_CONFIG.logo,
     src: 'https://img.icons8.com/color/96/000000/administrative-tools.png',
-    alt: 'DevOps Tools Logo',
+    alt: 'DevOps Platform',
     link: '/',
     width: '32px',
     height: '32px',
@@ -37,7 +37,7 @@ const mockConfig: LayoutConfig = {
   },
   footer: {
     ...DEFAULT_LAYOUT_CONFIG.footer,
-    content: '© 2024 DevOps Ops Platform. Powered by Angular & Ant Design.',
+    content: '© 2024 DevOps Platform. Powered by Angular & Ant Design.',
     visible: true
   }
 };

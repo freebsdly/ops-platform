@@ -312,16 +312,16 @@ export interface FooterConfig {
  * 默认布局配置
  */
 export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
-  appTitle: 'Ops Platform',
+  appTitle: 'DevOps Platform',
   logo: {
-    src: 'https://ng.ant.design/assets.img/logo.svg',
-    alt: 'Logo',
-    link: 'https://ng.ant.design/',
+    src: 'https://img.icons8.com/color/96/000000/administrative-tools.png',
+    alt: 'DevOps Platform',
+    link: '/',
     width: '32px',
     height: '32px',
     visible: true,
-    collapsedIcon: 'bars',
-    expandedIcon: 'bars'
+    collapsedIcon: 'tool',
+    expandedIcon: 'tool'
   },
   theme: {
     mode: 'light',
@@ -360,7 +360,7 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
     height: 48,
     backgroundColor: '#f0f2f5',
     textColor: '#8c8c8c',
-    content: '© 2024 Ops Platform. All rights reserved.',
+    content: '© 2024 DevOps Platform. All rights reserved.',
     visible: true,
     fixed: false
   }
