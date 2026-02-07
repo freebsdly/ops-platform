@@ -1,0 +1,289 @@
+<div class="overview-dashboard">
+  <!-- 页面标题和操作 -->
+  <div class="dashboard-header mb-6">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold mb-2">{{ 'CONFIG.OVERVIEW_DASHBOARD' | translate }}</h1>
+        <p class="text-gray-500">实时监控系统状态和关键指标</p>
+      </div>
+      <div class="flex gap-2">
+        <button nz-button nzType="primary" (click)="refreshData()">
+          <span nz-icon nzType="sync"></span> 刷新数据
+        </button>
+        <button nz-button>
+          <span nz-icon nzType="download"></span> 导出报告
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 概览统计卡片 -->
+  <div nz-row [nzGutter]="16" class="mb-6">
+    <div nz-col [nzSpan]="6">
+      <nz-card class="stat-card">
+        <nz-statistic
+          [nzValue]="systemHealth()"
+          [nzSuffix]="'%'"
+          [nzTitle]="'系统健康度'"
+          [nzValueStyle]="{ color: systemHealth() >= 90 ? '#52c41a' : systemHealth() >= 70 ? '#faad14' : '#f5222d' }"
+        >
+          <nz-progress
+            [nzPercent]="systemHealth()"
+            [nzStrokeColor]="systemHealth() >= 90 ? '#52c41a' : systemHealth() >= 70 ? '#faad14' : '#f5222d'"
+            [nzShowInfo]="true"
+            nzSize="small"
+          ></nz-progress>
+        </nz-statistic>
+      </nz-card>
+    </div>
+    <div nz-col [nzSpan]="6">
+      <nz-card class="stat-card">
+        <nz-statistic
+          [nzValue]="activeServices()"
+          [nzTitle]="'活跃服务数'"
+          [nzPrefix]="'icon'"
+          [nzValueStyle]="{ color: '#1890ff' }"
+        >
+          <span nz-icon nzType="appstore" slot="prefix"></span>
+        </nz-statistic>
+      </nz-card>
+    </div>
+    <div nz-col [nzSpan]="6">
+      <nz-card class="stat-card">
+        <nz-statistic
+          [nzValue]="pendingAlerts()"
+          [nzTitle]="'待处理告警'"
+          [nzPrefix]="'icon'"
+          [nzValueStyle]="{ color: pendingAlerts() > 10 ? '#f5222d' : '#faad14' }"
+        >
+          <span nz-icon nzType="warning" slot="prefix"></span>
+        </nz-statistic>
+      </nz-card>
+    </div>
+    <div nz-col [nzSpan]="6">
+      <nz-card class="stat-card">
+        <nz-statistic
+          [nzValue]="completedTasks()"
+          [nzTitle]="'已完成任务'"
+          [nzPrefix]="'icon'"
+          [nzValueStyle]="{ color: '#52c41a' }"
+        >
+          <span nz-icon nzType="check-circle" slot="prefix"></span>
+        </nz-statistic>
+      </nz-card>
+    </div>
+  </div>
+
+  <!-- 统计摘要 -->
+  <div nz-row [nzGutter]="16" class="mb-6">
+    <div nz-col [nzSpan]="12">
+      <nz-card nzTitle="服务状态摘要" class="summary-card">
+        <div class="summary-item">
+          <span class="summary-label">总服务数:</span>
+          <span class="summary-value">{{ totalServices() }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">健康服务数:</span>
+          <span class="summary-value">{{ healthyServices() }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">告警统计:</span>
+          <div class="flex gap-2">
+            <nz-tag nzColor="error">高: {{ getAlertLevelCount('高') }}</nz-tag>
+            <nz-tag nzColor="warning">中: {{ getAlertLevelCount('中') }}</nz-tag>
+            <nz-tag>低: {{ getAlertLevelCount('低') }}</nz-tag>
+          </div>
+        </div>
+      </nz-card>
+    </div>
+    
+    <div nz-col [nzSpan]="12">
+      <nz-card nzTitle="快速操作" class="quick-actions-card">
+        <div class="actions-grid">
+          <button nz-button nzType="primary" class="action-button">
+            <span nz-icon nzType="plus"></span> 新建服务
+          </button>
+          <button nz-button nzType="default" class="action-button">
+            <span nz-icon nzType="audit"></span> 查看日志
+          </button>
+          <button nz-button nzType="default" class="action-button">
+            <span nz-icon nzType="dashboard"></span> 刷新监控
+          </button>
+          <button nz-button nzType="default" class="action-button">
+            <span nz-icon nzType="bell"></span> 告警设置
+          </button>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+
+  <!-- 告警和服务状态 -->
+  <div nz-row [nzGutter]="16" class="mb-6">
+    <div nz-col [nzSpan]="12">
+      <nz-card 
+        nzTitle="最近告警" 
+        [nzExtra]="extraTemplate" 
+        class="table-card"
+      >
+        <nz-table
+          #alertsTable
+          [nzData]="alertsData()"
+          [nzFrontPagination]="false"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>级别</th>
+              <th>服务</th>
+              <th>描述</th>
+              <th>时间</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of alertsTable.data; track data.id) {
+              <tr>
+                <td>
+                  <nz-tag
+                    [nzColor]="data.level === '高' ? 'error' : data.level === '中' ? 'warning' : 'default'"
+                  >
+                    {{ data.level }}
+                  </nz-tag>
+                </td>
+                <td>{{ data.service }}</td>
+                <td>{{ data.description }}</td>
+                <td>{{ data.time }}</td>
+                <td>{{ data.status }}</td>
+                <td>
+                  @if (data.status === '待处理') {
+                    <button nz-button nzSize="small" (click)="handleAlert(data.id)">
+                      处理
+                    </button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+
+    <div nz-col [nzSpan]="12">
+      <nz-card nzTitle="服务状态概览" class="table-card">
+        <nz-table
+          #servicesTable
+          [nzData]="servicesData()"
+          [nzFrontPagination]="false"
+          [nzShowPagination]="false"
+        >
+          <thead>
+            <tr>
+              <th>服务名称</th>
+              <th>状态</th>
+              <th>可用率</th>
+              <th>响应时间</th>
+              <th>实例数</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (data of servicesTable.data; track data.name) {
+              <tr>
+                <td>{{ data.name }}</td>
+                <td>
+                  <nz-tag [nzColor]="data.status === '运行正常' ? 'success' : 'error'">
+                    {{ data.status }}
+                  </nz-tag>
+                </td>
+                <td>{{ data.uptime }}</td>
+                <td>{{ data.responseTime }}</td>
+                <td>{{ data.instances }}</td>
+                <td>
+                  <button 
+                    nz-button 
+                    nzType="link" 
+                    nzSize="small"
+                    (click)="viewServiceDetails(data.name)"
+                  >
+                    详情
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </nz-table>
+      </nz-card>
+    </div>
+  </div>
+
+  <!-- 待办事项 -->
+  <div nz-row [nzGutter]="16">
+    <div nz-col [nzSpan]="12">
+      <nz-card nzTitle="待办事项" class="todo-card">
+        <ul class="todo-list">
+          @for (item of todoItems(); track item.id) {
+            <li class="todo-item">
+              <div class="todo-content">
+                <span class="todo-text">{{ item.task }}</span>
+                <div class="todo-meta">
+                  <nz-tag 
+                    [nzColor]="item.priority === '高' ? 'error' : item.priority === '中' ? 'warning' : 'default'"
+                    class="mr-2"
+                  >
+                    {{ item.priority }}
+                  </nz-tag>
+                  <span class="text-gray-500">截止: {{ item.dueDate }}</span>
+                </div>
+              </div>
+              <button 
+                nz-button 
+                nzType="primary" 
+                nzSize="small"
+                (click)="completeTodo(item.id)"
+              >
+                完成
+              </button>
+            </li>
+          }
+        </ul>
+        @if (todoItems().length === 0) {
+          <div class="empty-state">
+            <nz-empty nzNotFoundImage="simple" nzDescription="暂无待办事项"></nz-empty>
+          </div>
+        }
+      </nz-card>
+    </div>
+    
+    <div nz-col [nzSpan]="12">
+      <nz-card nzTitle="系统信息" class="info-card">
+        <div class="info-item">
+          <span class="info-label">系统版本:</span>
+          <span class="info-value">DevOps Platform v2.1.0</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">最后更新时间:</span>
+          <span class="info-value">2024-01-15 14:30:22</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">数据刷新间隔:</span>
+          <span class="info-value">60秒</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">监控节点:</span>
+          <span class="info-value">24个</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">API响应状态:</span>
+          <span class="info-value">
+            <nz-tag nzColor="success">正常</nz-tag>
+          </span>
+        </div>
+      </nz-card>
+    </div>
+  </div>
+</div>
+
+<ng-template #extraTemplate>
+  <a>查看全部</a>
+</ng-template>
