@@ -125,6 +125,12 @@ export class App implements OnInit, OnDestroy {
     return config?.logo?.expandedIcon || 'tool';
   });
   
+  // 是否显示应用底部（app footer）
+  showAppFooterSig = computed(() => {
+    const config = this.layoutConfigSig();
+    return config?.showAppFooter ?? true;
+  });
+  
   // Track if auth check is in progress
   isAuthChecking = signal<boolean>(true);
 

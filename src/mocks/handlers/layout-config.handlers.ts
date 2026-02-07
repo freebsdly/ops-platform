@@ -39,7 +39,9 @@ const mockConfig: LayoutConfig = {
     ...DEFAULT_LAYOUT_CONFIG.footer,
     content: '© 2024 DevOps Platform. Powered by Angular & Ant Design.',
     visible: true
-  }
+  },
+  showSiderFooter: true,
+  showAppFooter: true
 };
 
 export const layoutConfigHandlers = [
