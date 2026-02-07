@@ -245,5 +245,15 @@
     "TAGS": "Tags",
     "TAGS_PLACEHOLDER": "Select or type tags",
     "ADVANCED_SEARCH": "Advanced Search"
+  },
+  "TABS": {
+    "MANAGEMENT": {
+      "CLOSE_CURRENT_TAB": "Close current tab",
+      "CLOSE_OTHER_TABS": "Close other tabs",
+      "CLOSE_ALL_TABS": "Close all tabs",
+      "RELOAD_CURRENT_TAB": "Reload current tab",
+      "PIN_CURRENT_TAB": "Pin current tab",
+      "UNPIN_CURRENT_TAB": "Unpin current tab"
+    }
   }
 }
