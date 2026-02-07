@@ -57,9 +57,15 @@ export const routes: Routes = [
     loadChildren: () => import('./pages/service/service.routes').then(m => m.SERVICE_ROUTES),
     canActivate: [AuthGuard]
   },
-  // 默认重定向到配置管理模块
+  // 工作台模块 - 懒加载
+  { 
+    path: 'workbench', 
+    loadChildren: () => import('./pages/workbench/workbench.routes').then(m => m.WORKBENCH_ROUTES),
+    canActivate: [AuthGuard]
+  },
+  // 默认重定向到工作台模块
   { 
     path: '**', 
-    redirectTo: '/configuration/management/model' 
+    redirectTo: '/workbench/dashboard/overview' 
   }
 ];

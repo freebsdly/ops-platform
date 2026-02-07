@@ -28,6 +28,13 @@ export interface ModuleConfig {
 // 模块配置 - 定义所有可用的模块
 export const MODULES_CONFIG: ModuleConfig[] = [
   {
+    id: 'workbench',
+    title: 'CONFIG.WORKBENCH',
+    icon: 'dashboard',
+    color: '#13c2c2',
+    defaultPath: '/workbench/dashboard/overview',
+  },
+  {
     id: 'configuration',
     title: 'CONFIG.CONFIG_CENTER',
     icon: 'setting',
@@ -235,6 +242,44 @@ export const MENUS_CONFIG: Record<string, MenuItem[]> = {
         { key: 'CONFIG.COST_ALLOCATION', text: '成本分摊', icon: 'dollar', link: '/service/collaboration/cost' },
         { key: 'CONFIG.DATA_ANALYSIS', text: '数据分析', icon: 'line-chart', link: '/service/collaboration/analysis' },
         { key: 'CONFIG.SERVICE_IMPROVEMENT', text: '服务改进', icon: 'up-circle', link: '/service/collaboration/improvement' },
+      ],
+    },
+  ],
+  workbench: [
+    {
+      key: 'CONFIG.WORKBENCH_DASHBOARD',
+      text: '工作台仪表板',
+      icon: 'dashboard',
+      open: true,
+      children: [
+        { key: 'CONFIG.OVERVIEW_DASHBOARD', text: '概览仪表板', icon: 'dashboard', link: '/workbench/dashboard/overview' },
+        { key: 'CONFIG.PERFORMANCE_DASHBOARD', text: '性能仪表板', icon: 'line-chart', link: '/workbench/dashboard/performance' },
+        { key: 'CONFIG.BUSINESS_DASHBOARD', text: '业务仪表板', icon: 'bar-chart', link: '/workbench/dashboard/business' },
+        { key: 'CONFIG.OPERATIONAL_DASHBOARD', text: '运维仪表板', icon: 'desktop', link: '/workbench/dashboard/operational' },
+      ],
+    },
+    {
+      key: 'CONFIG.WORKBENCH_ANALYTICS',
+      text: '工作台分析',
+      icon: 'pie-chart',
+      open: true,
+      children: [
+        { key: 'CONFIG.DATA_ANALYSIS', text: '数据分析', icon: 'bar-chart', link: '/workbench/analytics/data' },
+        { key: 'CONFIG.TREND_ANALYSIS', text: '趋势分析', icon: 'rise', link: '/workbench/analytics/trend' },
+        { key: 'CONFIG.COMPARATIVE_ANALYSIS', text: '对比分析', icon: 'swap', link: '/workbench/analytics/comparative' },
+        { key: 'CONFIG.ROOT_CAUSE_ANALYSIS', text: '根因分析', icon: 'experiment', link: '/workbench/analytics/root-cause' },
+      ],
+    },
+    {
+      key: 'CONFIG.WORKBENCH_MANAGEMENT',
+      text: '工作台管理',
+      icon: 'setting',
+      open: true,
+      children: [
+        { key: 'CONFIG.DASHBOARD_CUSTOMIZATION', text: '仪表板定制', icon: 'tool', link: '/workbench/management/customization' },
+        { key: 'CONFIG.WIDGET_MANAGEMENT', text: '组件管理', icon: 'appstore', link: '/workbench/management/widget' },
+        { key: 'CONFIG.DATA_SOURCE_MANAGEMENT', text: '数据源管理', icon: 'database', link: '/workbench/management/datasource' },
+        { key: 'CONFIG.REPORT_MANAGEMENT', text: '报表管理', icon: 'file-text', link: '/workbench/management/report' },
       ],
     },
   ],
