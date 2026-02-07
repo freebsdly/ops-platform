@@ -277,6 +277,7 @@ export class AppTabBar {
   }
 
   onTabClick(index: number): void {
+    console.log(`[Tabs] Tab clicked: index=${index}, path=${this.tabs()[index]?.path}`);
     this.selectedIndex.set(index);
     const tab = this.tabs()[index];
     if (tab && tab.path) {

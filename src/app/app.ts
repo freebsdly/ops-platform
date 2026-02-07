@@ -19,6 +19,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { Subject, Subscription, combineLatest } from 'rxjs';
 import { AuthService } from './services/auth.service';
+import { MODULES_CONFIG } from './config/menu.config';
 
 @Component({
   selector: 'app-root',
@@ -356,15 +357,16 @@ export class App implements OnInit, OnDestroy {
     const url = this.currentPath();
     const segments = url.split('/').filter(segment => segment.length > 0);
     
-    // Default to dashboard if no segments or first segment is dashboard
+    // Default to dashboard if no segments
     let currentModule = segments[0] || 'dashboard';
     
     // Check if it's a valid module from MODULES_CONFIG
-    const validModules = ['dashboard', 'configuration', 'monitoring', 'incident', 'service'];
-    if (!validModules.includes(currentModule)) {
+    const validModuleIds = MODULES_CONFIG.map(module => module.id);
+    if (!validModuleIds.includes(currentModule)) {
       currentModule = 'dashboard';
     }
     
+    console.log(`[App] Initial URL: ${url}, setting initial module: ${currentModule}`);
     this.storeService.setCurrentModule(currentModule);
   }
 }

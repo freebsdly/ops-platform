@@ -36,6 +36,7 @@ export class SiderMenu {
     this.storeService.currentModule$
   ]).pipe(
     switchMap(([isCollapsed, currentModuleId]) => {
+      console.log(`[SiderMenu] Module changed: ${currentModuleId}, collapsed: ${isCollapsed}`);
       let menuData$: Observable<MenuItem[]>;
       let isRootRoute = false;
       
@@ -47,9 +48,11 @@ export class SiderMenu {
       
       if (isRootPath) {
         isRootRoute = true;
+        console.log(`[SiderMenu] Showing root menu for module: ${currentModuleId}`);
         // 根路由或仪表板：显示所有模块的概览菜单
         menuData$ = this.createRootMenuData();
       } else {
+        console.log(`[SiderMenu] Getting module menus for: ${currentModuleId}`);
         // 其他模块从服务获取菜单
         menuData$ = this.moduleMenuService.getModuleMenus(currentModuleId);
       }

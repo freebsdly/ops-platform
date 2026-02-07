@@ -118,15 +118,14 @@ export class ModuleMenuService {
   }
 
   getAvailableModules(): Observable<ModuleOption[]> {
-    const currentModuleId = this.router.url.split('/').filter(segment => segment.length > 0)[0];
-
     const modules = MODULES_CONFIG.map(module => ({
       id: module.id,
       title: module.title,
       icon: module.icon,
       color: module.color,
       defaultPath: module.defaultPath,
-      isActive: module.id === currentModuleId,
+      // isActive is not used by ModuleSelector - it recomputes isSelected from store
+      isActive: false,
     }));
     return of(modules);
   }

@@ -3,6 +3,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Router, NavigationEnd } from '@angular/router';
 import { tap, filter, map } from 'rxjs/operators';
 import * as LayoutActions from './layout.actions';
+import { MODULES_CONFIG } from '../../../config/menu.config';
 
 @Injectable()
 export class LayoutEffects {
@@ -40,15 +41,16 @@ export class LayoutEffects {
           const url = (event as NavigationEnd).url;
           const segments = url.split('/').filter(segment => segment.length > 0);
           
-          // Default to dashboard if no segments or first segment is dashboard
+          // Default to dashboard if no segments
           let currentModule = segments[0] || 'dashboard';
           
           // Check if it's a valid module from MODULES_CONFIG
-          const validModules = ['dashboard', 'configuration', 'monitoring', 'incident', 'service'];
-          if (!validModules.includes(currentModule)) {
+          const validModuleIds = MODULES_CONFIG.map(module => module.id);
+          if (!validModuleIds.includes(currentModule)) {
             currentModule = 'dashboard';
           }
           
+          console.log(`[LayoutEffects] Navigation to ${url}, detected module: ${currentModule}`);
           return LayoutActions.setCurrentModule({ module: currentModule });
         })
       )
