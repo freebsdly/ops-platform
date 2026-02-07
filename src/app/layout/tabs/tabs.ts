@@ -20,6 +20,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDropdownModule, NzContextMenuService, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
+import { NzMessageService } from 'ng-zorro-antd/message';
 import { RouteConfigService } from '../../services/route-config.service';
 import { StoreService } from '../../core/stores/store.service';
 
@@ -44,6 +45,7 @@ export class AppTabBar {
   private readonly routeConfigService = inject(RouteConfigService);
   private readonly contextMenuService = inject(NzContextMenuService);
   private readonly storeService = inject(StoreService);
+  private readonly messageService = inject(NzMessageService);
   private readonly tabsStorageKey = 'app_tabs';
 
   @ViewChild('tabContainer') tabContainer!: ElementRef<HTMLDivElement>;
@@ -53,7 +55,7 @@ export class AppTabBar {
   private siderCollapsedSubscription: Subscription | null = null;
   private isViewInitialized = false;
 
-  // Initialize tabs from localStorage or with default dashboard tab
+  // Initialize tabs from localStorage or with default overview dashboard tab
   tabs = signal<TabItem[]>(this.loadTabsFromStorage());
 
   visibleTabs = computed(() => {
@@ -146,34 +148,61 @@ export class AppTabBar {
       const stored = localStorage.getItem(this.tabsStorageKey);
       if (stored) {
         const parsed = JSON.parse(stored);
-        // Ensure we always have at least the dashboard tab
+        console.log(`[Tabs] Loading tabs from storage:`, parsed.tabs?.length || 0, 'tabs');
+        // Ensure we always have at least the overview dashboard tab
         const tabs = parsed.tabs || [];
-        const hasDashboard = tabs.some((tab: TabItem) => tab.key === 'dashboard');
+        
+        // Convert old 'dashboard' or 'workbench' tabs to new 'CONFIG.OVERVIEW_DASHBOARD' tab
+        const convertedTabs = tabs.map((tab: TabItem) => {
+          if (tab.key === 'dashboard' || tab.key === 'workbench') {
+            return {
+              key: 'CONFIG.OVERVIEW_DASHBOARD',
+              label: 'CONFIG.OVERVIEW_DASHBOARD',
+              path: '/workbench/dashboard/overview',
+              icon: 'dashboard',
+              closable: false,
+            };
+          }
+          return tab;
+        });
+        
+        const hasOverviewDashboard = convertedTabs.some((tab: TabItem) => tab.key === 'CONFIG.OVERVIEW_DASHBOARD');
 
-        if (!hasDashboard) {
-          return [
+        if (!hasOverviewDashboard) {
+          const result = [
             {
-              key: 'dashboard',
-              label: 'MENU.DASHBOARD',
-              path: '/',
+              key: 'CONFIG.OVERVIEW_DASHBOARD',
+              label: 'CONFIG.OVERVIEW_DASHBOARD',
+              path: '/workbench/dashboard/overview',
               icon: 'dashboard',
               closable: false,
             },
-            ...tabs,
+            ...convertedTabs,
           ];
+          console.log(`[Tabs] No overview dashboard found, adding default. Total tabs:`, result.length);
+          return result;
         }
-        return tabs;
+        
+        // Remove duplicate overview dashboard tabs
+        const uniqueTabs = convertedTabs.filter((tab: TabItem, index: number, self: TabItem[]) =>
+          index === self.findIndex((t: TabItem) => t.key === tab.key)
+        );
+        
+        console.log(`[Tabs] After deduplication:`, uniqueTabs.length, 'unique tabs');
+        console.log(`[Tabs] Tab keys:`, uniqueTabs.map((t: TabItem) => t.key));
+        return uniqueTabs;
       }
     } catch (error) {
-      console.error('Error loading tabs from storage:', error);
+      console.error('[Tabs] Error loading tabs from storage:', error);
     }
 
     // Default tab if no storage or error
+    console.log(`[Tabs] Using default tab`);
     return [
       {
-        key: 'dashboard',
-        label: 'MENU.DASHBOARD',
-        path: '/',
+        key: 'CONFIG.OVERVIEW_DASHBOARD',
+        label: 'CONFIG.OVERVIEW_DASHBOARD',
+        path: '/workbench/dashboard/overview',
         icon: 'dashboard',
         closable: false,
       },
@@ -213,6 +242,11 @@ export class AppTabBar {
       return;
     }
 
+    // Don't handle tabs for root route - it's just a redirect
+    if (currentPath === '/') {
+      return;
+    }
+
     const currentTab = this.tabs().find((tab) => tab.path === currentPath);
 
     // If we're at a new route that's not already a tab, add it
@@ -236,10 +270,20 @@ export class AppTabBar {
     // Get tab configuration from unified service
     const tabConfig = this.routeConfigService.getTabConfig(path);
 
+    // Check if a tab with the same key already exists
     const existingTabIndex = this.tabs().findIndex((tab) => tab.key === tabConfig.key);
+    
+    // Also check if a tab with the exact same path already exists
+    const existingTabWithSamePath = this.tabs().findIndex((tab) => tab.path === path);
+
+    if (existingTabWithSamePath !== -1) {
+      // Tab with exact same path exists, just activate it
+      this.selectedIndex.set(existingTabWithSamePath);
+      return;
+    }
 
     if (existingTabIndex === -1) {
-      // Add new tab
+      // Add new tab with unique key
       const newTab: TabItem = {
         key: tabConfig.key,
         label: tabConfig.label,
@@ -252,13 +296,37 @@ export class AppTabBar {
       this.tabs.set(currentTabs);
       this.selectedIndex.set(currentTabs.length - 1);
     } else {
-      // Tab already exists, just activate it
-      this.selectedIndex.set(existingTabIndex);
+      // Tab with same key exists but different path
+      // Check if it's a default tab that should have a fixed path
+      if (this.isDefaultTab(tabConfig.key)) {
+        // For default tabs, update the existing tab's path if needed
+        const updatedTabs = [...this.tabs()];
+        updatedTabs[existingTabIndex] = {
+          ...updatedTabs[existingTabIndex],
+          path: path,
+        };
+        this.tabs.set(updatedTabs);
+      } else {
+        // For non-default tabs with same key but different path,
+        // create a new tab with a unique key to avoid confusion
+        const uniqueKey = `${tabConfig.key}-${Date.now()}`;
+        const newTab: TabItem = {
+          key: uniqueKey,
+          label: tabConfig.label,
+          path: path,
+          icon: tabConfig.icon,
+          closable: true,
+        };
+
+        const currentTabs = [...this.tabs(), newTab];
+        this.tabs.set(currentTabs);
+        this.selectedIndex.set(currentTabs.length - 1);
+      }
     }
   }
 
   isDefaultTab(key: string): boolean {
-    return ['dashboard'].includes(key);
+    return ['CONFIG.OVERVIEW_DASHBOARD', 'dashboard', 'workbench'].includes(key);
   }
 
   isTabClosable(): boolean {
@@ -322,8 +390,8 @@ export class AppTabBar {
         this.selectedIndex.set(newIndex);
         this.router.navigate([currentTabs[newIndex].path]);
       } else {
-        // Default to dashboard if no tabs left
-        this.router.navigate(['/']);
+        // Default to workbench if no tabs left
+        this.router.navigate(['/workbench/dashboard/overview']);
       }
     }
     // If index > currentSelectedIndex, selected index stays the same
@@ -373,14 +441,14 @@ export class AppTabBar {
   }
 
   closeAllTabs(): void {
-    // Keep only default tabs (dashboard)
+    // Keep only default tabs (workbench)
     const defaultTabs = this.tabs().filter((tab) => this.isDefaultTab(tab.key));
     this.tabs.set(defaultTabs);
     this.selectedIndex.set(0);
 
-    // Navigate to dashboard if not already there
-    if (this.router.url !== '/') {
-      this.router.navigate(['/']);
+    // Navigate to workbench if not already there
+    if (this.router.url !== '/workbench/dashboard/overview') {
+      this.router.navigate(['/workbench/dashboard/overview']);
     }
   }
 
@@ -430,19 +498,43 @@ export class AppTabBar {
     }
   }
 
-  unpinCurrentTab(): void {
-    const currentIndex = this.contextMenuIndex();
-    const currentTab = this.tabs()[currentIndex];
-
-    if (currentTab && currentTab.closable === false) {
-      // Make the tab closable again (unpinned)
-      const updatedTabs = [...this.tabs()];
-      updatedTabs[currentIndex] = {
-        ...currentTab,
-        closable: true,
-      };
-
-      this.tabs.set(updatedTabs);
+  cleanupDuplicateTabs(): void {
+    const currentTabs = this.tabs();
+    console.log(`[Tabs] Before cleanup:`, currentTabs.length, 'tabs');
+    console.log(`[Tabs] Tab keys before:`, currentTabs.map(t => t.key));
+    
+    // Remove duplicate tabs based on key
+    const uniqueTabs = currentTabs.filter((tab, index, self) =>
+      index === self.findIndex((t) => t.key === tab.key)
+    );
+    
+    // Also ensure we don't have duplicate paths with different keys
+    const finalTabs = uniqueTabs.filter((tab, index, self) =>
+      index === self.findIndex((t) => t.path === tab.path)
+    );
+    
+    console.log(`[Tabs] After cleanup:`, finalTabs.length, 'tabs');
+    console.log(`[Tabs] Tab keys after:`, finalTabs.map(t => t.key));
+    
+    if (finalTabs.length < currentTabs.length) {
+      this.tabs.set(finalTabs);
+      this.messageService.success(`清理了 ${currentTabs.length - finalTabs.length} 个重复的标签页`);
+      
+      // Update selected index if needed
+      const currentSelectedIndex = this.selectedIndex();
+      const currentTab = currentTabs[currentSelectedIndex];
+      if (currentTab) {
+        const newIndex = finalTabs.findIndex(t => t.key === currentTab.key);
+        if (newIndex !== -1 && newIndex !== currentSelectedIndex) {
+          this.selectedIndex.set(newIndex);
+        } else if (newIndex === -1 && finalTabs.length > 0) {
+          // Selected tab was removed, select first tab
+          this.selectedIndex.set(0);
+          this.router.navigate([finalTabs[0].path]);
+        }
+      }
+    } else {
+      this.messageService.info('没有发现重复的标签页');
     }
   }
 }

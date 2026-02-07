@@ -40,7 +40,8 @@
     "SYSTEM": "系统管理",
     "USER_MANAGEMENT": "用户管理",
     "ROLE_MANAGEMENT": "角色管理",
-    "PERMISSION_MANAGEMENT": "权限管理"
+    "PERMISSION_MANAGEMENT": "权限管理",
+    "HOME": "首页"
   },
   "LAYOUT": {
     "HEADER": {

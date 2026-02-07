@@ -80,15 +80,16 @@
       <span>{{ 'TABS.MANAGEMENT.CLOSE_ALL_TABS' | translate }}</span>
     </li>
     <li nz-menu-divider></li>
+    <li nz-menu-item (click)="cleanupDuplicateTabs()">
+      <span>清理重复标签页</span>
+    </li>
+    <li nz-menu-divider></li>
     <li nz-menu-item (click)="reloadCurrentTab()">
       <span>{{ 'TABS.MANAGEMENT.RELOAD_CURRENT_TAB' | translate }}</span>
     </li>
     <li nz-menu-divider></li>
     <li nz-menu-item (click)="pinCurrentTab()" [nzDisabled]="isTabPinned() || isTabDefault()">
       <span>{{ 'TABS.MANAGEMENT.PIN_CURRENT_TAB' | translate }}</span>
-    </li>
-    <li nz-menu-item (click)="unpinCurrentTab()" [nzDisabled]="!isTabPinned()">
-      <span>{{ 'TABS.MANAGEMENT.UNPIN_CURRENT_TAB' | translate }}</span>
     </li>
   </ul>
 </nz-dropdown-menu>

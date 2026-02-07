@@ -24,14 +24,7 @@ export class RouteConfigService {
 
   private initializeRouteConfigs(): void {
     this.routeConfigs.push(
-      // Root route
-      {
-        path: '/',
-        key: 'home',
-        titleKey: 'MENU.HOME',
-        icon: 'home',
-      },
-      // Welcome route
+      // Welcome route (kept for potential direct access, but likely won't generate a tab)
       {
         path: '/welcome',
         key: 'welcome',

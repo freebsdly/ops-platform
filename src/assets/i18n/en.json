@@ -40,7 +40,8 @@
     "SYSTEM": "System",
     "USER_MANAGEMENT": "Users",
     "ROLE_MANAGEMENT": "Roles",
-    "PERMISSION_MANAGEMENT": "Permissions"
+    "PERMISSION_MANAGEMENT": "Permissions",
+    "HOME": "Home"
   },
   "LAYOUT": {
     "HEADER": {
