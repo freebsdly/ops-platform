@@ -38,3 +38,37 @@ li[nz-menu-item] span[nz-icon] {
 .ant-menu-inline-collapsed li[nz-menu-item] span[nz-icon] {
   margin-right: 0;
 }
+
+/* Force hide all text in collapsed state - only show icons */
+.ant-menu.ant-menu-inline-collapsed .ant-menu-item .ant-menu-title-content,
+.ant-menu.ant-menu-inline-collapsed li[nz-menu-item] .ant-menu-title-content,
+.ant-menu.ant-menu-inline-collapsed .ant-menu-submenu-title .ant-menu-title-content,
+.ant-menu.ant-menu-inline-collapsed .ant-menu-item > a,
+.ant-menu.ant-menu-inline-collapsed li[nz-menu-item] > a,
+.ant-menu.ant-menu-inline-collapsed .ant-menu-submenu-title > a,
+.ant-menu.ant-menu-inline-collapsed > .ant-menu-item .anticon + span,
+.ant-menu.ant-menu-inline-collapsed > .ant-menu-item-group > .ant-menu-item-group-list > .ant-menu-item .anticon + span,
+.ant-menu.ant-menu-inline-collapsed > .ant-menu-submenu > .ant-menu-submenu-title .anticon + span {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Ensure icons are centered in collapsed state */
+.ant-menu.ant-menu-inline-collapsed .ant-menu-item .anticon,
+.ant-menu.ant-menu-inline-collapsed li[nz-menu-item] .anticon,
+.ant-menu.ant-menu-inline-collapsed li[nz-menu-item] span[nz-icon],
+.ant-menu.ant-menu-inline-collapsed .ant-menu-submenu-title .anticon,
+.ant-menu.ant-menu-inline-collapsed .ant-menu-submenu-title span[nz-icon] {
+  margin: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
