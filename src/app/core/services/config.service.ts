@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, BehaviorSubject, catchError, tap, map } from 'rxjs';
-import { LayoutConfig, LogoConfig, DEFAULT_LAYOUT_CONFIG } from '../types/layout-config.interface';
+import { Observable, of, BehaviorSubject, catchError, tap, map, throwError } from 'rxjs';
+import { LayoutConfig, LogoConfig } from '../types/layout-config.interface';
 
 /**
  * 配置服务 - 负责从后端加载和管理应用配置
@@ -20,7 +20,7 @@ export class ConfigService {
   /**
    * 当前布局配置
    */
-  private layoutConfigSubject = new BehaviorSubject<LayoutConfig>(DEFAULT_LAYOUT_CONFIG);
+  private layoutConfigSubject = new BehaviorSubject<LayoutConfig | null>(null);
   
   /**
    * 布局配置可观察对象
@@ -51,11 +51,12 @@ export class ConfigService {
    * @param forceRefresh 是否强制刷新（忽略缓存）
    */
   loadLayoutConfig(forceRefresh: boolean = false): Observable<LayoutConfig> {   
-    // 检查是否有认证token，如果没有token，直接返回默认配置
+    // 检查是否有认证token，如果没有token，直接报错
     const token = localStorage.getItem('auth_token');
     if (!token) {
-      this.layoutConfigSubject.next(DEFAULT_LAYOUT_CONFIG);
-      return of(DEFAULT_LAYOUT_CONFIG);
+      const error = new Error('未找到认证令牌，请重新登录');
+      this.errorSubject.next(error.message);
+      return throwError(() => error);
     }
     
     // 检查缓存
@@ -82,12 +83,12 @@ export class ConfigService {
         this.loadingSubject.next(false);
       }),
       catchError((error) => {
-        this.errorSubject.next(error.message || 'Failed to load configuration');
+        const errorMessage = this.getErrorMessage(error);
+        this.errorSubject.next(errorMessage);
         this.loadingSubject.next(false);
         
-        // 使用默认配置作为回退
-        this.layoutConfigSubject.next(DEFAULT_LAYOUT_CONFIG);
-        return of(DEFAULT_LAYOUT_CONFIG);
+        // 直接抛出错误，不再使用默认配置
+        return throwError(() => new Error(errorMessage));
       })
     );
   }
@@ -95,7 +96,7 @@ export class ConfigService {
   /**
    * 获取当前布局配置
    */
-  getLayoutConfig(): LayoutConfig {
+  getLayoutConfig(): LayoutConfig | null {
     return this.layoutConfigSubject.value;
   }
   
@@ -105,6 +106,10 @@ export class ConfigService {
    */
   updateLayoutConfig(config: Partial<LayoutConfig>): void {
     const currentConfig = this.layoutConfigSubject.value;
+    if (!currentConfig) {
+      console.error('Cannot update config: current config is null');
+      return;
+    }
     const newConfig = { ...currentConfig, ...config };
     this.layoutConfigSubject.next(newConfig);
     this.cacheConfig(newConfig);
@@ -126,13 +131,10 @@ export class ConfigService {
   }
   
   /**
-   * 重置为默认配置
+   * 重置配置
    */
-  resetToDefault(): void {
-    this.layoutConfigSubject.next(DEFAULT_LAYOUT_CONFIG);
-    this.cacheConfig(DEFAULT_LAYOUT_CONFIG);
-    
-    // 清除缓存，强制下次从后端加载
+  resetConfig(): void {
+    this.layoutConfigSubject.next(null);
     this.clearCache();
   }
   
@@ -140,35 +142,40 @@ export class ConfigService {
    * 获取Logo配置
    */
   getLogoConfig() {
-    return this.layoutConfigSubject.value.logo;
+    const config = this.layoutConfigSubject.value;
+    return config?.logo;
   }
   
   /**
    * 获取应用标题
    */
-  getAppTitle(): string {
-    return this.layoutConfigSubject.value.appTitle;
+  getAppTitle(): string | null {
+    const config = this.layoutConfigSubject.value;
+    return config?.appTitle || null;
   }
   
   /**
    * 获取侧边栏配置
    */
   getSidebarConfig() {
-    return this.layoutConfigSubject.value.sidebar;
+    const config = this.layoutConfigSubject.value;
+    return config?.sidebar;
   }
   
   /**
    * 获取主题配置
    */
   getThemeConfig() {
-    return this.layoutConfigSubject.value.theme;
+    const config = this.layoutConfigSubject.value;
+    return config?.theme;
   }
   
   /**
    * 获取页头配置
    */
   getHeaderConfig() {
-    return this.layoutConfigSubject.value.header;
+    const config = this.layoutConfigSubject.value;
+    return config?.header;
   }
   
   /**
@@ -202,60 +209,14 @@ export class ConfigService {
   }
 
   /**
-   * 获取布局配置中的Logo配置
-   * @deprecated 请直接使用布局配置中的logo字段
-   */
-  getLogoConfigFromApi(): Observable<LogoConfig> {
-    return this.loadLayoutConfig().pipe(
-      map(config => config.logo)
-    );
-  }
-
-  /**
-   * 获取布局配置中的主题配置
-   * @deprecated 请直接使用布局配置中的theme字段
-   */
-  getThemeConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.theme> {
-    return this.loadLayoutConfig().pipe(
-      map(config => config.theme)
-    );
-  }
-
-  /**
-   * 获取布局配置中的侧边栏配置
-   * @deprecated 请直接使用布局配置中的sidebar字段
-   */
-  getSidebarConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.sidebar> {
-    return this.loadLayoutConfig().pipe(
-      map(config => config.sidebar)
-    );
-  }
-
-  /**
-   * 获取布局配置中的页头配置
-   * @deprecated 请直接使用布局配置中的header字段
-   */
-  getHeaderConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.header> {
-    return this.loadLayoutConfig().pipe(
-      map(config => config.header)
-    );
-  }
-
-  /**
-   * 获取布局配置中的页脚配置
-   * @deprecated 请直接使用布局配置中的footer字段
-   */
-  getFooterConfigFromApi(): Observable<typeof DEFAULT_LAYOUT_CONFIG.footer> {
-    return this.loadLayoutConfig().pipe(
-      map(config => config.footer)
-    );
-  }
-  
-  /**
    * 更新Logo配置
    */
   updateLogoConfig(logoConfig: Partial<LogoConfig>): void {
     const currentConfig = this.layoutConfigSubject.value;
+    if (!currentConfig) {
+      console.error('Cannot update logo config: current config is null');
+      return;
+    }
     const updatedLogo = { ...currentConfig.logo, ...logoConfig };
     this.updateLayoutConfig({ logo: updatedLogo });
   }
@@ -271,7 +232,7 @@ export class ConfigService {
    * 检查配置是否已加载
    */
   isConfigLoaded(): boolean {
-    return this.layoutConfigSubject.value !== DEFAULT_LAYOUT_CONFIG || 
+    return this.layoutConfigSubject.value !== null || 
            this.getCachedConfig() !== null;
   }
   
@@ -326,5 +287,32 @@ export class ConfigService {
     } catch (error) {
       console.warn('Failed to clear cache:', error);
     }
+  }
+
+  /**
+   * 获取友好的错误消息
+   */
+  private getErrorMessage(error: any): string {
+    if (!error) {
+      return '配置加载失败';
+    }
+    
+    if (error.status === 401) {
+      return '认证失败，请重新登录';
+    } else if (error.status === 403) {
+      return '权限不足，无法加载配置';
+    } else if (error.status === 404) {
+      return '配置接口不存在';
+    } else if (error.status === 0 || error.status === 500) {
+      return '服务器错误，请稍后重试';
+    } else if (error.error?.error) {
+      return `服务器错误: ${error.error.error}`;
+    } else if (error.message) {
+      return error.message;
+    } else if (error.statusText) {
+      return `网络错误: ${error.statusText}`;
+    }
+    
+    return '配置加载失败，未知错误';
   }
 }

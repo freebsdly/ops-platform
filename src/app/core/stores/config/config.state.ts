@@ -1,7 +1,7 @@
-import { LayoutConfig, DEFAULT_LAYOUT_CONFIG } from '../../types/layout-config.interface';
+import { LayoutConfig } from '../../types/layout-config.interface';
 
 export interface ConfigState {
-  config: LayoutConfig;
+  config: LayoutConfig | null;
   loading: boolean;
   loaded: boolean;
   error: string | null;
@@ -9,7 +9,7 @@ export interface ConfigState {
 }
 
 export const initialState: ConfigState = {
-  config: DEFAULT_LAYOUT_CONFIG,
+  config: null,
   loading: false,
   loaded: false,
   error: null,

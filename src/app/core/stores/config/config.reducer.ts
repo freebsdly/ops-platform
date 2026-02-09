@@ -29,11 +29,17 @@ export const configReducer = createReducer(
   })),
   
   // 更新配置
-  on(ConfigActions.updateConfig, (state, { config }) => ({
-    ...state,
-    config: { ...state.config, ...config },
-    lastUpdated: Date.now()
-  })),
+  on(ConfigActions.updateConfig, (state, { config }) => {
+    if (!state.config) {
+      // 如果当前配置为null，不能更新部分配置
+      return state;
+    }
+    return {
+      ...state,
+      config: { ...state.config, ...config },
+      lastUpdated: Date.now()
+    };
+  }),
   
   on(ConfigActions.updateConfigSuccess, (state, { config }) => ({
     ...state,
@@ -90,21 +96,31 @@ export const configReducer = createReducer(
   })),
   
   // 特定配置更新
-  on(ConfigActions.updateLogoConfig, (state, { logoConfig }) => ({
-    ...state,
-    config: {
-      ...state.config,
-      logo: { ...state.config.logo, ...logoConfig }
-    },
-    lastUpdated: Date.now()
-  })),
+  on(ConfigActions.updateLogoConfig, (state, { logoConfig }) => {
+    if (!state.config) {
+      return state;
+    }
+    return {
+      ...state,
+      config: {
+        ...state.config,
+        logo: { ...state.config.logo, ...logoConfig }
+      },
+      lastUpdated: Date.now()
+    };
+  }),
   
-  on(ConfigActions.updateAppTitle, (state, { title }) => ({
-    ...state,
-    config: {
-      ...state.config,
-      appTitle: title
-    },
-    lastUpdated: Date.now()
-  }))
+  on(ConfigActions.updateAppTitle, (state, { title }) => {
+    if (!state.config) {
+      return state;
+    }
+    return {
+      ...state,
+      config: {
+        ...state.config,
+        appTitle: title
+      },
+      lastUpdated: Date.now()
+    };
+  })
 );

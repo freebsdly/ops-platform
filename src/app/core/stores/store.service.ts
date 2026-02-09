@@ -13,8 +13,6 @@ import * as ConfigSelectors from './config/config.selectors';
 import { Router } from '@angular/router';
 import { signal, Signal, computed } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { DEFAULT_LAYOUT_CONFIG } from '../types/layout-config.interface';
-import { map } from 'rxjs/operators';
 
 @Injectable({ providedIn: 'root' })
 export class StoreService {
@@ -144,20 +142,18 @@ export class StoreService {
   }
 
   get logoConfig$(): Observable<any> {
-    return this.store.select(ConfigSelectors.selectLogoConfig).pipe(
-      map(logoConfig => logoConfig || DEFAULT_LAYOUT_CONFIG.logo)
-    );
+    return this.store.select(ConfigSelectors.selectLogoConfig);
   }
 
-  get appTitle$(): Observable<string> {
+  get appTitle$(): Observable<string | undefined> {
     return this.store.select(ConfigSelectors.selectAppTitle);
   }
 
-  get logoSrc$(): Observable<string> {
+  get logoSrc$(): Observable<string | undefined> {
     return this.store.select(ConfigSelectors.selectLogoSrc);
   }
 
-  get logoAlt$(): Observable<string> {
+  get logoAlt$(): Observable<string | undefined> {
     return this.store.select(ConfigSelectors.selectLogoAlt);
   }
 
@@ -173,11 +169,11 @@ export class StoreService {
     return this.store.select(ConfigSelectors.selectConfigLoaded);
   }
 
-  get logoCollapsedIcon$(): Observable<string> {
+  get logoCollapsedIcon$(): Observable<string | undefined> {
     return this.store.select(ConfigSelectors.selectLogoCollapsedIcon);
   }
 
-  get logoExpandedIcon$(): Observable<string> {
+  get logoExpandedIcon$(): Observable<string | undefined> {
     return this.store.select(ConfigSelectors.selectLogoExpandedIcon);
   }
 

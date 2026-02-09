@@ -1,13 +1,11 @@
 import { http, HttpResponse } from 'msw';
-import { LayoutConfig, DEFAULT_LAYOUT_CONFIG } from '../../app/core/types/layout-config.interface';
+import { LayoutConfig } from '../../app/core/types/layout-config.interface';
 
 // 模拟配置数据
 const mockConfig: LayoutConfig = {
-  ...DEFAULT_LAYOUT_CONFIG,
   appTitle: 'DevOps Platform',
   appVersion: '1.2.0',
   logo: {
-    ...DEFAULT_LAYOUT_CONFIG.logo,
     src: 'https://img.icons8.com/color/96/000000/administrative-tools.png',
     alt: 'DevOps Platform',
     link: '/',
@@ -18,28 +16,45 @@ const mockConfig: LayoutConfig = {
     expandedIcon: 'tool'
   },
   theme: {
-    ...DEFAULT_LAYOUT_CONFIG.theme,
     mode: 'light',
     primaryColor: '#1890ff',
-    secondaryColor: '#52c41a'
+    secondaryColor: '#52c41a',
+    backgroundColor: '#ffffff',
+    textColor: '#262626',
+    borderColor: '#d9d9d9'
   },
   sidebar: {
-    ...DEFAULT_LAYOUT_CONFIG.sidebar,
     width: 220,
+    collapsedWidth: 80,
+    defaultCollapsed: false,
+    collapsible: true,
     backgroundColor: '#001529',
-    textColor: '#ffffff'
+    textColor: '#ffffff',
+    menu: {
+      mode: 'vertical',
+      theme: 'dark',
+      multiple: false,
+      autoOpen: true,
+      items: []
+    }
   },
   header: {
-    ...DEFAULT_LAYOUT_CONFIG.header,
+    height: 64,
+    backgroundColor: '#ffffff',
+    textColor: '#262626',
+    fixed: true,
     showBreadcrumb: true,
     showUserInfo: true,
     showLangSelector: true,
     showThemeSwitcher: true
   },
   footer: {
-    ...DEFAULT_LAYOUT_CONFIG.footer,
+    height: 48,
+    backgroundColor: '#f0f2f5',
+    textColor: '#8c8c8c',
     content: '© 2024 DevOps Platform. Powered by Angular & Ant Design.',
-    visible: false
+    visible: false,
+    fixed: false
   },
   showSiderFooter: true
 };
@@ -47,6 +62,14 @@ const mockConfig: LayoutConfig = {
 export const layoutConfigHandlers = [
   // 获取完整布局配置 - 单次API调用获取所有配置
   http.get('/api/config/layout', () => {
+    // 测试：随机失败，50%概率返回错误
+    // const shouldFail = Math.random() > 0.5;
+    // if (shouldFail) {
+    //   return new HttpResponse(null, {
+    //     status: 500,
+    //     statusText: 'Internal Server Error'
+    //   });
+    // }
     return HttpResponse.json(mockConfig);
   }),
 

@@ -51,7 +51,7 @@
       </nz-content>
       @if (showAppFooterSig()) {
         <nz-footer class="app-layout-footer">
-          <p>{{ layoutConfigSig().footer?.content || '© DevOps Platform' }}</p>
+          <p>{{ layoutConfigSig()?.footer?.content }}</p>
         </nz-footer>
       }
     </nz-layout>

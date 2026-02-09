@@ -11,32 +11,32 @@ export const selectConfig = createSelector(
 
 export const selectLogoConfig = createSelector(
   selectConfig,
-  (config) => config.logo
+  (config) => config?.logo
 );
 
 export const selectAppTitle = createSelector(
   selectConfig,
-  (config) => config.appTitle
+  (config) => config?.appTitle
 );
 
 export const selectSidebarConfig = createSelector(
   selectConfig,
-  (config) => config.sidebar
+  (config) => config?.sidebar
 );
 
 export const selectThemeConfig = createSelector(
   selectConfig,
-  (config) => config.theme
+  (config) => config?.theme
 );
 
 export const selectHeaderConfig = createSelector(
   selectConfig,
-  (config) => config.header
+  (config) => config?.header
 );
 
 export const selectFooterConfig = createSelector(
   selectConfig,
-  (config) => config.footer
+  (config) => config?.footer
 );
 
 export const selectConfigLoading = createSelector(
@@ -61,40 +61,40 @@ export const selectConfigLastUpdated = createSelector(
 
 export const selectLogoVisible = createSelector(
   selectLogoConfig,
-  (logo) => logo.visible
+  (logo) => logo?.visible ?? true
 );
 
 export const selectLogoSrc = createSelector(
   selectLogoConfig,
-  (logo) => logo.src
+  (logo) => logo?.src
 );
 
 export const selectLogoAlt = createSelector(
   selectLogoConfig,
-  (logo) => logo.alt
+  (logo) => logo?.alt
 );
 
 export const selectLogoLink = createSelector(
   selectLogoConfig,
-  (logo) => logo.link
+  (logo) => logo?.link
 );
 
 export const selectLogoWidth = createSelector(
   selectLogoConfig,
-  (logo) => logo.width || '32px'
+  (logo) => logo?.width
 );
 
 export const selectLogoHeight = createSelector(
   selectLogoConfig,
-  (logo) => logo.height || '32px'
+  (logo) => logo?.height
 );
 
 export const selectLogoCollapsedIcon = createSelector(
   selectLogoConfig,
-  (logo) => logo.collapsedIcon || 'bars'
+  (logo) => logo?.collapsedIcon
 );
 
 export const selectLogoExpandedIcon = createSelector(
   selectLogoConfig,
-  (logo) => logo.expandedIcon || 'bars'
+  (logo) => logo?.expandedIcon
 );

@@ -4,12 +4,13 @@ import { of } from 'rxjs';
 import { catchError, map, mergeMap, tap } from 'rxjs/operators';
 import { ConfigService } from '../../services/config.service';
 import * as ConfigActions from './config.actions';
-import { LayoutConfig, DEFAULT_LAYOUT_CONFIG } from '../../types/layout-config.interface';
+import { NzMessageService } from 'ng-zorro-antd/message';
 
 @Injectable()
 export class ConfigEffects {
   private actions$ = inject(Actions);
   private configService = inject(ConfigService);
+  private message = inject(NzMessageService);
 
   /**
    * 加载配置效果
@@ -46,13 +47,13 @@ export class ConfigEffects {
   );
 
   /**
-   * 重置配置效果
+   * 重置配置效果 - 从API重新加载配置
    */
   resetConfig$ = createEffect(() =>
     this.actions$.pipe(
       ofType(ConfigActions.resetConfig),
       mergeMap(() =>
-        of(DEFAULT_LAYOUT_CONFIG).pipe(
+        this.configService.loadLayoutConfig(true).pipe(
           map((config) => ConfigActions.resetConfigSuccess({ config })),
           catchError((error) =>
             of(ConfigActions.resetConfigFailure({ error: error.message }))
@@ -62,24 +63,7 @@ export class ConfigEffects {
     )
   );
 
-  /**
-   * 更新Logo配置效果
-   */
-  updateLogoConfig$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(ConfigActions.updateLogoConfig),
-      map(({ logoConfig }) => {
-        // 确保必需的字段有默认值
-        const fullLogoConfig = {
-          src: DEFAULT_LAYOUT_CONFIG.logo.src,
-          alt: DEFAULT_LAYOUT_CONFIG.logo.alt,
-          visible: true,
-          ...logoConfig
-        };
-        return ConfigActions.updateConfig({ config: { logo: fullLogoConfig } });
-      })
-    )
-  );
+
 
   /**
    * 更新应用标题效果
@@ -131,8 +115,8 @@ export class ConfigEffects {
         ),
         tap(({ error }) => {
           console.error('Configuration error:', error);
-          // 这里可以添加用户通知，比如使用Toast服务
-          // this.notificationService.error('配置加载失败', error);
+          // 显示错误alert通知
+          this.message.error(`配置错误: ${error}`);
         })
       ),
     { dispatch: false }

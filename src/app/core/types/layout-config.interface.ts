@@ -1,56 +1,4 @@
 /**
- * 布局配置接口
- */
-export interface LayoutConfig {
-  /**
-   * 应用标题
-   */
-  appTitle: string;
-
-  /**
-   * 应用版本号
-   */
-  appVersion: string;
-  
-  /**
-   * Logo配置
-   */
-  logo: LogoConfig;
-  
-  /**
-   * 主题配置
-   */
-  theme: ThemeConfig;
-  
-  /**
-   * 侧边栏配置
-   */
-  sidebar: SidebarConfig;
-  
-  /**
-   * 页头配置
-   */
-  header: HeaderConfig;
-  
-  /**
-   * 页脚配置
-   */
-  footer: FooterConfig;
-  
-  /**
-   * 是否显示侧边栏底部（sider footer）
-   */
-  showSiderFooter: boolean;
-  
-
-  
-  /**
-   * 其他布局相关配置
-   */
-  [key: string]: any;
-}
-
-/**
  * Logo配置接口
  */
 export interface LogoConfig {
@@ -321,61 +269,52 @@ export interface FooterConfig {
 }
 
 /**
- * 默认布局配置
+ * 布局配置接口
  */
-export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
-  appTitle: 'DevOps Platform',
-  appVersion: '1.0.0',
-  logo: {
-    src: 'https://img.icons8.com/color/96/000000/administrative-tools.png',
-    alt: 'DevOps Platform',
-    link: '/',
-    width: '32px',
-    height: '32px',
-    visible: true,
-    collapsedIcon: 'tool',
-    expandedIcon: 'tool'
-  },
-  theme: {
-    mode: 'light',
-    primaryColor: '#1890ff',
-    secondaryColor: '#52c41a',
-    backgroundColor: '#ffffff',
-    textColor: '#262626',
-    borderColor: '#d9d9d9'
-  },
-  sidebar: {
-    width: 200,
-    collapsedWidth: 80,
-    defaultCollapsed: false,
-    collapsible: true,
-    backgroundColor: '#001529',
-    textColor: '#ffffff',
-    menu: {
-      mode: 'vertical',
-      theme: 'dark',
-      multiple: false,
-      autoOpen: true,
-      items: []
-    }
-  },
-  header: {
-    height: 64,
-    backgroundColor: '#ffffff',
-    textColor: '#262626',
-    fixed: true,
-    showBreadcrumb: true,
-    showUserInfo: true,
-    showLangSelector: true,
-    showThemeSwitcher: true
-  },
-  footer: {
-    height: 48,
-    backgroundColor: '#f0f2f5',
-    textColor: '#8c8c8c',
-    content: '© 2024 DevOps Platform. All rights reserved.',
-    visible: false,
-    fixed: false
-  },
-  showSiderFooter: true
-};
+export interface LayoutConfig {
+  /**
+   * 应用标题
+   */
+  appTitle: string;
+
+  /**
+   * 应用版本号
+   */
+  appVersion: string;
+
+  /**
+   * Logo配置
+   */
+  logo: LogoConfig;
+  
+  /**
+   * 主题配置
+   */
+  theme: ThemeConfig;
+  
+  /**
+   * 侧边栏配置
+   */
+  sidebar: SidebarConfig;
+  
+  /**
+   * 页头配置
+   */
+  header: HeaderConfig;
+  
+  /**
+   * 页脚配置
+   */
+  footer: FooterConfig;
+
+  /**
+   * 是否显示侧边栏底部（sider footer）
+   */
+  showSiderFooter: boolean;
+  
+  /**
+   * 其他布局相关配置
+   */
+  [key: string]: any;
+}
+

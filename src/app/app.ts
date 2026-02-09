@@ -43,6 +43,8 @@ import { MODULES_CONFIG } from './config/menu.config';
   styleUrl: './app.css',
 })
 export class App implements OnInit, OnDestroy {
+  // 这些属性现在由layout config提供
+  // 保留这些属性作为回退，但应该从layout config读取
   logoSrc = 'https://img.icons8.com/color/96/000000/administrative-tools.png';
   logoAlt = 'DevOps Platform';
   title = 'DevOps Platform';
@@ -97,32 +99,32 @@ export class App implements OnInit, OnDestroy {
   // 派生配置信号 - 使用safe computed
   appTitleSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.appTitle || 'DevOps Platform';
+    return config?.appTitle;
   });
   
   logoSrcSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.src || 'https://img.icons8.com/color/96/000000/administrative-tools.png';
+    return config?.logo?.src;
   });
   
   logoAltSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.alt || 'DevOps Platform';
+    return config?.logo?.alt;
   });
   
   logoLinkSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.link || '/';
+    return config?.logo?.link;
   });
   
   logoCollapsedIconSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.collapsedIcon || 'tool';
+    return config?.logo?.collapsedIcon;
   });
   
   logoExpandedIconSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.logo?.expandedIcon || 'tool';
+    return config?.logo?.expandedIcon;
   });
   
   // 是否显示应用底部（app footer）
