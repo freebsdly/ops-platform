@@ -5,6 +5,7 @@ import { LayoutConfig, DEFAULT_LAYOUT_CONFIG } from '../../app/core/types/layout
 const mockConfig: LayoutConfig = {
   ...DEFAULT_LAYOUT_CONFIG,
   appTitle: 'DevOps Platform',
+  appVersion: '1.2.0',
   logo: {
     ...DEFAULT_LAYOUT_CONFIG.logo,
     src: 'https://img.icons8.com/color/96/000000/administrative-tools.png',

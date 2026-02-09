@@ -13,7 +13,10 @@ export class SiderFooter {
   isSiderCollapsed = input<boolean>(false);
   
   // 从配置中获取信息
-  appVersion = computed(() => '1.0.0'); // 暂时硬编码，后续可以从配置中获取
+  appVersion = computed(() => {
+    const config = this.layoutConfig();
+    return config?.appVersion || '1.0.0';
+  });
   
   // 是否显示sider footer
   showSiderFooter = computed(() => {

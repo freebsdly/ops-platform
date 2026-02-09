@@ -6,6 +6,11 @@ export interface LayoutConfig {
    * 应用标题
    */
   appTitle: string;
+
+  /**
+   * 应用版本号
+   */
+  appVersion: string;
   
   /**
    * Logo配置
@@ -320,6 +325,7 @@ export interface FooterConfig {
  */
 export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
   appTitle: 'DevOps Platform',
+  appVersion: '1.0.0',
   logo: {
     src: 'https://img.icons8.com/color/96/000000/administrative-tools.png',
     alt: 'DevOps Platform',
