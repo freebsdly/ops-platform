@@ -128,7 +128,7 @@ export class App implements OnInit, OnDestroy {
   // 是否显示应用底部（app footer）
   showAppFooterSig = computed(() => {
     const config = this.layoutConfigSig();
-    return config?.showAppFooter ?? true;
+    return config?.footer?.visible ?? false;
   });
   
   // Track if auth check is in progress

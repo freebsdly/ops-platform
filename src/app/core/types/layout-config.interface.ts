@@ -37,10 +37,7 @@ export interface LayoutConfig {
    */
   showSiderFooter: boolean;
   
-  /**
-   * 是否显示应用底部（app footer）
-   */
-  showAppFooter: boolean;
+
   
   /**
    * 其他布局相关配置
@@ -371,9 +368,8 @@ export const DEFAULT_LAYOUT_CONFIG: LayoutConfig = {
     backgroundColor: '#f0f2f5',
     textColor: '#8c8c8c',
     content: '© 2024 DevOps Platform. All rights reserved.',
-    visible: true,
+    visible: false,
     fixed: false
   },
-  showSiderFooter: true,
-  showAppFooter: true
+  showSiderFooter: true
 };
