@@ -34,10 +34,10 @@ export class Logo {
   showIcon = computed(() => {
     // 在折叠状态下，总是显示图标
     if (this.isCollapsed()) {
-      return this.isVisible();
+      return this.isVisible() && !!this.iconType();
     }
     // 在展开状态下，如果没有logo图片，显示图标
-    return this.isVisible() && !this.logoSrc();
+    return this.isVisible() && !this.logoSrc() && !!this.iconType();
   });
   iconType = computed(() =>
     this.isCollapsed()

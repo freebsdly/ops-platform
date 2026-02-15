@@ -43,12 +43,8 @@ import { MODULES_CONFIG } from './config/menu.config';
   styleUrl: './app.css',
 })
 export class App implements OnInit, OnDestroy {
-  // 这些属性现在由layout config提供
-  // 保留这些属性作为回退，但应该从layout config读取
-  logoSrc = 'https://img.icons8.com/color/96/000000/administrative-tools.png';
-  logoAlt = 'DevOps Platform';
+  // 布局配置现在通过layoutConfigSig信号提供
   title = 'DevOps Platform';
-  logoLink = '/';
 
   layoutService = inject(LayoutService);
   private router = inject(Router);
@@ -97,36 +93,12 @@ export class App implements OnInit, OnDestroy {
   });
   
   // 派生配置信号 - 使用safe computed
+  // 派生配置信号 - 使用safe computed
   appTitleSig = computed(() => {
     const config = this.layoutConfigSig();
     return config?.appTitle;
   });
-  
-  logoSrcSig = computed(() => {
-    const config = this.layoutConfigSig();
-    return config?.logo?.src;
-  });
-  
-  logoAltSig = computed(() => {
-    const config = this.layoutConfigSig();
-    return config?.logo?.alt;
-  });
-  
-  logoLinkSig = computed(() => {
-    const config = this.layoutConfigSig();
-    return config?.logo?.link;
-  });
-  
-  logoCollapsedIconSig = computed(() => {
-    const config = this.layoutConfigSig();
-    return config?.logo?.collapsedIcon;
-  });
-  
-  logoExpandedIconSig = computed(() => {
-    const config = this.layoutConfigSig();
-    return config?.logo?.expandedIcon;
-  });
-  
+
   // 是否显示应用底部（app footer）
   showAppFooterSig = computed(() => {
     const config = this.layoutConfigSig();
@@ -342,13 +314,15 @@ export class App implements OnInit, OnDestroy {
     this.resourcesLoaded = true;
   }
 
-  // 在应用初始化时从缓存加载配置
+  // 在应用初始化时从缓存加载配置并更新store
   private loadConfigFromCache(): void {
     try {
       const cached = localStorage.getItem('app_layout_config');
       if (cached) {
         const config = JSON.parse(cached);
         this.layoutConfigSignal.set(config);
+        // 同时更新store，确保logo组件能获取到配置
+        this.storeService.updateConfig(config);
       }
     } catch (error) {
       console.warn('Failed to load config from cache:', error);
