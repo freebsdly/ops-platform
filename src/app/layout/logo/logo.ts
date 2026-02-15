@@ -2,6 +2,7 @@ import { Component, input, computed, inject } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { StoreService } from '../../core/stores/store.service';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { LayoutConfig } from '../../core/types/layout-config.interface';
 
 @Component({
   selector: 'app-logo',
@@ -13,9 +14,20 @@ export class Logo {
   private storeService = inject(StoreService);
 
   isCollapsed = input.required<boolean>();
+  // 优先使用父组件传递的配置
+  layoutConfig = input<LayoutConfig>();
 
-  // 直接从StoreService获取状态
-  logoConfigSig = toSignal(this.storeService.logoConfig$);
+  // 从StoreService获取状态（作为fallback）
+  logoConfigFromStoreSig = toSignal(this.storeService.logoConfig$);
+
+  // 使用配置：优先使用input，其次使用store
+  logoConfigSig = computed(() => {
+    const inputConfig = this.layoutConfig();
+    if (inputConfig?.logo) {
+      return inputConfig.logo;
+    }
+    return this.logoConfigFromStoreSig();
+  });
 
   // 从配置派生属性
   logoSrc = computed(() => this.logoConfigSig()?.src);
@@ -44,4 +56,16 @@ export class Logo {
       ? this.logoCollapsedIcon()
       : this.logoExpandedIcon()
   );
+
+  // 调试日志
+  constructor() {
+    console.log('[Logo] constructor called');
+    
+    setTimeout(() => {
+      console.log('[Logo] layoutConfig input:', this.layoutConfig());
+      console.log('[Logo] logoConfigFromStoreSig:', this.logoConfigFromStoreSig());
+      console.log('[Logo] logoConfigSig:', this.logoConfigSig());
+      console.log('[Logo] showImage:', this.showImage());
+    }, 200);
+  }
 }

@@ -93,7 +93,6 @@ export class App implements OnInit, OnDestroy {
   });
   
   // 派生配置信号 - 使用safe computed
-  // 派生配置信号 - 使用safe computed
   appTitleSig = computed(() => {
     const config = this.layoutConfigSig();
     return config?.appTitle;
@@ -110,6 +109,13 @@ export class App implements OnInit, OnDestroy {
 
   // For cleanup
   private destroy$ = new Subject<void>();
+
+  constructor() {
+    console.log('[App] constructor called');
+    // 在构造函数中同步加载缓存配置
+    // 确保在组件渲染前配置已可用
+    this.loadConfigFromCache();
+  }
 
   ngOnInit(): void {
     // Initialize current path from router
@@ -203,8 +209,8 @@ export class App implements OnInit, OnDestroy {
       this.storeService.setSiderCollapsed(savedSiderCollapsed === 'true');
     }
 
-    // Load config from cache if available
-    this.loadConfigFromCache();
+    // Config已经在构造函数中从缓存加载
+    // this.loadConfigFromCache();
 
     // Set current module based on initial URL
     this.setInitialModule();
@@ -247,7 +253,7 @@ export class App implements OnInit, OnDestroy {
     );
     
     // 订阅配置加载完成状态
-    this.configSubscription.add(
+      this.configSubscription.add(
       this.storeService.configLoaded$.subscribe(loaded => {
         this.configLoadedSignal.set(loaded);
       })
@@ -318,14 +324,19 @@ export class App implements OnInit, OnDestroy {
   private loadConfigFromCache(): void {
     try {
       const cached = localStorage.getItem('app_layout_config');
+      console.log('[App] loadConfigFromCache: cached exists?', !!cached);
       if (cached) {
         const config = JSON.parse(cached);
+        console.log('[App] loadConfigFromCache: parsed config', config?.logo);
         this.layoutConfigSignal.set(config);
         // 同时更新store，确保logo组件能获取到配置
         this.storeService.updateConfig(config);
+        console.log('[App] loadConfigFromCache: config updated to store');
+      } else {
+        console.log('[App] loadConfigFromCache: no cached config found');
       }
     } catch (error) {
-      console.warn('Failed to load config from cache:', error);
+      console.warn('[App] Failed to load config from cache:', error);
     }
   }
 

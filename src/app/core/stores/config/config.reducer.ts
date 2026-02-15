@@ -31,8 +31,13 @@ export const configReducer = createReducer(
   // 更新配置
   on(ConfigActions.updateConfig, (state, { config }) => {
     if (!state.config) {
-      // 如果当前配置为null，不能更新部分配置
-      return state;
+      // 如果当前配置为null，使用传入的配置作为初始配置
+      return {
+        ...state,
+        config: config as any,
+        loaded: true,
+        lastUpdated: Date.now()
+      };
     }
     return {
       ...state,
