@@ -1,4 +1,4 @@
-import { Component, input, inject, ChangeDetectionStrategy } from '@angular/core';
+import { Component, inject, ChangeDetectionStrategy } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -10,7 +10,6 @@ import { Observable, combineLatest, of } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
 import { MenuItem } from '../../config/menu.config';
 import { MODULES_CONFIG, MENUS_CONFIG } from '../../config/menu.config';
-import { LayoutConfig } from '../../core/types/layout-config.interface';
 
 @Component({
   selector: 'app-sider-menu',
@@ -22,10 +21,7 @@ import { LayoutConfig } from '../../core/types/layout-config.interface';
 export class SiderMenu {
   private storeService = inject(StoreService);
   private moduleMenuService = inject(ModuleMenuService);
-  
-  // 从父组件接收配置
-  layoutConfig = input<LayoutConfig>();
-  
+
   // 组合Observable：当前模块ID和侧边栏折叠状态
   vm$: Observable<{
     isCollapsed: boolean;

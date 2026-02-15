@@ -1,3 +1,7 @@
 @if (showSiderFooter() && !isSiderCollapsed()) {
-  <p>v{{ appVersion() }}</p>
+  @if (appVersion(); as version) {
+    <p>v{{ version }}</p>
+  } @else {
+    <!-- 配置加载中，不显示版本号 -->
+  }
 }
