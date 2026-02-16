@@ -16,7 +16,6 @@ import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzDropdownDirective, NzDropdownMenuComponent } from 'ng-zorro-antd/dropdown';
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { TranslateModule } from '@ngx-translate/core';
 import { UserApiService } from '../../core/services/user-api.service';
@@ -39,7 +38,6 @@ export interface UserInfoData {
     NzIconModule,
     NzDropdownDirective,
     NzDropdownMenuComponent,
-    NzCardModule,
     NzSpaceModule,
     TranslateModule,
   ],

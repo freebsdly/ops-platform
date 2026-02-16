@@ -5,6 +5,57 @@
   height: 100%;
 }
 
+/* 自定义dropdown-menu样式 */
+.user-info-dropdown-menu {
+  padding: 0 !important;
+  margin: 0 !important;
+  font-size: 0; /* 消除inline-block元素间的空白间隙 */
+}
+
+.user-info-dropdown-menu.ant-dropdown-menu {
+  padding: 0 !important;
+  margin: 0 !important;
+  min-width: auto !important;
+}
+
+.user-info-dropdown-menu > * {
+  font-size: initial; /* 恢复内部元素的字体大小 */
+}
+
+.app-user-info :deep(.ant-dropdown-menu) {
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0;
+}
+
+.app-user-info :deep(.ant-dropdown) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* CDK overlay panel可能添加的padding */
+.app-user-info :deep(.cdk-overlay-pane) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.app-user-info :deep(.ant-dropdown-menu-xs) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 设置nz-dropdown-menu的直接子元素 */
+.app-user-info :deep(.ant-dropdown-menu) > * {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 针对整个dropdown内容的包装 */
+.app-user-info :deep(.ant-dropdown-menu-xw) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
 .user-info-trigger {
   height: 100%;
   display: flex;
@@ -41,18 +92,45 @@
 }
 
 .user-info-card {
+  background: #fff;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 1px solid #f0f0f0;
+  border-top: none;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+
+.user-info-card :deep(.ant-card) {
+  margin: 0 !important;
+  padding: 0 !important;
 }
 
 .user-info-card :deep(.ant-card-body) {
-  padding: 0;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* 针对ant-card-head和ant-card-body的包装元素 */
+.user-info-card :deep(.ant-card-head) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.user-info-card :deep(.ant-card-head-wrapper) {
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 .user-info-profile-header {
   background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-  padding: 1.5rem;
+  padding: 0;
   position: relative;
+}
+
+.user-info-content {
+  padding: 1.5rem;
 }
 
 .user-info-profile-header::before {
@@ -61,8 +139,8 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, #1890ff 0%, #40a9ff 50%, #1890ff 100%);
+  height: 0;
+  background: transparent;
 }
 
 .user-info-profile-avatar {
@@ -106,24 +184,31 @@
 }
 
 .user-info-menu {
-  padding: 0.75rem 0;
+  padding: 0;
   border: none !important;
   margin: 0;
 }
 
 .user-info-menu-item {
   height: 56px !important;
-  padding-left: 1.5rem !important;
-  padding-right: 1.5rem !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
   transition: all 0.2s ease;
-  margin: 0.25rem 0;
+  margin: 0;
   border-radius: 8px;
+}
+
+.user-info-menu-item-content {
+  padding: 0 1.5rem;
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .user-info-menu-item:hover {
   background: linear-gradient(90deg, rgba(24, 144, 255, 0.08) 0%, rgba(24, 144, 255, 0.12) 100%);
   border-left: 3px solid #1890ff;
-  padding-left: 1.75rem !important;
+  padding-left: 0 !important;
 }
 
 .user-info-menu-icon {
@@ -179,10 +264,14 @@
 }
 
 .user-info-footer {
-  padding: 1.5rem;
+  padding: 0;
   border-top: 1px solid rgba(0, 0, 0, 0.06);
   background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
   margin: 0;
+}
+
+.user-info-footer-content {
+  padding: 1.5rem;
 }
 
 .user-info-logout-button {

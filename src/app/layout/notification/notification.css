@@ -154,8 +154,8 @@
   left: 0;
   top: 0;
   bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, #1890ff 0%, #40a9ff 100%);
+  width: 0;
+  background: transparent;
 }
 
 /* 图标包裹器 */
