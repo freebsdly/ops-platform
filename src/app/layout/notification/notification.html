@@ -1,0 +1,114 @@
+<a
+  nz-dropdown
+  [nzDropdownMenu]="notificationMenu"
+  nzTrigger="hover"
+  nzPlacement="bottomRight"
+  class="notification-trigger"
+  [nz-tooltip]="'NOTIFICATION.TITLE' | translate"
+>
+  <nz-badge [nzCount]="unreadCount()" [nzOverflowCount]="99">
+    <span nz-icon nzType="bell" class="notification-icon"></span>
+  </nz-badge>
+</a>
+
+<nz-dropdown-menu #notificationMenu="nzDropdownMenu">
+  <div class="notification-dropdown">
+    <div class="notification-header">
+      <div class="header-left">
+        <span class="notification-title">{{ 'NOTIFICATION.TITLE' | translate }}</span>
+        @if (unreadCount() > 0) {
+          <span class="notification-count-badge">{{ unreadCount() }}</span>
+        }
+      </div>
+      @if (unreadCount() > 0) {
+        <div class="header-actions">
+          <button
+            nz-button
+            nzType="text"
+            nzSize="small"
+            (click)="markAllAsRead()"
+            class="mark-all-button"
+            [nz-tooltip]="'NOTIFICATION.MARK_ALL_READ' | translate"
+          >
+            <span nz-icon nzType="check"></span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <nz-list class="notification-list" [nzBordered]="false" [nzSize]="'small'">
+      @if (!notifications() || notifications().length === 0) {
+        <nz-empty
+          [nzNotFoundContent]="'NOTIFICATION.EMPTY' | translate"
+          class="notification-empty"
+        ></nz-empty>
+      } @else {
+        @for (item of displayedNotifications(); track item.id) {
+          <nz-list-item
+            [class.notification-unread]="!item.read"
+            (click)="markAsRead(item.id)"
+            class="notification-item"
+          >
+            <nz-list-item-extra>
+              <div class="notification-icon-wrapper" [ngClass]="getIconClass(item.type)">
+                <span
+                  nz-icon
+                  [nzType]="getNotificationIcon(item.type)"
+                  class="notification-item-icon"
+                ></span>
+              </div>
+            </nz-list-item-extra>
+
+            <nz-list-item-meta>
+              <nz-list-item-meta-title>
+                <span class="notification-item-title" [class.notification-item-unread]="!item.read">
+                  {{ item.title }}
+                </span>
+              </nz-list-item-meta-title>
+              <nz-list-item-meta-description>
+                <p class="notification-item-message">{{ item.message }}</p>
+                <div class="notification-item-meta">
+                  <span class="notification-item-time">
+                    <span nz-icon nzType="clock-circle" nzTheme="outline"></span>
+                    {{ formatTimestamp(item.timestamp) }}
+                  </span>
+                  <nz-tag [nzColor]="getTagColor(item.type)" class="notification-item-type">
+                    {{ item.type }}
+                  </nz-tag>
+                </div>
+              </nz-list-item-meta-description>
+            </nz-list-item-meta>
+
+            <nz-list-item-action>
+              <button
+                nz-button
+                nzType="text"
+                nzSize="small"
+                nzDanger
+                (click)="dismissNotification($event, item.id)"
+                class="notification-dismiss-button"
+              >
+                <span nz-icon nzType="close"></span>
+              </button>
+            </nz-list-item-action>
+          </nz-list-item>
+        }
+      }
+    </nz-list>
+
+    @if (hasMoreNotifications()) {
+      <div class="notification-footer">
+        <button
+          nz-button
+          nzBlock
+          nzType="default"
+          (click)="viewAllNotifications()"
+          class="view-all-button"
+        >
+          <span>{{ 'NOTIFICATION.VIEW_ALL' | translate }}</span>
+          <span nz-icon nzType="arrow-right" class="arrow-icon"></span>
+        </button>
+      </div>
+    }
+  </div>
+</nz-dropdown-menu>

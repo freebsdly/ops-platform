@@ -41,6 +41,7 @@
           <app-search />
           <app-lang-selector />
           @if (isAuthenticatedSig() && userSig(); as user) {
+            <app-notification />
             <app-user-info (onLogout)="storeService.logout()" />
           }
         </div>

@@ -87,6 +87,13 @@ import {
   // Social login icons
   GithubOutline,
   GoogleOutline,
+  // Notification center icons
+  EllipsisOutline,
+  EyeOutline,
+  CloseCircleOutline,
+  DeleteOutline,
+  ArrowLeftOutline,
+  InboxOutline,
 } from '@ant-design/icons-angular/icons';
 
 export const icons = [
@@ -178,4 +185,11 @@ export const icons = [
   // Social login icons
   GithubOutline,
   GoogleOutline,
+  // Notification center icons
+  EllipsisOutline,
+  EyeOutline,
+  CloseCircleOutline,
+  DeleteOutline,
+  ArrowLeftOutline,
+  InboxOutline,
 ];

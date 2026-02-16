@@ -1,0 +1,219 @@
+<div class="notification-center-container">
+  <!-- 页面头部 -->
+  <div class="page-header">
+    <div class="header-left">
+      <button nz-button nzType="text" (click)="goBack()" class="back-button">
+        <span nz-icon nzType="arrow-left"></span>
+      </button>
+      <div class="title-section">
+        <h1 class="page-title">{{ 'NOTIFICATION.CENTER_TITLE' | translate }}</h1>
+        <p class="page-subtitle">
+          @if (unreadCount() > 0) {
+            <span class="unread-highlight">{{ unreadCount() }}</span> 条未读通知
+          } @else {
+            全部已读
+          }
+        </p>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      @if (unreadCount() > 0) {
+        <button
+          nz-button
+          nzType="primary"
+          (click)="markAllAsRead()"
+          class="header-action-btn"
+        >
+          <span nz-icon nzType="check"></span>
+          <span>{{ 'NOTIFICATION.MARK_ALL_READ' | translate }}</span>
+        </button>
+      }
+      <button
+        nz-button
+        nzType="default"
+        nzDanger
+        (click)="clearAll()"
+        [disabled]="filteredNotifications().length === 0"
+        class="header-action-btn"
+      >
+        <span nz-icon nzType="delete"></span>
+        <span>{{ 'NOTIFICATION.CLEAR_ALL' | translate }}</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- 工具栏 -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <!-- 快速筛选 -->
+      <nz-radio-group [(ngModel)]="filterType" class="quick-filters">
+        <label nz-radio-button nzValue="all">
+          <span class="filter-label">{{ 'NOTIFICATION.FILTER_ALL' | translate }}</span>
+          <span class="filter-count">{{ totalCount() }}</span>
+        </label>
+        <label nz-radio-button nzValue="unread">
+          <span class="filter-label">{{ 'NOTIFICATION.FILTER_UNREAD' | translate }}</span>
+          @if (unreadCount() > 0) {
+            <span class="filter-badge">{{ unreadCount() }}</span>
+          }
+        </label>
+        <label nz-radio-button nzValue="read">
+          <span class="filter-label">{{ 'NOTIFICATION.FILTER_READ' | translate }}</span>
+        </label>
+      </nz-radio-group>
+
+      <!-- 类型筛选 -->
+      <nz-select
+        [(ngModel)]="notificationTypeFilter"
+        nzPlaceHolder="{{ 'NOTIFICATION.TYPE_FILTER' | translate }}"
+        nzSize="small"
+        class="type-filter"
+      >
+        <nz-option nzValue="all" nzLabel="{{ 'NOTIFICATION.TYPE_ALL' | translate }}">
+          <span nz-icon nzType="appstore" nzTheme="outline"></span>
+          {{ 'NOTIFICATION.TYPE_ALL' | translate }}
+        </nz-option>
+        <nz-option nzValue="info" nzLabel="{{ 'NOTIFICATION.TYPE_INFO' | translate }}">
+          <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+          {{ 'NOTIFICATION.TYPE_INFO' | translate }}
+        </nz-option>
+        <nz-option nzValue="warning" nzLabel="{{ 'NOTIFICATION.TYPE_WARNING' | translate }}">
+          <span nz-icon nzType="warning" nzTheme="outline"></span>
+          {{ 'NOTIFICATION.TYPE_WARNING' | translate }}
+        </nz-option>
+        <nz-option nzValue="error" nzLabel="{{ 'NOTIFICATION.TYPE_ERROR' | translate }}">
+          <span nz-icon nzType="close-circle" nzTheme="outline"></span>
+          {{ 'NOTIFICATION.TYPE_ERROR' | translate }}
+        </nz-option>
+        <nz-option nzValue="success" nzLabel="{{ 'NOTIFICATION.TYPE_SUCCESS' | translate }}">
+          <span nz-icon nzType="check-circle" nzTheme="outline"></span>
+          {{ 'NOTIFICATION.TYPE_SUCCESS' | translate }}
+        </nz-option>
+      </nz-select>
+    </div>
+
+    <div class="toolbar-right">
+      <!-- 搜索框 -->
+      <nz-input-group
+        [nzPrefix]="searchIcon"
+        nzSize="small"
+        class="search-box"
+      >
+        <input
+          type="text"
+          nz-input
+          [ngModel]="searchQuery()"
+          (ngModelChange)="onSearchInput($event)"
+          [placeholder]="'NOTIFICATION.SEARCH_PLACEHOLDER' | translate"
+        />
+      </nz-input-group>
+      <ng-template #searchIcon>
+        <span nz-icon nzType="search"></span>
+      </ng-template>
+    </div>
+  </div>
+
+  <!-- 通知列表 -->
+  <div class="notifications-container">
+    @if (loading()) {
+      <div class="loading-state">
+        <nz-spin nzSimple="true" [nzSize]="'large'"></nz-spin>
+        <p class="loading-text">加载通知中...</p>
+      </div>
+    } @else if (error()) {
+      <div class="error-state">
+        <span nz-icon nzType="warning" class="error-icon"></span>
+        <p class="error-text">{{ error() }}</p>
+        <button nz-button nzType="primary" (click)="refresh()">重试</button>
+      </div>
+    } @else if (filteredNotifications().length === 0) {
+      <div class="empty-state">
+        <nz-empty
+          [nzNotFoundContent]="'NOTIFICATION.EMPTY' | translate"
+          class="notification-empty"
+        >
+          <ng-template nz-empty>
+            <span nz-icon nzType="inbox" class="empty-icon"></span>
+            <p class="empty-title">{{ 'NOTIFICATION.EMPTY_TITLE' | translate }}</p>
+            <p class="empty-description">
+              {{ 'NOTIFICATION.EMPTY_DESCRIPTION' | translate }}
+            </p>
+          </ng-template>
+        </nz-empty>
+      </div>
+    } @else {
+      <div class="notifications-list">
+        @for (item of filteredNotifications(); track item.id) {
+          <div
+            class="notification-card"
+            [class.notification-card-unread]="!item.read"
+            (click)="markAsRead(item.id)"
+          >
+            <!-- 左侧图标 -->
+            <div class="notification-icon-wrapper" [ngClass]="getIconClass(item.type)">
+              <span
+                nz-icon
+                [nzType]="getNotificationIcon(item.type)"
+                class="notification-icon"
+              ></span>
+            </div>
+
+            <!-- 内容区域 -->
+            <div class="notification-content">
+              <div class="notification-header-row">
+                <h3 class="notification-title" [class.notification-title-unread]="!item.read">
+                  {{ item.title }}
+                </h3>
+                <div class="notification-meta">
+                  <nz-tag [nzColor]="getTagColor(item.type)" class="notification-type-tag">
+                    {{ item.type }}
+                  </nz-tag>
+                </div>
+              </div>
+
+              <p class="notification-message">{{ item.message }}</p>
+
+              <div class="notification-footer-row">
+                <div class="notification-time">
+                  <span nz-icon nzType="clock-circle" nzTheme="outline"></span>
+                  @let timeData = formatTimestamp(item.timestamp);
+                  @if (timeData.value !== undefined) {
+                    {{ timeData.key | translate: {value: timeData.value} }}
+                  } @else {
+                    {{ timeData.key | translate }}
+                  }
+                </div>
+              </div>
+            </div>
+
+            <!-- 操作按钮 -->
+            <div class="notification-actions" (click)="$event.stopPropagation()">
+              <div nz-dropdown nzTrigger="click" nzPlacement="bottomRight">
+                <button nz-button nzType="text" nzSize="small" class="action-trigger">
+                  <span nz-icon nzType="ellipsis"></span>
+                </button>
+                <ul nz-menu>
+                  @if (!item.read) {
+                    <li nz-menu-item (click)="markAsRead(item.id)">
+                      <span nz-icon nzType="check"></span>
+                      {{ 'NOTIFICATION.MARK_AS_READ' | translate }}
+                    </li>
+                  }
+                  <li nz-menu-item (click)="markAsUnread(item.id)">
+                    <span nz-icon nzType="eye"></span>
+                    {{ 'NOTIFICATION.MARK_AS_UNREAD' | translate }}
+                  </li>
+                  <li nz-menu-item nzDanger (click)="deleteNotification($event, item.id)">
+                    <span nz-icon nzType="delete"></span>
+                    {{ 'NOTIFICATION.DELETE' | translate }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </div>
+</div>

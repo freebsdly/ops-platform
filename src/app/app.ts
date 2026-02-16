@@ -15,6 +15,7 @@ import { SiderHeader } from './layout/sider-header/sider-header';
 import { SiderMenu } from './layout/sider-menu/sider-menu';
 import { SiderFooter } from './layout/sider-footer/sider-footer';
 import { AppTabBar } from './layout/tabs/tabs';
+import { Notification } from './layout/notification/notification';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { Subject, Subscription, combineLatest } from 'rxjs';
@@ -37,7 +38,8 @@ import { MODULES_CONFIG } from './config/menu.config';
     SiderHeader,
     SiderMenu,
     SiderFooter,
-    AppTabBar
+    AppTabBar,
+    Notification
   ],
   templateUrl: './app.html',
   styleUrl: './app.css',

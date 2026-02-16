@@ -252,5 +252,11 @@ export const MENUS_CONFIG: Record<string, MenuItem[]> = {
       icon: 'dashboard',
       link: '/workbench/dashboard/overview',
     },
+    {
+      key: 'NOTIFICATION.TITLE',
+      text: '通知中心',
+      icon: 'bell',
+      link: '/workbench/notification-center',
+    },
   ],
 };
