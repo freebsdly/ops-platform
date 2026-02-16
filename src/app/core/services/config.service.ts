@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, catchError, tap, map, throwError } from 'rxjs';
 import { LayoutConfig, LogoConfig } from '../types/layout-config.interface';
+import { AppConfigResponse, ConfigValidationResponse } from '../types/api-response.interface';
 
 /**
  * 配置服务 - 负责从后端加载和管理应用配置
@@ -181,31 +182,15 @@ export class ConfigService {
   /**
    * 获取应用配置
    */
-  getAppConfig(): Observable<{
-    version: string;
-    environment: string;
-    apiUrl: string;
-    features: Record<string, boolean>;
-  }> {
-    return this.http.get<{
-      version: string;
-      environment: string;
-      apiUrl: string;
-      features: Record<string, boolean>;
-    }>(`${this.API_BASE_URL}/config/app`);
+  getAppConfig(): Observable<AppConfigResponse> {
+    return this.http.get<AppConfigResponse>(`${this.API_BASE_URL}/config/app`);
   }
 
   /**
    * 验证配置
    */
-  validateConfig(config: Partial<LayoutConfig>): Observable<{
-    valid: boolean;
-    errors: string[];
-  }> {
-    return this.http.post<{
-      valid: boolean;
-      errors: string[];
-    }>(`${this.API_BASE_URL}/config/validate`, config);
+  validateConfig(config: Partial<LayoutConfig>): Observable<ConfigValidationResponse> {
+    return this.http.post<ConfigValidationResponse>(`${this.API_BASE_URL}/config/validate`, config);
   }
 
   /**

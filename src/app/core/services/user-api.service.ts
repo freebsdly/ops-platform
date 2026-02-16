@@ -3,6 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, catchError, tap } from 'rxjs';
 import { User } from '../types/user.interface';
 import { MenuPermission, ApiMenuResponse } from '../types/menu-permission.interface';
+import { Permission } from '../types/permission.interface';
+import {
+  UsersListResponse,
+  RoutePermissionCheckResponse,
+  BatchRoutePermissionCheckResponse,
+  PermissionCheckResponse,
+  SystemModulesResponse,
+  ModuleMenusResponse,
+  SearchTagsResponse,
+  UserMenuItem
+} from '../types/api-response.interface';
 
 export interface AuthResponse {
   user: User;
@@ -75,25 +86,13 @@ export class UserApiService {
   /**
    * 获取用户列表
    */
-  getUsers(search?: string, page: number = 1, pageSize: number = 10): Observable<{
-    users: User[];
-    total: number;
-    page: number;
-    pageSize: number;
-    totalPages: number;
-  }> {
+  getUsers(search?: string, page: number = 1, pageSize: number = 10): Observable<UsersListResponse> {
     const params: any = { page: page.toString(), pageSize: pageSize.toString() };
     if (search) {
       params.search = search;
     }
-    
-    return this.http.get<{
-      users: User[];
-      total: number;
-      page: number;
-      pageSize: number;
-      totalPages: number;
-    }>(`${this.API_BASE_URL}/users`, { params });
+
+    return this.http.get<UsersListResponse>(`${this.API_BASE_URL}/users`, { params });
   }
   
   /**
@@ -113,8 +112,8 @@ export class UserApiService {
   /**
    * 获取用户权限
    */
-  getUserPermissions(userId: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.API_BASE_URL}/users/${userId}/permissions`);
+  getUserPermissions(userId: number): Observable<Permission[]> {
+    return this.http.get<Permission[]>(`${this.API_BASE_URL}/users/${userId}/permissions`);
   }
 
   /**
@@ -144,136 +143,64 @@ export class UserApiService {
   /**
    * 检查用户是否有特定路由的权限
    */
-  checkRoutePermission(routePath: string, userId?: number): Observable<{
-    hasPermission: boolean;
-    requiredPermission?: MenuPermission;
-    userPermission?: MenuPermission;
-  }> {
+  checkRoutePermission(routePath: string, userId?: number): Observable<RoutePermissionCheckResponse> {
     const body: any = { routePath };
     if (userId) {
       body.userId = userId;
     }
-    
-    return this.http.post<{
-      hasPermission: boolean;
-      requiredPermission?: MenuPermission;
-      userPermission?: MenuPermission;
-    }>(`${this.API_BASE_URL}/permissions/check-route`, body);
+
+    return this.http.post<RoutePermissionCheckResponse>(`${this.API_BASE_URL}/permissions/check-route`, body);
   }
 
   /**
    * 批量检查路由权限
    */
-  checkBatchRoutePermissions(routes: string[], userId?: number): Observable<{
-    results: Array<{
-      routePath: string;
-      hasPermission: boolean;
-    }>;
-  }> {
+  checkBatchRoutePermissions(routes: string[], userId?: number): Observable<BatchRoutePermissionCheckResponse> {
     const body: any = { routes };
     if (userId) {
       body.userId = userId;
     }
-    
-    return this.http.post<{
-      results: Array<{
-        routePath: string;
-        hasPermission: boolean;
-      }>;
-    }>(`${this.API_BASE_URL}/permissions/check-batch-routes`, body);
+
+    return this.http.post<BatchRoutePermissionCheckResponse>(`${this.API_BASE_URL}/permissions/check-batch-routes`, body);
   }
 
   /**
    * 检查用户权限
    */
-  checkPermission(userId: number, permissionId: string): Observable<{
-    hasPermission: boolean;
-    user: { id: number; name: string };
-    permissionId: string;
-  }> {
-    return this.http.post<{
-      hasPermission: boolean;
-      user: { id: number; name: string };
-      permissionId: string;
-    }>(`${this.API_BASE_URL}/permissions/check`, { userId, permissionId });
+  checkPermission(userId: number, permissionId: string): Observable<PermissionCheckResponse> {
+    return this.http.post<PermissionCheckResponse>(`${this.API_BASE_URL}/permissions/check`, { userId, permissionId });
   }
   
   /**
    * 获取系统模块列表
    */
-  getSystemModules(): Observable<{
-    modules: Array<{
-      id: string;
-      title: string;
-      icon: string;
-      color: string;
-      defaultPath: string;
-    }>;
-  }> {
-    return this.http.get<{
-      modules: Array<{
-        id: string;
-        title: string;
-        icon: string;
-        color: string;
-        defaultPath: string;
-      }>;
-    }>(`${this.API_BASE_URL}/system/modules`);
+  getSystemModules(): Observable<SystemModulesResponse> {
+    return this.http.get<SystemModulesResponse>(`${this.API_BASE_URL}/system/modules`);
   }
 
   /**
    * 获取模块菜单
    */
-  getModuleMenus(moduleId: string): Observable<{
-    menus: Array<{
-      id: string;
-      title: string;
-      icon: string;
-      path: string;
-      children?: Array<{
-        id: string;
-        title: string;
-        icon: string;
-        path: string;
-      }>;
-    }>;
-  }> {
-    return this.http.get<{
-      menus: Array<{
-        id: string;
-        title: string;
-        icon: string;
-        path: string;
-        children?: Array<{
-          id: string;
-          title: string;
-          icon: string;
-          path: string;
-        }>;
-      }>;
-    }>(`${this.API_BASE_URL}/system/modules/${moduleId}/menus`);
+  getModuleMenus(moduleId: string): Observable<ModuleMenusResponse> {
+    return this.http.get<ModuleMenusResponse>(`${this.API_BASE_URL}/system/modules/${moduleId}/menus`);
   }
 
   /**
    * 获取可用的搜索标签
    */
-  getSearchTags(): Observable<{
-    tags: string[];
-  }> {
-    return this.http.get<{
-      tags: string[];
-    }>(`${this.API_BASE_URL}/system/search/tags`);
+  getSearchTags(): Observable<SearchTagsResponse> {
+    return this.http.get<SearchTagsResponse>(`${this.API_BASE_URL}/system/search/tags`);
   }
 
   /**
    * 获取用户菜单（旧接口，保持兼容）
    */
-  getUserMenus(userId?: number): Observable<any[]> {
+  getUserMenus(userId?: number): Observable<UserMenuItem[]> {
     const params: any = {};
     if (userId) {
       params.userId = userId.toString();
     }
-    
-    return this.http.get<any[]>(`${this.API_BASE_URL}/user/menus`, { params });
+
+    return this.http.get<UserMenuItem[]>(`${this.API_BASE_URL}/user/menus`, { params });
   }
 }
