@@ -1,6 +1,31 @@
 import { http, HttpResponse } from 'msw';
 import { LayoutConfig } from '../../app/core/types/layout-config.interface';
 
+/**
+ * 辅助函数：包装成功响应
+ */
+function wrapSuccessResponse<T>(data: T) {
+  return {
+    code: 0,
+    message: 'success',
+    data
+  };
+}
+
+/**
+ * 辅助函数：包装错误响应
+ */
+function wrapErrorResponse(code: number, message: string, status: number = 400) {
+  return HttpResponse.json(
+    {
+      code,
+      message,
+      data: null
+    },
+    { status }
+  );
+}
+
 // 模拟配置数据
 const mockConfig: LayoutConfig = {
   appTitle: 'DevOps Platform',
@@ -70,7 +95,7 @@ export const layoutConfigHandlers = [
     //     statusText: 'Internal Server Error'
     //   });
     // }
-    return HttpResponse.json(mockConfig);
+    return HttpResponse.json(wrapSuccessResponse(mockConfig));
   }),
 
   // 保存布局配置
@@ -80,7 +105,7 @@ export const layoutConfigHandlers = [
     // 更新配置（在实际实现中应该合并而不是替换）
     Object.assign(mockConfig, config);
     
-    return HttpResponse.json(mockConfig);
+    return HttpResponse.json(wrapSuccessResponse(mockConfig));
   }),
 
   // 验证配置
@@ -97,15 +122,15 @@ export const layoutConfigHandlers = [
       errors.push('Logo图片URL格式无效');
     }
 
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       valid: errors.length === 0,
       errors
-    });
+    }));
   }),
 
   // 获取应用配置（独立配置，不属于布局配置）
   http.get('/api/config/app', () => {
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       version: '1.2.0',
       environment: 'development',
       apiUrl: 'http://localhost:3000/api',
@@ -115,7 +140,7 @@ export const layoutConfigHandlers = [
         notifications: true,
         darkMode: true
       }
-    });
+    }));
   })
 ];
 

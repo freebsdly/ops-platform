@@ -1,4 +1,13 @@
 /**
+ * 统一 API 响应格式
+ */
+export interface ApiResponse<T = any> {
+  code: number;
+  message: string;
+  data: T;
+}
+
+/**
  * 用户列表响应
  */
 export interface UsersListResponse {

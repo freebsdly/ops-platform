@@ -4,6 +4,31 @@ import { Permission } from '../../app/core/types/permission.interface';
 import { MenuPermission } from '../../app/core/types/menu-permission.interface';
 import { MODULES_CONFIG, MENUS_CONFIG, MenuItem } from '../../app/config/menu.config';
 
+/**
+ * 辅助函数：包装成功响应
+ */
+function wrapSuccessResponse<T>(data: T) {
+  return {
+    code: 0,
+    message: 'success',
+    data
+  };
+}
+
+/**
+ * 辅助函数：包装错误响应
+ */
+function wrapErrorResponse(code: number, message: string, status: number = 400) {
+  return HttpResponse.json(
+    {
+      code,
+      message,
+      data: null
+    },
+    { status }
+  );
+}
+
 // 模拟用户数据
 const mockUsers: User[] = [
   {
@@ -260,10 +285,7 @@ export const userHandlers = [
     const token = authHeader?.replace('Bearer ', '') || localStorage.getItem('auth_token');
 
     if (!token) {
-      return HttpResponse.json(
-        { error: '未授权' },
-        { status: 401 }
-      );
+      return wrapErrorResponse(401, '未授权', 401);
     }
 
     // 从 token 中提取用户 ID 或从 localStorage 获取用户信息
@@ -276,7 +298,7 @@ export const userHandlers = [
         if (storedToken === token) {
           // 同步更新 currentUser
           currentUser = user;
-          return HttpResponse.json(currentUser);
+          return HttpResponse.json(wrapSuccessResponse(currentUser));
         }
       } catch (e) {
         console.error('解析用户信息失败:', e);
@@ -284,7 +306,7 @@ export const userHandlers = [
     }
 
     // 如果无法从 localStorage 获取，返回当前用户或默认用户
-    return HttpResponse.json(currentUser);
+    return HttpResponse.json(wrapSuccessResponse(currentUser));
   }),
 
   // 用户登录
@@ -295,10 +317,7 @@ export const userHandlers = [
     const user = mockUsers.find(u => u.username === username);
 
     if (!user) { // 简单密码验证
-      return HttpResponse.json(
-        { error: '用户名或密码错误' },
-        { status: 401 }
-      );
+      return wrapErrorResponse(401, '用户名或密码错误', 401);
     }
 
     // 更新当前用户
@@ -307,10 +326,10 @@ export const userHandlers = [
     // 生成模拟token
     const token = `mock_jwt_token_${Date.now()}_${user.id}`;
 
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       user,
       token
-    });
+    }));
   }),
 
   // 用户登出
@@ -320,7 +339,7 @@ export const userHandlers = [
     // 清除 localStorage 中的认证信息
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
-    return HttpResponse.json({ success: true });
+    return HttpResponse.json(wrapSuccessResponse({ success: true }));
   }),
 
   // 获取用户列表
@@ -345,13 +364,13 @@ export const userHandlers = [
     const endIndex = startIndex + pageSize;
     const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
 
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       users: paginatedUsers,
       total: filteredUsers.length,
       page,
       pageSize,
       totalPages: Math.ceil(filteredUsers.length / pageSize)
-    });
+    }));
   }),
 
   // 获取单个用户信息
@@ -360,13 +379,10 @@ export const userHandlers = [
     const user = mockUsers.find(u => u.id === id);
 
     if (!user) {
-      return HttpResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      );
+      return wrapErrorResponse(404, '用户不存在', 404);
     }
 
-    return HttpResponse.json(user);
+    return HttpResponse.json(wrapSuccessResponse(user));
   }),
 
   // 更新用户信息
@@ -375,10 +391,7 @@ export const userHandlers = [
     const userIndex = mockUsers.findIndex(u => u.id === id);
 
     if (userIndex === -1) {
-      return HttpResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      );
+      return wrapErrorResponse(404, '用户不存在', 404);
     }
 
     const updates = await request.json() as Partial<User>;
@@ -394,7 +407,7 @@ export const userHandlers = [
       currentUser = mockUsers[userIndex];
     }
 
-    return HttpResponse.json(mockUsers[userIndex]);
+    return HttpResponse.json(wrapSuccessResponse(mockUsers[userIndex]));
   }),
 
   // 获取用户权限列表
@@ -403,13 +416,10 @@ export const userHandlers = [
     const user = mockUsers.find(u => u.id === id);
 
     if (!user) {
-      return HttpResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      );
+      return wrapErrorResponse(404, '用户不存在', 404);
     }
 
-    return HttpResponse.json(user.permissions);
+    return HttpResponse.json(wrapSuccessResponse(user.permissions));
   }),
 
   // 检查用户权限
@@ -418,32 +428,29 @@ export const userHandlers = [
     const user = mockUsers.find(u => u.id === userId);
 
     if (!user) {
-      return HttpResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      );
+      return wrapErrorResponse(404, '用户不存在', 404);
     }
 
     const hasPermission = user.permissions.some(p => p.id === permissionId);
 
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       hasPermission,
       user: {
         id: user.id,
         name: user.name
       },
       permissionId
-    });
+    }));
   }),
 
   // 获取所有权限列表
   http.get('/api/permissions', () => {
-    return HttpResponse.json(mockPermissions);
+    return HttpResponse.json(wrapSuccessResponse(mockPermissions));
   }),
 
   // 获取所有角色列表
   http.get('/api/roles', () => {
-    return HttpResponse.json(mockRoles);
+    return HttpResponse.json(wrapSuccessResponse(mockRoles));
   }),
 
   // 获取用户菜单
@@ -466,7 +473,7 @@ export const userHandlers = [
     ];
 
     if (user.roles.includes('admin')) {
-      return HttpResponse.json([
+      return HttpResponse.json(wrapSuccessResponse([
         ...baseMenus,
         {
           id: 'users',
@@ -500,9 +507,9 @@ export const userHandlers = [
           order: 5,
           enabled: user.permissions.some(p => p.id === 'report:view')
         }
-      ]);
+      ]));
     } else if (user.roles.includes('user')) {
-      return HttpResponse.json([
+      return HttpResponse.json(wrapSuccessResponse([
         ...baseMenus,
         {
           id: 'reports',
@@ -512,15 +519,15 @@ export const userHandlers = [
           order: 2,
           enabled: user.permissions.some(p => p.id === 'report:view')
         }
-      ]);
+      ]));
     } else {
-      return HttpResponse.json(baseMenus);
+      return HttpResponse.json(wrapSuccessResponse(baseMenus));
     }
   }),
 
   // 获取可用的搜索标签
   http.get('/api/system/search/tags', () => {
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       tags: [
         'urgent',
         'documentation',
@@ -531,12 +538,12 @@ export const userHandlers = [
         'backend',
         'frontend'
       ]
-    });
+    }));
   }),
 
   // 获取系统模块列表
   http.get('/api/system/modules', () => {
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       modules: MODULES_CONFIG.map(module => ({
         id: module.id,
         title: module.title,
@@ -544,7 +551,7 @@ export const userHandlers = [
         color: module.color,
         defaultPath: module.defaultPath
       }))
-    });
+    }));
   }),
 
   // 获取指定模块的菜单
@@ -553,10 +560,7 @@ export const userHandlers = [
     const moduleMenus = MENUS_CONFIG[moduleId];
 
     if (!moduleMenus) {
-      return HttpResponse.json(
-        { error: '模块不存在' },
-        { status: 404 }
-      );
+      return wrapErrorResponse(404, '模块不存在', 404);
     }
 
     // 定义API响应类型
@@ -589,7 +593,7 @@ export const userHandlers = [
       return apiMenu;
     });
 
-    return HttpResponse.json({ menus });
+    return HttpResponse.json(wrapSuccessResponse({ menus }));
   }),
 
   // 获取用户菜单权限列表
@@ -628,7 +632,7 @@ export const userHandlers = [
       flattenMenus(menus);
     });
     
-    return HttpResponse.json(menuPermissions);
+    return HttpResponse.json(wrapSuccessResponse(menuPermissions));
   }),
 
   // 检查用户是否有特定路由的权限
@@ -637,10 +641,7 @@ export const userHandlers = [
     
     const user = userId ? mockUsers.find(u => u.id === userId) : currentUser;
     if (!user) {
-      return HttpResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      );
+      return wrapErrorResponse(404, '用户不存在', 404);
     }
     
     // 查找匹配的路由对应的菜单项
@@ -655,18 +656,18 @@ export const userHandlers = [
         action: matchingMenu.permission?.action ? [matchingMenu.permission.action] : ['read']
       };
       
-      return HttpResponse.json({
+      return HttpResponse.json(wrapSuccessResponse({
         hasPermission,
         requiredPermission: requiredPermission,
         userPermission: hasPermission ? requiredPermission : undefined
-      });
+      }));
     }
     
     // 如果没有找到对应的菜单配置，检查用户是否具有默认权限
     const hasDefaultPermission = user.roles.includes('admin') || 
                                  user.permissions.some(p => p.id.includes('default'));
     
-    return HttpResponse.json({
+    return HttpResponse.json(wrapSuccessResponse({
       hasPermission: hasDefaultPermission,
       requiredPermission: {
         menuId: routePath,
@@ -678,7 +679,7 @@ export const userHandlers = [
         resource: extractResourceFromPath(routePath),
         action: ['read']
       } : undefined
-    });
+    }));
   }),
 
   // 批量检查路由权限
@@ -687,10 +688,7 @@ export const userHandlers = [
     
     const user = userId ? mockUsers.find(u => u.id === userId) : currentUser;
     if (!user) {
-      return HttpResponse.json(
-        { error: '用户不存在' },
-        { status: 404 }
-      );
+      return wrapErrorResponse(404, '用户不存在', 404);
     }
     
     const results = routes.map(routePath => {
@@ -709,6 +707,6 @@ export const userHandlers = [
       return { routePath, hasPermission: hasDefaultPermission };
     });
     
-    return HttpResponse.json({ results });
+    return HttpResponse.json(wrapSuccessResponse({ results }));
   })
 ];

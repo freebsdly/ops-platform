@@ -17,6 +17,7 @@ import { provideEffects } from '@ngrx/effects';
 import { provideRouterStore } from '@ngrx/router-store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
 import { httpCancelInterceptor } from './core/interceptors/http-cancel.interceptor';
+import { apiResponseInterceptor } from './core/interceptors/api-response.interceptor';
 
 registerLocaleData(zh);
 registerLocaleData(en);
@@ -36,7 +37,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([httpCancelInterceptor])),
+    provideHttpClient(withInterceptors([httpCancelInterceptor, apiResponseInterceptor])),
     provideNzIcons(icons),
     provideNzI18n(zh_CN),
     provideNzConfig(ngZorroConfig),
