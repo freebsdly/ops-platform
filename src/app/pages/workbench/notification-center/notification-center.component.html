@@ -189,10 +189,19 @@
 
             <!-- 操作按钮 -->
             <div class="notification-actions" (click)="$event.stopPropagation()">
-              <div nz-dropdown nzTrigger="click" nzPlacement="bottomRight">
-                <button nz-button nzType="text" nzSize="small" class="action-trigger">
-                  <span nz-icon nzType="ellipsis"></span>
-                </button>
+              <button
+                nz-button
+                nzType="text"
+                nzSize="small"
+                class="action-trigger"
+                nz-dropdown
+                [nzDropdownMenu]="actionMenu"
+                nzTrigger="hover"
+                nzPlacement="bottomRight"
+              >
+                <span nz-icon nzType="ellipsis"></span>
+              </button>
+              <nz-dropdown-menu #actionMenu="nzDropdownMenu">
                 <ul nz-menu>
                   @if (!item.read) {
                     <li nz-menu-item (click)="markAsRead(item.id)">
@@ -209,7 +218,7 @@
                     {{ 'NOTIFICATION.DELETE' | translate }}
                   </li>
                 </ul>
-              </div>
+              </nz-dropdown-menu>
             </div>
           </div>
         }

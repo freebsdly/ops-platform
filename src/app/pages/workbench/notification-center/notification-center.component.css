@@ -85,7 +85,12 @@
 }
 
 .header-action-btn:hover {
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.header-action-btn:active {
+  transform: translateY(0);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -187,6 +192,12 @@
 .type-filter :deep(.ant-select-selector) {
   border-radius: 6px;
   font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.type-filter:hover :deep(.ant-select-selector) {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
 }
 
 .type-filter :deep(.ant-select-selection-item) {
@@ -197,16 +208,37 @@
 
 .type-filter :deep(.ant-select-selection-item .anticon) {
   font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.type-filter:hover :deep(.ant-select-selection-item .anticon) {
+  transform: scale(1.1);
 }
 
 /* 搜索框 */
 .search-box {
   width: 280px;
+  transition: all 0.3s ease;
+}
+
+.search-box:hover {
+  width: 300px;
 }
 
 .search-box :deep(.ant-input) {
   border-radius: 6px;
   font-size: 13px;
+  transition: all 0.3s ease;
+}
+
+.search-box :deep(.ant-input:hover) {
+  border-color: #1890ff;
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.1);
+}
+
+.search-box :deep(.ant-input:focus) {
+  border-color: #1890ff;
+  box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.1);
 }
 
 /* 通知列表容器 */
@@ -309,9 +341,14 @@
 }
 
 .notification-card:hover {
-  background: linear-gradient(90deg, rgba(24, 144, 255, 0.02) 0%, rgba(24, 144, 255, 0.05) 100%);
+  background: linear-gradient(90deg, rgba(24, 144, 255, 0.03) 0%, rgba(24, 144, 255, 0.08) 100%);
   border-color: #1890ff;
-  transform: translateY(-2px);
+  transform: translateY(-4px) scale(1.01);
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.2);
+}
+
+.notification-card:active {
+  transform: translateY(-2px) scale(1.005);
   box-shadow: 0 4px 12px rgba(24, 144, 255, 0.15);
 }
 
@@ -333,6 +370,12 @@
   bottom: 0;
   width: 4px;
   background: linear-gradient(180deg, #1890ff 0%, #40a9ff 100%);
+  transition: all 0.3s ease;
+}
+
+.notification-card-unread:hover::before {
+  width: 6px;
+  box-shadow: 0 0 8px rgba(24, 144, 255, 0.5);
 }
 
 /* 图标包裹器 */
@@ -344,15 +387,35 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.notification-icon-wrapper::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
 }
 
 .notification-card:hover .notification-icon-wrapper {
-  transform: scale(1.1) rotate(5deg);
+  transform: scale(1.15) rotate(8deg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.notification-card:hover .notification-icon-wrapper::after {
+  border-color: rgba(24, 144, 255, 0.3);
 }
 
 .notification-icon {
   font-size: 22px;
+  transition: all 0.3s ease;
+}
+
+.notification-card:hover .notification-icon {
+  transform: scale(1.1);
 }
 
 .notification-icon-info {
@@ -410,6 +473,11 @@
   color: #262626;
   line-height: 1.4;
   flex: 1;
+  transition: all 0.3s ease;
+}
+
+.notification-card:hover .notification-title {
+  color: #1890ff;
 }
 
 .notification-title-unread {
@@ -431,6 +499,12 @@
   border-radius: 4px;
   text-transform: capitalize;
   font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.notification-card:hover .notification-type-tag {
+  transform: scale(1.05);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .notification-message {
@@ -457,10 +531,20 @@
   gap: 4px;
   font-size: 12px;
   color: #8c8c8c;
+  transition: all 0.3s ease;
+}
+
+.notification-card:hover .notification-time {
+  color: #1890ff;
 }
 
 .notification-time :deep(.anticon) {
   font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.notification-card:hover .notification-time :deep(.anticon) {
+  transform: rotate(-10deg);
 }
 
 /* 操作按钮 */
@@ -476,13 +560,22 @@
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.6;
+  transform: scale(0.95);
+}
+
+.notification-card:hover .action-trigger {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .action-trigger:hover {
-  background: rgba(24, 144, 255, 0.1);
+  background: rgba(24, 144, 255, 0.15);
   color: #1890ff;
-  transform: rotate(90deg);
+  transform: rotate(90deg) scale(1.1);
+  box-shadow: 0 2px 8px rgba(24, 144, 255, 0.3);
+  opacity: 1;
 }
 
 /* 响应式 */
