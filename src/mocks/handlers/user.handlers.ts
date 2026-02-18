@@ -3,6 +3,7 @@ import { User } from '../../app/core/types/user.interface';
 import { Permission } from '../../app/core/types/permission.interface';
 import { MenuPermission } from '../../app/core/types/menu-permission.interface';
 import { MODULES_CONFIG, MENUS_CONFIG, MenuItem } from '../../app/config/menu.config';
+import { MockCookieHelper } from '../utils/cookie-helper';
 
 /**
  * 辅助函数：包装成功响应
@@ -282,11 +283,19 @@ export const userHandlers = [
   http.get('/api/user/me', ({ request }) => {
     // 从请求头获取 token
     const authHeader = request.headers.get('Authorization');
-    const token = authHeader?.replace('Bearer ', '') || localStorage.getItem('auth_token');
+    const xAuthToken = request.headers.get('X-Auth-Token');
+
+    // 优先从模拟Cookie读取
+    const token = xAuthToken ||
+                authHeader?.replace('Bearer ', '') ||
+                MockCookieHelper.getCookie('auth_token');
 
     if (!token) {
+      console.log('[UserHandlers] /api/user/me: No token found');
       return wrapErrorResponse(401, '未授权', 401);
     }
+
+    console.log('[UserHandlers] /api/user/me: Token found, validating...');
 
     // 从 token 中提取用户 ID 或从 localStorage 获取用户信息
     const userStr = localStorage.getItem('user');
@@ -294,18 +303,20 @@ export const userHandlers = [
       try {
         const user = JSON.parse(userStr);
         // 验证 token 是否匹配
-        const storedToken = localStorage.getItem('auth_token');
+        const storedToken = MockCookieHelper.getCookie('auth_token');
         if (storedToken === token) {
           // 同步更新 currentUser
           currentUser = user;
+          console.log('[UserHandlers] /api/user/me: Token validated, user:', user.username);
           return HttpResponse.json(wrapSuccessResponse(currentUser));
         }
       } catch (e) {
-        console.error('解析用户信息失败:', e);
+        console.error('[UserHandlers] Error parsing user info:', e);
       }
     }
 
     // 如果无法从 localStorage 获取，返回当前用户或默认用户
+    console.log('[UserHandlers] /api/user/me: Using current user:', currentUser?.username);
     return HttpResponse.json(wrapSuccessResponse(currentUser));
   }),
 
@@ -317,6 +328,7 @@ export const userHandlers = [
     const user = mockUsers.find(u => u.username === username);
 
     if (!user) { // 简单密码验证
+      console.log('[UserHandlers] /api/auth/login: User not found:', username);
       return wrapErrorResponse(401, '用户名或密码错误', 401);
     }
 
@@ -326,19 +338,44 @@ export const userHandlers = [
     // 生成模拟token
     const token = `mock_jwt_token_${Date.now()}_${user.id}`;
 
-    return HttpResponse.json(wrapSuccessResponse({
+    // 设置模拟HttpOnly Cookie
+    MockCookieHelper.setCookie('auth_token', token, {
+      httpOnly: true,
+      secure: false, // Mock环境不启用secure
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000  // 24小时
+    });
+
+    console.log('[UserHandlers] /api/auth/login: Login successful for user:', username);
+
+    // 返回响应，包含token在响应头中
+    const response = HttpResponse.json(wrapSuccessResponse({
       user,
       token
-    }));
+    }), {
+      headers: {
+        'X-Auth-Token': token,
+        'X-Auth-Created': 'true'
+      }
+    });
+
+    return response;
   }),
 
   // 用户登出
   http.post('/api/auth/logout', () => {
     // 重置为默认用户
     currentUser = mockUsers[0];
-    // 清除 localStorage 中的认证信息
+
+    // 清除模拟的Cookie
+    MockCookieHelper.removeCookie('auth_token');
+
+    // 清除旧的localStorage中的认证信息（向后兼容）
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
+
+    console.log('[UserHandlers] /api/auth/logout: User logged out');
+
     return HttpResponse.json(wrapSuccessResponse({ success: true }));
   }),
 

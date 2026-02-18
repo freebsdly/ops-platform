@@ -48,8 +48,10 @@ export class AuthService implements OnDestroy {
   login(username: string, password: string): Observable<AuthResponse> {
     return this.userApiService.login(username, password).pipe(
       tap(response => {
-        localStorage.setItem(this.tokenKey, response.token);
+        // Token现在由MSW通过模拟Cookie管理，不再存储到localStorage
+        // localStorage.setItem(this.tokenKey, response.token);
         localStorage.setItem(this.userKey, JSON.stringify(response.user));
+        console.log('[AuthService] Login successful, user:', response.user.username);
       }),
       catchError(error => {
         console.error('登录失败:', error);
@@ -84,7 +86,8 @@ export class AuthService implements OnDestroy {
   }
 
   private performLogout() {
-    localStorage.removeItem(this.tokenKey);
+    // Token现在由模拟Cookie管理，不再需要清除localStorage中的token
+    // localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.userKey);
     // 清除配置缓存
     localStorage.removeItem('app_layout_config');
@@ -99,10 +102,13 @@ export class AuthService implements OnDestroy {
     this.timerCleanupService.cleanup();
     this.webSocketCleanupService.cleanup();
     this.serviceWorkerCleanupService.cleanup();
+
+    console.log('[AuthService] Local storage cleared');
   }
 
   checkAuth(): Observable<{ user: User | null; token: string | null }> {
-    const token = localStorage.getItem(this.tokenKey);
+    // Token现在由模拟Cookie管理
+    const token = this.getToken();
     const userStr = localStorage.getItem(this.userKey);
 
     let user: User | null = null;
@@ -119,7 +125,8 @@ export class AuthService implements OnDestroy {
 
   // Synchronous check for initial app loading
   checkAuthSync(): { user: User | null; token: string | null } {
-    const token = localStorage.getItem(this.tokenKey);
+    // Token现在由模拟Cookie管理
+    const token = this.getToken();
     const userStr = localStorage.getItem(this.userKey);
 
     let user: User | null = null;
@@ -135,10 +142,37 @@ export class AuthService implements OnDestroy {
   }
 
   getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
+    // 从模拟Cookie读取token
+    // 在真实环境中，这将由浏览器自动处理，此方法仅用于检查
+    const cookieToken = localStorage.getItem('cookie_auth_token');
+
+    if (cookieToken) {
+      try {
+        const cookieData = JSON.parse(cookieToken);
+        // 检查是否过期
+        if (cookieData.maxAge) {
+          const elapsed = Date.now() - cookieData.createdAt;
+          if (elapsed > cookieData.maxAge * 1000) {
+            localStorage.removeItem('cookie_auth_token');
+            return null;
+          }
+        }
+        return cookieData.value;
+      } catch {
+        return null;
+      }
+    }
+
+    // 向后兼容：旧的localStorage存储
+    const oldToken = localStorage.getItem('auth_token');
+    if (oldToken) {
+      return oldToken;
+    }
+
+    return null;
   }
 
   isAuthenticated(): boolean {
-    return !!localStorage.getItem(this.tokenKey);
+    return !!this.getToken();
   }
 }
