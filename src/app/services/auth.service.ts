@@ -8,6 +8,7 @@ import { RequestCancelService } from '../core/services/request-cancel.service';
 import { TimerCleanupService } from '../core/services/timer-cleanup.service';
 import { WebSocketCleanupService } from '../core/services/websocket-cleanup.service';
 import { ServiceWorkerCleanupService } from '../core/services/service-worker-cleanup.service';
+import { CsrfTokenService } from '../core/services/csrf-token.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,6 +22,7 @@ export class AuthService implements OnDestroy {
   private timerCleanupService = inject(TimerCleanupService);
   private webSocketCleanupService = inject(WebSocketCleanupService);
   private serviceWorkerCleanupService = inject(ServiceWorkerCleanupService);
+  private csrfTokenService = inject(CsrfTokenService);
   private broadcastChannel: BroadcastChannel | null = null;
 
   constructor() {
@@ -62,15 +64,18 @@ export class AuthService implements OnDestroy {
 
   logout(): Observable<void> {
     console.log('auth.service: 开始登出流程');
-    
+
     // 先清除本地状态，确保LoginGuard能正确工作
     this.performLogout();
-    
+
     this.requestCancelService.cancelPendingRequests();
     if (this.broadcastChannel) {
       this.broadcastChannel.postMessage({ type: 'logout' });
     }
-    
+
+    // 清除CSRF token
+    this.csrfTokenService.clearToken();
+
     // 调用API登出，但不等待它完成（fire-and-forget）
     return this.userApiService.logout().pipe(
       map(() => undefined),

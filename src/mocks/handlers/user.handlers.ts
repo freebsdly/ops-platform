@@ -278,12 +278,22 @@ function findMenuByPath(routePath: string): MenuItem | null {
 // 模拟当前登录用户
 let currentUser = mockUsers[0];
 
+// CSRF token存储（模拟服务端CSRF验证）
+let serverCsrfToken: string | null = null;
+
 export const userHandlers = [
   // 获取当前用户信息
   http.get('/api/user/me', ({ request }) => {
     // 从请求头获取 token
     const authHeader = request.headers.get('Authorization');
     const xAuthToken = request.headers.get('X-Auth-Token');
+    const csrfToken = request.headers.get('X-CSRF-Token');
+
+    // 验证CSRF token
+    if (csrfToken && serverCsrfToken && csrfToken !== serverCsrfToken) {
+      console.error('[UserHandlers] CSRF token validation failed');
+      return wrapErrorResponse(403, 'CSRF token验证失败', 403);
+    }
 
     // 优先从模拟Cookie读取
     const token = xAuthToken ||
@@ -296,6 +306,9 @@ export const userHandlers = [
     }
 
     console.log('[UserHandlers] /api/user/me: Token found, validating...');
+    if (csrfToken) {
+      console.log('[UserHandlers] /api/user/me: CSRF token validated');
+    }
 
     // 从 token 中提取用户 ID 或从 localStorage 获取用户信息
     const userStr = localStorage.getItem('user');
