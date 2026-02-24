@@ -4,6 +4,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { NzI18nService, zh_CN, en_US, NzI18nInterface } from 'ng-zorro-antd/i18n';
+import { StorageService, StorageType } from '../../core/services/storage.service';
 
 @Component({
   selector: 'app-lang-selector',
@@ -15,6 +16,7 @@ import { NzI18nService, zh_CN, en_US, NzI18nInterface } from 'ng-zorro-antd/i18n
 export class LangSelector implements AfterViewInit {
   private translate = inject(TranslateService);
   private i18n = inject(NzI18nService);
+  private storageService = inject(StorageService);
 
   currentLanguage = 'zh';
 
@@ -24,7 +26,9 @@ export class LangSelector implements AfterViewInit {
   ];
 
   ngAfterViewInit() {
-    const savedLang = localStorage.getItem('preferredLanguage');
+    const savedLang = this.storageService.getItem<string>('preferredLanguage', {
+      type: StorageType.LOCAL
+    });
     if (savedLang) {
       this.changeLanguage(savedLang, false);
     }
@@ -37,7 +41,9 @@ export class LangSelector implements AfterViewInit {
     this.currentLanguage = lang;
     this.translate.use(lang);
     this.i18n.setLocale(language.locale as NzI18nInterface);
-    localStorage.setItem('preferredLanguage', lang);
+    this.storageService.setItem('preferredLanguage', lang, {
+      type: StorageType.LOCAL
+    });
 
     if (reload) {
       window.location.reload();
