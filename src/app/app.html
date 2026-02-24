@@ -40,10 +40,8 @@
         <div class="header-right">
           <app-search />
           <app-lang-selector />
-          @if (isAuthenticatedSig() && userSig(); as user) {
-            <app-notification />
-            <app-user-info (onLogout)="storeService.logout()" />
-          }
+          <app-notification />
+          <app-user-info (onLogout)="storeService.logout()" />
         </div>
       </nz-header>
       <app-tabbar />

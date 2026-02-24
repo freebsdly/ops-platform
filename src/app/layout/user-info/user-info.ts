@@ -21,6 +21,8 @@ import { TranslateModule } from '@ngx-translate/core';
 import { UserApiService } from '../../core/services/user-api.service';
 import { catchError, of, tap, takeUntil } from 'rxjs';
 import { Subject } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { Router } from '@angular/router';
 
 export interface UserInfoData {
   name: string;
@@ -58,10 +60,12 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   private userApiService = inject(UserApiService);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
   // 从API获取的用户数据
   apiUserData = signal<UserInfoData | null>(null);
-  isLoading = signal(true);
+  isLoading = signal(false);
   error = signal<string | null>(null);
 
   constructor() {
@@ -81,7 +85,10 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.loadUserFromApi();
+    // 只有在认证状态下才加载用户数据
+    if (this.authService.isAuthenticated()) {
+      this.loadUserFromApi();
+    }
   }
 
   ngAfterViewInit() {
@@ -143,8 +150,12 @@ export class UserInfo implements OnInit, AfterViewInit, OnDestroy {
     this.onLogout.emit();
   }
 
+  navigateToLogin() {
+    this.router.navigate(['/login']);
+  }
+
   // 获取当前显示的用户数据
-  get currentUser(): UserInfoData {
-    return this.apiUserData()!;
+  get currentUser(): UserInfoData | null {
+    return this.apiUserData();
   }
 }

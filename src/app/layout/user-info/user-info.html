@@ -62,7 +62,7 @@
               <div class="user-info-menu-text">
                 <div class="user-info-menu-title">{{ 'LAYOUT.HEADER.SETTINGS' | translate }}</div>
                 <div class="user-info-menu-desc">{{ 'USER_CARD.SETTINGS_DESCRIPTION' | translate }}</div>
-              </div>
+                           </div>
             </nz-space>
           </div>
         </li>
@@ -85,4 +85,16 @@
       </div>
     </div>
   </nz-dropdown-menu>
+} @else {
+  <div class="user-info-trigger">
+    <button
+      nz-button
+      nzType="primary"
+      (click)="navigateToLogin()"
+      class="user-info-login-button"
+    >
+      <span nz-icon nzType="login"></span>
+      <span>Login</span>
+    </button>
+  </div>
 }

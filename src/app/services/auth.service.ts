@@ -122,8 +122,14 @@ export class AuthService implements OnDestroy {
   checkAuth(): Observable<{ user: User | null; token: string | null }> {
     // Token由SecureTokenService管理
     const token = this.getToken();
-    // 用户信息由UserCacheService管理（内存缓存）
+    // 用户信息由UserCacheService管理（内存缓存 + sessionStorage备份）
     const user = this.userCacheService.getUser();
+
+    console.log('[AuthService] checkAuth called:', {
+      hasToken: !!token,
+      hasUser: !!user,
+      username: user?.username
+    });
 
     return of({ user, token }).pipe(delay(100));
   }
@@ -132,8 +138,14 @@ export class AuthService implements OnDestroy {
   checkAuthSync(): { user: User | null; token: string | null } {
     // Token由SecureTokenService管理
     const token = this.getToken();
-    // 用户信息由UserCacheService管理（内存缓存）
+    // 用户信息由UserCacheService管理（内存缓存 + sessionStorage备份）
     const user = this.userCacheService.getUser();
+
+    console.log('[AuthService] checkAuthSync called:', {
+      hasToken: !!token,
+      hasUser: !!user,
+      username: user?.username
+    });
 
     return { user, token };
   }

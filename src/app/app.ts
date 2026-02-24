@@ -114,6 +114,11 @@ export class App implements OnInit, OnDestroy {
 
   constructor() {
     console.log('[App] constructor called');
+    console.log('[App] Initial auth state:', {
+      hasToken: !!this.initialAuthState.token,
+      hasUser: !!this.initialAuthState.user,
+      username: this.initialAuthState.user?.username
+    });
     // 在构造函数中同步加载缓存配置
     // 确保在组件渲染前配置已可用
     this.loadConfigFromCache();

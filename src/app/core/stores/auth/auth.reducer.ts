@@ -51,14 +51,23 @@ export const authReducer = createReducer(
     ...state,
     isLoading: true,
   })),
-  on(AuthActions.checkAuthSuccess, (state, { user, token }) => ({
-    ...state,
-    user,
-    token,
-    isAuthenticated: !!user && !!token,
-    isLoading: false,
-    error: null,
-  })),
+  on(AuthActions.checkAuthSuccess, (state, { user, token }) => {
+    const isAuthenticated = !!user && !!token;
+    console.log('[AuthReducer] checkAuthSuccess:', {
+      isAuthenticated,
+      hasUser: !!user,
+      hasToken: !!token,
+      username: user?.username
+    });
+    return {
+      ...state,
+      user,
+      token,
+      isAuthenticated,
+      isLoading: false,
+      error: null,
+    };
+  }),
   // Clear Error
   on(AuthActions.clearAuthError, (state) => ({
     ...state,
