@@ -146,59 +146,55 @@ export class AppTabBar {
   }
 
   private loadTabsFromStorage(): TabItem[] {
-    try {
-      const stored = localStorage.getItem(this.tabsStorageKey);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        console.log(`[Tabs] Loading tabs from storage:`, parsed.tabs?.length || 0, 'tabs');
-        // Ensure we always have at least the overview dashboard tab
-        const tabs = parsed.tabs || [];
-        
-        // Convert old 'dashboard' or 'workbench' tabs to new 'CONFIG.OVERVIEW_DASHBOARD' tab
-        const convertedTabs = tabs.map((tab: TabItem) => {
-          if (tab.key === 'dashboard' || tab.key === 'workbench') {
-            return {
-              key: 'CONFIG.OVERVIEW_DASHBOARD',
-              label: 'CONFIG.OVERVIEW_DASHBOARD',
-              path: '/workbench/dashboard/overview',
-              icon: 'dashboard',
-              closable: false,
-            };
-          }
-          return tab;
-        });
-        
-        const hasOverviewDashboard = convertedTabs.some((tab: TabItem) => tab.key === 'CONFIG.OVERVIEW_DASHBOARD');
+    const stored = this.storageService.getItem<{ tabs: TabItem[]; selectedIndex: number }>(this.tabsStorageKey, {
+      type: StorageType.LOCAL
+    });
 
-        if (!hasOverviewDashboard) {
-          const result = [
-            {
-              key: 'CONFIG.OVERVIEW_DASHBOARD',
-              label: 'CONFIG.OVERVIEW_DASHBOARD',
-              path: '/workbench/dashboard/overview',
-              icon: 'dashboard',
-              closable: false,
-            },
-            ...convertedTabs,
-          ];
-          console.log(`[Tabs] No overview dashboard found, adding default. Total tabs:`, result.length);
-          return result;
+    if (stored && stored.tabs) {
+      console.log(`[Tabs] Loading tabs from storage:`, stored.tabs.length, 'tabs');
+
+      // Convert old 'dashboard' or 'workbench' tabs to new 'CONFIG.OVERVIEW_DASHBOARD' tab
+      const convertedTabs = stored.tabs.map((tab: TabItem) => {
+        if (tab.key === 'dashboard' || tab.key === 'workbench') {
+          return {
+            key: 'CONFIG.OVERVIEW_DASHBOARD',
+            label: 'CONFIG.OVERVIEW_DASHBOARD',
+            path: '/workbench/dashboard/overview',
+            icon: 'dashboard',
+            closable: false,
+          };
         }
-        
-        // Remove duplicate overview dashboard tabs
-        const uniqueTabs = convertedTabs.filter((tab: TabItem, index: number, self: TabItem[]) =>
-          index === self.findIndex((t: TabItem) => t.key === tab.key)
-        );
-        
-        console.log(`[Tabs] After deduplication:`, uniqueTabs.length, 'unique tabs');
-        console.log(`[Tabs] Tab keys:`, uniqueTabs.map((t: TabItem) => t.key));
-        return uniqueTabs;
+        return tab;
+      });
+
+      const hasOverviewDashboard = convertedTabs.some((tab: TabItem) => tab.key === 'CONFIG.OVERVIEW_DASHBOARD');
+
+      if (!hasOverviewDashboard) {
+        const result = [
+          {
+            key: 'CONFIG.OVERVIEW_DASHBOARD',
+            label: 'CONFIG.OVERVIEW_DASHBOARD',
+            path: '/workbench/dashboard/overview',
+            icon: 'dashboard',
+            closable: false,
+          },
+          ...convertedTabs,
+        ];
+        console.log(`[Tabs] No overview dashboard found, adding default. Total tabs:`, result.length);
+        return result;
       }
-    } catch (error) {
-      console.error('[Tabs] Error loading tabs from storage:', error);
+
+      // Remove duplicate overview dashboard tabs
+      const uniqueTabs = convertedTabs.filter((tab: TabItem, index: number, self: TabItem[]) =>
+        index === self.findIndex((t: TabItem) => t.key === tab.key)
+      );
+
+      console.log(`[Tabs] After deduplication:`, uniqueTabs.length, 'unique tabs');
+      console.log(`[Tabs] Tab keys:`, uniqueTabs.map((t: TabItem) => t.key));
+      return uniqueTabs;
     }
 
-    // Default tab if no storage or error
+    // Default tab if no storage
     console.log(`[Tabs] Using default tab`);
     return [
       {
@@ -210,7 +206,6 @@ export class AppTabBar {
       },
     ];
   }
-
   private loadSelectedIndexFromStorage(): number {
     const stored = this.storageService.getItem<{ tabs: TabItem[]; selectedIndex: number }>(this.tabsStorageKey, {
       type: StorageType.LOCAL
