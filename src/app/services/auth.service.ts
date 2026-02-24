@@ -10,12 +10,12 @@ import { WebSocketCleanupService } from '../core/services/websocket-cleanup.serv
 import { ServiceWorkerCleanupService } from '../core/services/service-worker-cleanup.service';
 import { CsrfTokenService } from '../core/services/csrf-token.service';
 import { SecureTokenService } from '../core/services/secure-token.service';
+import { UserCacheService } from '../core/services/user-cache.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  private readonly userKey = 'user';
   private router = inject(Router);
   private userApiService = inject(UserApiService);
   private requestCancelService = inject(RequestCancelService);
@@ -24,6 +24,7 @@ export class AuthService implements OnDestroy {
   private serviceWorkerCleanupService = inject(ServiceWorkerCleanupService);
   private csrfTokenService = inject(CsrfTokenService);
   private secureTokenService = inject(SecureTokenService);
+  private userCacheService = inject(UserCacheService);
   private broadcastChannel: BroadcastChannel | null = null;
 
   constructor() {
@@ -54,8 +55,8 @@ export class AuthService implements OnDestroy {
         // 使用安全Token服务管理token（存储在sessionStorage中）
         this.secureTokenService.setToken(response.token, 24 * 60 * 60 * 1000);
 
-        // 不再存储用户信息到localStorage（安全修复）
-        // localStorage.setItem(this.userKey, JSON.stringify(response.user));
+        // 缓存用户信息到内存中（不存储到localStorage）
+        this.userCacheService.setUser(response.user);
 
         console.log('[AuthService] Login successful, user:', response.user.username);
       }),
@@ -95,11 +96,12 @@ export class AuthService implements OnDestroy {
   }
 
   private performLogout() {
-    // 清除安全token（内存中的token）
+    // 清除安全token
     this.secureTokenService.clearToken();
 
-    // 清除用户信息
-    localStorage.removeItem(this.userKey);
+    // 清除用户缓存
+    this.userCacheService.clear();
+
     // 清除配置缓存
     localStorage.removeItem('app_layout_config');
     localStorage.removeItem('app_layout_config_timestamp');
@@ -118,36 +120,20 @@ export class AuthService implements OnDestroy {
   }
 
   checkAuth(): Observable<{ user: User | null; token: string | null }> {
-    // Token现在由模拟Cookie管理
+    // Token由SecureTokenService管理
     const token = this.getToken();
-    const userStr = localStorage.getItem(this.userKey);
-
-    let user: User | null = null;
-    if (userStr) {
-      try {
-        user = JSON.parse(userStr);
-      } catch {
-        user = null;
-      }
-    }
+    // 用户信息由UserCacheService管理（内存缓存）
+    const user = this.userCacheService.getUser();
 
     return of({ user, token }).pipe(delay(100));
   }
 
   // Synchronous check for initial app loading
   checkAuthSync(): { user: User | null; token: string | null } {
-    // Token现在由模拟Cookie管理
+    // Token由SecureTokenService管理
     const token = this.getToken();
-    const userStr = localStorage.getItem(this.userKey);
-
-    let user: User | null = null;
-    if (userStr) {
-      try {
-        user = JSON.parse(userStr);
-      } catch {
-        user = null;
-      }
-    }
+    // 用户信息由UserCacheService管理（内存缓存）
+    const user = this.userCacheService.getUser();
 
     return { user, token };
   }
