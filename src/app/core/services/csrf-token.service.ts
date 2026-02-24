@@ -2,7 +2,9 @@ import { Injectable } from '@angular/core';
 
 /**
  * CSRF Token服务
- * 提供CSCSRF token生成和验证功能
+ *
+ * 使用sessionStorage存储CSRF token
+ * 避免localStorage暴露，同时保持跨标签页共享
  */
 @Injectable({
   providedIn: 'root'
@@ -21,13 +23,13 @@ export class CsrfTokenService {
   }
 
   /**
-   * 生成并存储CSRF token
+   * 生成并存储CSRF token到sessionStorage
    */
   generateAndStoreToken(): string {
     const token = this.generateToken();
     try {
-      localStorage.setItem(this.CSRF_TOKEN_KEY, token);
-      console.log('[CsrfTokenService] Generated CSRF token');
+      sessionStorage.setItem(this.CSRF_TOKEN_KEY, token);
+      console.log('[CsrfTokenService] Generated and stored CSRF token in sessionStorage');
       return token;
     } catch (error) {
       console.error('[CsrfTokenService] Error storing CSRF token:', error);
@@ -42,7 +44,7 @@ export class CsrfTokenService {
     token: string;
     header: string;
   } {
-    const token = localStorage.getItem(this.CSRF_TOKEN_KEY);
+    const token = sessionStorage.getItem(this.CSRF_TOKEN_KEY);
 
     if (!token) {
       console.log('[CsrfTokenService] No CSRF token found, generating new one');
@@ -63,7 +65,7 @@ export class CsrfTokenService {
    * 验证CSRF token
    */
   validateToken(token: string): boolean {
-    const storedToken = localStorage.getItem(this.CSRF_TOKEN_KEY);
+    const storedToken = sessionStorage.getItem(this.CSRF_TOKEN_KEY);
 
     if (!storedToken) {
       console.error('[CsrfTokenService] No stored CSRF token to validate');
@@ -86,8 +88,8 @@ export class CsrfTokenService {
    */
   clearToken(): void {
     try {
-      localStorage.removeItem(this.CSRF_TOKEN_KEY);
-      console.log('[CsrfTokenService] CSRF token cleared');
+      sessionStorage.removeItem(this.CSRF_TOKEN_KEY);
+      console.log('[CsrfTokenService] CSRF token cleared from sessionStorage');
     } catch (error) {
       console.error('[CsrfTokenService] Error clearing CSRF token:', error);
     }
@@ -105,7 +107,7 @@ export class CsrfTokenService {
    * 检查是否有有效的CSRF token
    */
   hasValidToken(): boolean {
-    const token = localStorage.getItem(this.CSRF_TOKEN_KEY);
+    const token = sessionStorage.getItem(this.CSRF_TOKEN_KEY);
     return !!token && token.length > 0;
   }
 }

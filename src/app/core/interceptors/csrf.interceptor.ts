@@ -84,7 +84,7 @@ export class CsrfInterceptor {
 
     if (csrfToken) {
       console.log('[CsrfInterceptor] CSRF token found in response headers');
-      localStorage.setItem('csrf_token', csrfToken);
+      sessionStorage.setItem('csrf_token', csrfToken);
       return;
     }
 
@@ -92,7 +92,7 @@ export class CsrfInterceptor {
     const body = event.body as any;
     if (body?.data?.csrfToken) {
       console.log('[CsrfInterceptor] CSRF token found in response body');
-      localStorage.setItem('csrf_token', body.data.csrfToken);
+      sessionStorage.setItem('csrf_token', body.data.csrfToken);
     }
   }
 
