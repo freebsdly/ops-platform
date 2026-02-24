@@ -258,10 +258,10 @@ export class SecureTokenService {
 
 **执行日期**：2026-02-24
 
-### 阶段4：存储架构优化 (高优先级) - **待执行**
+### 阶段4：存储架构优化 (高优先级) - **部分完成（2026-02-24）**
 **目标**：统一存储管理，提升可维护性和安全性
 
-#### 任务4.1：创建StorageService抽象层 - **待执行**
+#### 任务4.1：创建StorageService抽象层 ✅ **已完成（2026-02-24）**
 **新建文件**：`src/app/core/services/storage.service.ts`
 
 **核心功能**：
@@ -269,27 +269,33 @@ export class SecureTokenService {
    ```typescript
    setItem<T>(key: string, value: T, options?: StorageOptions): void
    getItem<T>(key: string, options?: StorageOptions): T | null
-   removeItem(key: string): void
-   clear(): void
+   removeItem(key: string, type?: StorageType): void
+   clear(type?: StorageType): void
+   hasItem(key: string, options?: StorageOptions): boolean
    ```
 
 2. 存储策略选择
    ```typescript
-   type StorageType = 'localStorage' | 'sessionStorage' | 'memory' | 'encrypted';
+   enum StorageType {
+     LOCAL = 'localStorage',
+     SESSION = 'sessionStorage',
+     MEMORY = 'memory'
+   }
    ```
 
 3. 容量监控和清理
-   ```- LRU缓存淘汰
+   - 自动清理过期数据
+   - 配额超限时LRU淘汰
    - 剩余空间检测
    - 自动清理策略
-   ```
 
 4. 数据版本管理
    ```typescript
    interface StorageData<T> {
-     version: number;
-     timestamp: number;
      value: T;
+     timestamp: number;
+     ttl?: number;
+     version?: number;
    }
    ```
 
