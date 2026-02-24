@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {
   HttpEvent,
   HttpInterceptor,
@@ -11,12 +11,15 @@ import {
 import { Observable, throwError, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
 import { ApiResponse } from '../types/api-response.interface';
+import { ErrorHandlerService, AppError } from '../services/error-handler.service';
 
 /**
  * 响应拦截器 - 自动解包统一响应格式 {code, message, data}
  */
 @Injectable()
 export class ApiResponseInterceptor implements HttpInterceptor {
+  private errorHandler = inject(ErrorHandlerService);
+
   intercept(
     request: HttpRequest<unknown>,
     next: HttpHandler
@@ -52,56 +55,12 @@ export class ApiResponseInterceptor implements HttpInterceptor {
         return event;
       }),
       catchError((error: HttpErrorResponse) => {
-        // 处理 HTTP 错误（网络错误、4xx、5xx等）
-        const errorMessage = this.getErrorMessage(error);
-        console.error('API 请求失败:', errorMessage, error);
+        // 使用统一的错误处理服务
+        const appError = this.errorHandler.handleHttpError(error);
 
-        // 尝试从错误响应中提取统一格式的错误信息
-        if (error.error && typeof error.error === 'object' && 'code' in error.error) {
-          const apiErrorResponse = error.error as ApiResponse<unknown>;
-          return throwError(() => ({
-            status: error.status,
-            statusText: error.statusText,
-            message: apiErrorResponse.message || errorMessage,
-            code: apiErrorResponse.code
-          }));
-        }
-
-        return throwError(() => error);
+        return throwError(() => appError);
       })
     );
-  }
-
-  /**
-   * 获取友好的错误消息
-   */
-  private getErrorMessage(error: HttpErrorResponse): string {
-    if (error.error?.message) {
-      return error.error.message;
-    }
-
-    switch (error.status) {
-      case 0:
-        return '网络连接失败，请检查网络';
-      case 400:
-        return '请求参数错误';
-      case 401:
-        return '未授权，请重新登录';
-      case 403:
-        return '权限不足';
-      case 404:
-        return '请求的资源不存在';
-      case 500:
-        return '服务器内部错误';
-      case 502:
-        return '网关错误';
-      case 503:
-        return '服务暂时不可用';
-      case 504:
-        return '请求超时';
-      default:
-        return `请求失败 (${error.status})`;
-    }
   }
 }
 
@@ -109,6 +68,8 @@ export class ApiResponseInterceptor implements HttpInterceptor {
  * 函数式拦截器版本（Angular 15+ 推荐）
  */
 export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
+  const errorHandler = inject(ErrorHandlerService);
+
   return next(req).pipe(
     map((event) => {
       // 只处理 HttpResponse
@@ -140,54 +101,10 @@ export const apiResponseInterceptor: HttpInterceptorFn = (req, next) => {
       return event;
     }),
     catchError((error: HttpErrorResponse) => {
-      // 处理 HTTP 错误（网络错误、4xx、5xx等）
-      const errorMessage = getErrorMessage(error);
-      console.error('API 请求失败:', errorMessage, error);
+      // 使用统一的错误处理服务
+      const appError = errorHandler.handleHttpError(error);
 
-      // 尝试从错误响应中提取统一格式的错误信息
-      if (error.error && typeof error.error === 'object' && 'code' in error.error) {
-        const apiErrorResponse = error.error as ApiResponse<unknown>;
-        throw {
-          status: error.status,
-          statusText: error.statusText,
-          message: apiErrorResponse.message || errorMessage,
-          code: apiErrorResponse.code
-        };
-      }
-
-      throw error;
+      return throwError(() => appError);
     })
   );
 };
-
-/**
- * 获取友好的错误消息
- */
-function getErrorMessage(error: HttpErrorResponse): string {
-  if (error.error?.message) {
-    return error.error.message;
-  }
-
-  switch (error.status) {
-    case 0:
-      return '网络连接失败，请检查网络';
-    case 400:
-      return '请求参数错误';
-    case 401:
-      return '未授权，请重新登录';
-    case 403:
-      return '权限不足';
-    case 404:
-      return '请求的资源不存在';
-    case 500:
-      return '服务器内部错误';
-    case 502:
-      return '网关错误';
-    case 503:
-      return '服务暂时不可用';
-    case 504:
-      return '请求超时';
-    default:
-      return `请求失败 (${error.status})`;
-  }
-}

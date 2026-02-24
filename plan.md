@@ -197,10 +197,33 @@ export class SecureTokenService {
 - ✅ CSRF Token自动生成和验证机制完整
 - ✅ CSRF验证失败时自动刷新token并重试请求
 
-#### 任务3.3：增强错误处理 ⏳ **待执行**
-- 结构化错误日志
-- 用户友好的错误消息
-- 错误边界处理
+#### 任务3.3：增强错误处理 ✅ **已完成（2026-02-24）**
+**目标**：提供结构化错误处理和用户友好的错误消息
+
+**实施方案（已完成）**：
+1. 创建ErrorHandlerService
+   - 结构化错误日志（AppError、ErrorLogEntry）
+   - 错误分类（网络、认证、授权、验证、服务器）
+   - 错误日志管理（最多100条）
+   - 自动错误上报（预留接口）
+
+2. 用户友好的错误消息
+   - 区分技术错误消息和用户消息
+   - 自动识别错误类型
+   - 认证错误自动跳转登录页
+   - 使用NzMessageService显示错误提示
+
+3. 集成到API响应拦截器
+   - 使用ErrorHandlerService处理HTTP错误
+   - 统一错误处理流程
+   - 移除重复的错误处理代码
+
+**状态更新（2026-02-24）**：
+- ✅ ErrorHandlerService已创建
+- ✅ ApiResponseInterceptor已集成ErrorHandlerService
+- ✅ 错误日志结构化
+- ✅ 用户友好的错误消息已实现
+- ✅ 认证错误自动处理已实现
 
 ### ✅ 阶段2：修复用户信息存储（已完成 - 2026-02-24）
 
@@ -436,6 +459,7 @@ export class SecureTokenService {
 - ✅ 阶段3：修复CSRF Token存储（CsrfTokenService使用sessionStorage）
 - ✅ 修复PermissionService中的localStorage用户信息访问
 - ✅ 修复刷新页面后UserInfo组件不显示的问题
+- ✅ 增强错误处理（ErrorHandlerService）
 
 ## 依赖项
 - Angular v20+ (已满足)
