@@ -7,6 +7,7 @@ import { User } from '../core/types/user.interface';
 import { UserApiService } from '../core/services/user-api.service';
 import { MenuPermissionMapperService } from '../core/services/menu-permission-mapper.service';
 import { MenuItem, MENUS_CONFIG } from '../config/menu.config';
+import { UserCacheService } from '../core/services/user-cache.service';
 
 export interface PermissionCheck {
   resource: string;
@@ -19,6 +20,7 @@ export interface PermissionCheck {
 export class PermissionService {
   private userApiService = inject(UserApiService);
   private menuPermissionMapper = inject(MenuPermissionMapperService);
+  private userCacheService = inject(UserCacheService);
   
   private currentPermissions: Permission[] = [];
   private currentMenuPermissions: MenuPermission[] = [];
@@ -219,18 +221,10 @@ export class PermissionService {
   }
 
   /**
-   * 从localStorage获取当前用户（临时方案，实际应从Store获取）
+   * 从UserCacheService获取当前用户
    */
   private getCurrentUserFromLocalStorage(): User | null {
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-      try {
-        return JSON.parse(userStr);
-      } catch {
-        return null;
-      }
-    }
-    return null;
+    return this.userCacheService.getUser();
   }
 
   /**

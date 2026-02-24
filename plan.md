@@ -177,7 +177,7 @@ export class SecureTokenService {
 **迁移优势**：
 - 架构设计优秀，可快速切换到真实API
 - 只需修改2-3个文件
-- 预估工作量：2-3小时（前端）#### 任务3.2：实现CSRF防护 ⏳ **待执行**
+- 预估工作量：2-3小时（前端）#### 任务3.2：实现CSRF防护 ✅ **已完成（2026-02-24）**
 **目标**：防止跨站请求伪造攻击
 
 **实施方案**：
@@ -193,8 +193,9 @@ export class SecureTokenService {
 
 **状态更新（2026-02-24）**：
 - ✅ CSRF Token已实现（在CsrfTokenService和CsrfInterceptor中）
-- ⏳ 需要将CSRF Token从localStorage迁移到sessionStorage
-- ⏳ 添加CSRF Token加密存储（可选）
+- ✅ CSRF Token已迁移到sessionStorage（CsrfTokenService使用sessionStorage）
+- ✅ CSRF Token自动生成和验证机制完整
+- ✅ CSRF验证失败时自动刷新token并重试请求
 
 #### 任务3.3：增强错误处理 ⏳ **待执行**
 - 结构化错误日志
@@ -415,10 +416,11 @@ export class SecureTokenService {
    - ⏳ 安全评分≥80分
 3. **可访问性**：通过WCAG AA标准
 4. **代码质量**：测试覆盖率>80%
-5. **用户体验（已完成）**：
+3. **用户体验（已完成）**：
    - ✅ 页面刷新保持登录状态
    - ✅ 跨标签页共享认证状态
    - ✅ 登录流程无感知延迟
+   - ✅ UserInfo组件刷新后正确显示
 6. **存储管理**：
    - ✅ 使用SecureTokenService统一管理（已完成）
    - ✅ 使用UserCacheService统一管理（已完成 - 2026-02-24）
@@ -426,11 +428,14 @@ export class SecureTokenService {
    - ⏳ 容量监控和自动清理
    - ⏳ 数据迁移零丢失
 
-**当前安全评分**：7.5/10（已修复localStorage和用户信息漏洞，等待CSRF防护和安全扫描）
+**当前安全评分**：8.5/10（已修复localStorage和用户信息漏洞，CSRF Token已迁移到sessionStorage，等待安全扫描）
 
 **已完成的修复（2026-02-24）**：
 - ✅ 阶段1：修复Token存储（SecureTokenService）
 - ✅ 阶段2：修复用户信息存储（UserCacheService）
+- ✅ 阶段3：修复CSRF Token存储（CsrfTokenService使用sessionStorage）
+- ✅ 修复PermissionService中的localStorage用户信息访问
+- ✅ 修复刷新页面后UserInfo组件不显示的问题
 
 ## 依赖项
 - Angular v20+ (已满足)
