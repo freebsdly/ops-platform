@@ -9,12 +9,12 @@ import { TimerCleanupService } from '../core/services/timer-cleanup.service';
 import { WebSocketCleanupService } from '../core/services/websocket-cleanup.service';
 import { ServiceWorkerCleanupService } from '../core/services/service-worker-cleanup.service';
 import { CsrfTokenService } from '../core/services/csrf-token.service';
+import { SecureTokenService } from '../core/services/secure-token.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService implements OnDestroy {
-  private readonly tokenKey = 'auth_token';
   private readonly userKey = 'user';
   private router = inject(Router);
   private userApiService = inject(UserApiService);
@@ -23,6 +23,7 @@ export class AuthService implements OnDestroy {
   private webSocketCleanupService = inject(WebSocketCleanupService);
   private serviceWorkerCleanupService = inject(ServiceWorkerCleanupService);
   private csrfTokenService = inject(CsrfTokenService);
+  private secureTokenService = inject(SecureTokenService);
   private broadcastChannel: BroadcastChannel | null = null;
 
   constructor() {
@@ -50,9 +51,12 @@ export class AuthService implements OnDestroy {
   login(username: string, password: string): Observable<AuthResponse> {
     return this.userApiService.login(username, password).pipe(
       tap(response => {
-        // Token现在由MSW通过模拟Cookie管理，不再存储到localStorage
-        // localStorage.setItem(this.tokenKey, response.token);
-        localStorage.setItem(this.userKey, JSON.stringify(response.user));
+        // 使用安全Token服务管理token（存储在sessionStorage中）
+        this.secureTokenService.setToken(response.token, 24 * 60 * 60 * 1000);
+
+        // 不再存储用户信息到localStorage（安全修复）
+        // localStorage.setItem(this.userKey, JSON.stringify(response.user));
+
         console.log('[AuthService] Login successful, user:', response.user.username);
       }),
       catchError(error => {
@@ -91,8 +95,10 @@ export class AuthService implements OnDestroy {
   }
 
   private performLogout() {
-    // Token现在由模拟Cookie管理，不再需要清除localStorage中的token
-    // localStorage.removeItem(this.tokenKey);
+    // 清除安全token（内存中的token）
+    this.secureTokenService.clearToken();
+
+    // 清除用户信息
     localStorage.removeItem(this.userKey);
     // 清除配置缓存
     localStorage.removeItem('app_layout_config');
@@ -147,37 +153,11 @@ export class AuthService implements OnDestroy {
   }
 
   getToken(): string | null {
-    // 从模拟Cookie读取token
-    // 在真实环境中，这将由浏览器自动处理，此方法仅用于检查
-    const cookieToken = localStorage.getItem('cookie_auth_token');
-
-    if (cookieToken) {
-      try {
-        const cookieData = JSON.parse(cookieToken);
-        // 检查是否过期
-        if (cookieData.maxAge) {
-          const elapsed = Date.now() - cookieData.createdAt;
-          if (elapsed > cookieData.maxAge * 1000) {
-            localStorage.removeItem('cookie_auth_token');
-            return null;
-          }
-        }
-        return cookieData.value;
-      } catch {
-        return null;
-      }
-    }
-
-    // 向后兼容：旧的localStorage存储
-    const oldToken = localStorage.getItem('auth_token');
-    if (oldToken) {
-      return oldToken;
-    }
-
-    return null;
+    // 使用安全Token服务获取token（模拟HttpOnly Cookie行为）
+    return this.secureTokenService.getToken();
   }
 
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    return this.secureTokenService.isAuthenticated();
   }
 }

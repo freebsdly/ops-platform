@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of, BehaviorSubject, catchError, tap, map, throwError } from 'rxjs';
 import { LayoutConfig, LogoConfig } from '../types/layout-config.interface';
 import { AppConfigResponse, ConfigValidationResponse } from '../types/api-response.interface';
+import { SecureTokenService } from './secure-token.service';
 
 /**
  * 配置服务 - 负责从后端加载和管理应用配置
@@ -12,6 +13,7 @@ import { AppConfigResponse, ConfigValidationResponse } from '../types/api-respon
 })
 export class ConfigService {
   private http = inject(HttpClient);
+  private secureTokenService = inject(SecureTokenService);
   
   /**
    * API基础URL - 使用相对路径，MSW会拦截
@@ -51,9 +53,10 @@ export class ConfigService {
    * 从后端加载布局配置
    * @param forceRefresh 是否强制刷新（忽略缓存）
    */
-  loadLayoutConfig(forceRefresh: boolean = false): Observable<LayoutConfig> {   
-    // 检查是否有认证token，如果没有token，直接报错
-    const token = localStorage.getItem('auth_token');
+  loadLayoutConfig(forceRefresh: boolean = false): Observable<LayoutConfig> {
+    // 检查是否有认证token（使用安全Token服务）
+    const token = this.secureTokenService.getToken();
+
     if (!token) {
       const error = new Error('未找到认证令牌，请重新登录');
       this.errorSubject.next(error.message);

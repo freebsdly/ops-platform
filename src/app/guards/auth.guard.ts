@@ -1,21 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
-import { AuthService } from '../services/auth.service';
+import { SecureTokenService } from '../core/services/secure-token.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  private secureTokenService = inject(SecureTokenService);
+  private router = inject(Router);
 
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
   ): boolean {
-    const isAuthenticated = this.authService.isAuthenticated();
+    const isAuthenticated = this.secureTokenService.isAuthenticated();
     console.log(`AuthGuard检查: isAuthenticated=${isAuthenticated}, path=${state.url}`);
     
     if (isAuthenticated) {
