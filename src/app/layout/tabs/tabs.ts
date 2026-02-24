@@ -23,6 +23,7 @@ import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { RouteConfigService } from '../../services/route-config.service';
 import { StoreService } from '../../core/stores/store.service';
+import { StorageService, StorageType } from '../../core/services/storage.service';
 
 export interface TabItem {
   key: string;
@@ -46,6 +47,7 @@ export class AppTabBar {
   private readonly contextMenuService = inject(NzContextMenuService);
   private readonly storeService = inject(StoreService);
   private readonly messageService = inject(NzMessageService);
+  private readonly storageService = inject(StorageService);
   private readonly tabsStorageKey = 'app_tabs';
 
   @ViewChild('tabContainer') tabContainer!: ElementRef<HTMLDivElement>;
@@ -210,28 +212,19 @@ export class AppTabBar {
   }
 
   private loadSelectedIndexFromStorage(): number {
-    try {
-      const stored = localStorage.getItem(this.tabsStorageKey);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        return parsed.selectedIndex || 0;
-      }
-    } catch (error) {
-      console.error('Error loading selected index from storage:', error);
-    }
-    return 0;
+    const stored = this.storageService.getItem<{ tabs: TabItem[]; selectedIndex: number }>(this.tabsStorageKey, {
+      type: StorageType.LOCAL
+    });
+    return stored?.selectedIndex || 0;
   }
 
   private saveTabsToStorage(tabs: TabItem[], selectedIndex: number): void {
-    try {
-      const data = {
-        tabs: tabs,
-        selectedIndex: selectedIndex,
-      };
-      localStorage.setItem(this.tabsStorageKey, JSON.stringify(data));
-    } catch (error) {
-      console.error('Error saving tabs to storage:', error);
-    }
+    this.storageService.setItem(this.tabsStorageKey, {
+      tabs,
+      selectedIndex
+    }, {
+      type: StorageType.LOCAL
+    });
   }
 
   handleRouteChange(): void {
