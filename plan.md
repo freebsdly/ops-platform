@@ -156,7 +156,7 @@ export class SecureTokenService {
 | 项目 | 修复前 | 修复后 |
 |------|--------|--------|
 | Token存储 | localStorage（XSS可访问）| sessionStorage（隔离）✅ |
-| 用户信息 | localStorage暴露 | 不再存储 ✅ |
+| 用户信息 | localStorage暴露 | 内存缓存（无法访问）✅ |
 | 认证检查 | 仅检查localStorage | 检查SecureTokenService ✅ |
 | 页面刷新 | 需要重新登录 | 保持登录状态 ✅ |
 | 跨标签页 | 不共享 | 共享认证状态 ✅ |
@@ -177,7 +177,7 @@ export class SecureTokenService {
 **迁移优势**：
 - 架构设计优秀，可快速切换到真实API
 - 只需修改2-3个文件
-- 预估工作量：2-3小时（前端）#### 任务3.2：实现CSRF防护
+- 预估工作量：2-3小时（前端）#### 任务3.2：实现CSRF防护 ⏳ **待执行**
 **目标**：防止跨站请求伪造攻击
 
 **实施方案**：
@@ -191,10 +191,48 @@ export class SecureTokenService {
    - 使用refresh_token获取新的access_token
    - 刷新失败时强制登出
 
-#### 任务3.3：增强错误处理
+**状态更新（2026-02-24）**：
+- ✅ CSRF Token已实现（在CsrfTokenService和CsrfInterceptor中）
+- ⏳ 需要将CSRF Token从localStorage迁移到sessionStorage
+- ⏳ 添加CSRF Token加密存储（可选）
+
+#### 任务3.3：增强错误处理 ⏳ **待执行**
 - 结构化错误日志
 - 用户友好的错误消息
 - 错误边界处理
+
+### ✅ 阶段2：修复用户信息存储（已完成 - 2026-02-24）
+
+#### 任务2.1：创建UserCacheService ✅
+**新建文件**：`src/app/core/services/user-cache.service.ts`
+
+**核心功能**：
+- 用户信息仅缓存在内存中（类的私有变量）
+- 不存储到localStorage或sessionStorage
+- 5分钟自动过期
+- 提供完整的缓存管理API
+
+**安全优势**：
+- ✅ XSS攻击无法通过localStorage获取用户信息
+- ✅ XSS攻击无法通过sessionStorage获取用户信息
+- ✅ 用户信息完全隔离在内存中
+
+#### 任务2.2：更新AuthService ✅
+**修改文件**：`src/app/services/auth.service.ts`
+
+**改动**：
+- **login()**: 使用UserCacheService缓存用户信息
+- **checkAuth()**: 从UserCacheService读取用户信息
+- **checkAuthSync()**: 从UserCacheService读取用户信息
+- **performLogout()**: 清除UserCacheService
+- **移除**：所有`localStorage.setItem/getItem('user')`调用
+
+**验证结果**：
+- ✅ 全项目搜索无localStorage存储用户信息的代码
+- ✅ 用户信息仅在内存中缓存
+- ✅ 登出时正确清除用户缓存
+
+**执行日期**：2026-02-24
 
 ### 阶段4：存储架构优化 (高优先级) - **待执行**
 **目标**：统一存储管理，提升可维护性和安全性
@@ -368,11 +406,12 @@ export class SecureTokenService {
 ## 成功标准
 1. **性能**：页面加载时间减少20%
 2. **安全性**：
-   - ✅ Token不再存储在localStorage（已完成）
-   - ✅ 用户信息不再暴露（已完成）
+   - ✅ Token不再存储在localStorage（已完成 - 2026-02-24）
+   - ✅ 用户信息不再暴露到localStorage（已完成 - 2026-02-24）
+   - ✅ 用户信息仅缓存在内存中（已完成 - 2026-02-24）
    - ⏳ 通过安全扫描，无XSS漏洞
+   - ⏳ CSRF Token使用sessionStorage（待执行）
    - ⏳ JWT token使用HttpOnly Cookie（生产环境）
-   - ⏳ 实现CSRF防护
    - ⏳ 安全评分≥80分
 3. **可访问性**：通过WCAG AA标准
 4. **代码质量**：测试覆盖率>80%
@@ -382,11 +421,16 @@ export class SecureTokenService {
    - ✅ 登录流程无感知延迟
 6. **存储管理**：
    - ✅ 使用SecureTokenService统一管理（已完成）
+   - ✅ 使用UserCacheService统一管理（已完成 - 2026-02-24）
    - ⏳ 统一的存储抽象层
    - ⏳ 容量监控和自动清理
    - ⏳ 数据迁移零丢失
 
-**当前安全评分**：7/10（已修复localStorage漏洞，等待CSRF防护和安全扫描）
+**当前安全评分**：7.5/10（已修复localStorage和用户信息漏洞，等待CSRF防护和安全扫描）
+
+**已完成的修复（2026-02-24）**：
+- ✅ 阶段1：修复Token存储（SecureTokenService）
+- ✅ 阶段2：修复用户信息存储（UserCacheService）
 
 ## 依赖项
 - Angular v20+ (已满足)
