@@ -35,11 +35,16 @@ interface MemoryStorageItem<T> {
   expireAt?: number;
 }
 
+import { Injectable } from '@angular/core';
+
 /**
  * StorageService - 统一存储抽象层
  *
  * 提供类型安全的存储API，支持多种存储策略
  */
+@Injectable({
+  providedIn: 'root'
+})
 export class StorageService {
   private memoryStorage = new Map<string, MemoryStorageItem<unknown>>();
   private readonly DEFAULT_TTL = 7 * 24 * 60 * 60 * 1000; // 7天默认TTL
@@ -440,8 +445,3 @@ export class StorageService {
     console.log(`[StorageService] Freed space by removing ${toDelete} items from localStorage`);
   }
 }
-
-/**
- * 单例实例
- */
-export const storageService = new StorageService();
