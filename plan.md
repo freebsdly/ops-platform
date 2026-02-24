@@ -307,15 +307,25 @@ export class SecureTokenService {
 - 仅对非敏感数据使用普通localStorage
 - 用户信息可加密存储（可选）
 
-#### 任务4.3：重构现有服务使用StorageService - **待执行**
+#### 任务4.3：重构现有服务使用StorageService ✅ **已完成（2026-02-24）**
 
-| 服务 | 文件 | 修改内容 |
-|------|------|----------|
-| ConfigService | `config.service.ts` | 替换直接localStorage调用 |
-| TabBar | `tabs.ts` | 使用StorageService管理标签页 |
-| LangSelector | `lang-selector.ts` | 使用StorageService管理语言 |
-| LayoutEffects | `layout.effects.ts` | 使用StorageService持久化状态 |
+**已重构**：
 
+|| 服务 | 文件 | 修改内容 | 状态 |
+||------|------|----------|------|
+|| ConfigService | `config.service.ts` | 替换直接localStorage调用为storageService | ✅ 已完成。|
+|| TabBar | `tabs.ts` | 使用StorageService管理标签页 | ✅ 已完成。|
+|| LangSelector | `lang-selector.ts` | 使用StorageService管理语言 | ✅ 已完成。|
+|| LayoutEffects | `layout.effects.ts` | 使用StorageService持久化状态 | ✅ 已完成。|
+
+**优势**：
+- ✅ 统一的存储管理
+- ✅ 类型安全的API
+- ✅ 自动TTL过期处理
+- ✅ 错误处理集中化
+- ✅ 减少代码重复
+
+**执行日期**：2026-02-24
 #### 任务4.4：性能优化（整合原阶段4内容）
 **目标**：减少不必要的DOM操作和检查
 
