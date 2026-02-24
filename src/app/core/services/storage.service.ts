@@ -161,7 +161,8 @@ export class StorageService {
         for (let i = 0; i < localStorage.length; i++) {
           const key = localStorage.key(i);
           if (key) {
-            size += (key.length + localStorage.getItem(key)?.length || 0) * 2; // UTF-16 chars are 2 bytes
+            const value = localStorage.getItem(key);
+            size += (key.length + (value?.length || 0)) * 2; // UTF-16 chars are 2 bytes
           }
         }
         break;
@@ -169,7 +170,8 @@ export class StorageService {
         for (let i = 0; i < sessionStorage.length; i++) {
           const key = sessionStorage.key(i);
           if (key) {
-            size += (key.length + sessionStorage.getItem(key)?.length || 0) * 2;
+            const value = sessionStorage.getItem(key);
+            size += (key.length + (value?.length || 0)) * 2;
           }
         }
         break;
