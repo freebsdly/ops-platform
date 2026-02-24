@@ -4,6 +4,7 @@ import { Observable, of, BehaviorSubject, catchError, tap, map, throwError } fro
 import { LayoutConfig, LogoConfig } from '../types/layout-config.interface';
 import { AppConfigResponse, ConfigValidationResponse } from '../types/api-response.interface';
 import { SecureTokenService } from './secure-token.service';
+import { StorageService, StorageType } from './storage.service';
 
 /**
  * 配置服务 - 负责从后端加载和管理应用配置
@@ -14,6 +15,7 @@ import { SecureTokenService } from './secure-token.service';
 export class ConfigService {
   private http = inject(HttpClient);
   private secureTokenService = inject(SecureTokenService);
+  private storageService = inject(StorageService);
   
   /**
    * API基础URL - 使用相对路径，MSW会拦截
@@ -46,7 +48,6 @@ export class ConfigService {
    * 配置缓存键
    */
   private readonly CONFIG_CACHE_KEY = 'app_layout_config';
-  private readonly CONFIG_CACHE_TIMESTAMP_KEY = 'app_layout_config_timestamp';
   private readonly CACHE_DURATION = 5 * 60 * 1000; // 5分钟缓存
   
   /**
@@ -228,53 +229,27 @@ export class ConfigService {
    * 缓存配置到本地存储
    */
   private cacheConfig(config: LayoutConfig): void {
-    try {
-      localStorage.setItem(this.CONFIG_CACHE_KEY, JSON.stringify(config));
-      localStorage.setItem(this.CONFIG_CACHE_TIMESTAMP_KEY, Date.now().toString());
-    } catch (error) {
-      console.warn('Failed to cache config:', error);
-    }
+    this.storageService.setItem(this.CONFIG_CACHE_KEY, config, {
+      type: StorageType.LOCAL,
+      ttl: this.CACHE_DURATION
+    });
   }
-  
+
   /**
    * 从本地存储获取缓存的配置
    */
   private getCachedConfig(): LayoutConfig | null {
-    try {
-      const cached = localStorage.getItem(this.CONFIG_CACHE_KEY);
-      const timestamp = localStorage.getItem(this.CONFIG_CACHE_TIMESTAMP_KEY);
-      
-      if (!cached || !timestamp) {
-        return null;
-      }
-      
-      const cacheTime = parseInt(timestamp, 10);
-      const now = Date.now();
-      
-      // 检查缓存是否过期
-      if (now - cacheTime > this.CACHE_DURATION) {
-        this.clearCache();
-        return null;
-      }
-      
-      return JSON.parse(cached) as LayoutConfig;
-    } catch (error) {
-      console.warn('Failed to read cached config:', error);
-      this.clearCache();
-      return null;
-    }
+    return this.storageService.getItem<LayoutConfig>(this.CONFIG_CACHE_KEY, {
+      type: StorageType.LOCAL,
+      ttl: this.CACHE_DURATION
+    });
   }
-  
+
   /**
    * 清除缓存
    */
   private clearCache(): void {
-    try {
-      localStorage.removeItem(this.CONFIG_CACHE_KEY);
-      localStorage.removeItem(this.CONFIG_CACHE_TIMESTAMP_KEY);
-    } catch (error) {
-      console.warn('Failed to clear cache:', error);
-    }
+    this.storageService.removeItem(this.CONFIG_CACHE_KEY, StorageType.LOCAL);
   }
 
   /**
