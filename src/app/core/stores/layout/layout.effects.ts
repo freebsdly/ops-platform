@@ -4,11 +4,13 @@ import { Router, NavigationEnd } from '@angular/router';
 import { tap, filter, map } from 'rxjs/operators';
 import * as LayoutActions from './layout.actions';
 import { MODULES_CONFIG } from '../../../config/menu.config';
+import { StorageService, StorageType } from '../../services/storage.service';
 
 @Injectable()
 export class LayoutEffects {
   private actions$ = inject(Actions);
   private router = inject(Router);
+  private storageService = inject(StorageService);
 
   persistLayoutState$ = createEffect(
     () =>
@@ -21,11 +23,15 @@ export class LayoutEffects {
           LayoutActions.setTheme
         ),
         tap((action) => {
-          // Persist layout state to localStorage for persistence
+          // Persist layout state to storage for persistence
           if (action.type === LayoutActions.setTheme.type) {
-            localStorage.setItem('theme', (action as any).theme);
+            this.storageService.setItem('theme', (action as any).theme, {
+              type: StorageType.LOCAL
+            });
           } else if (action.type === LayoutActions.setSiderCollapsed.type) {
-            localStorage.setItem('siderCollapsed', (action as any).collapsed.toString());
+            this.storageService.setItem('siderCollapsed', (action as any).collapsed.toString(), {
+              type: StorageType.LOCAL
+            });
           }
         })
       ),
