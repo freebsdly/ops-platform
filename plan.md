@@ -299,6 +299,18 @@ export class SecureTokenService {
    }
    ```
 
+#### 任务4.2：创建SecureStorageService ~~ **不适用（2026-02-24）~~
+
+**原因**：
+- 敏感数据（Token、用户信息、CSRF Token）已全部使用 sessionStorage
+- 非敏感数据（配置、标签页、语言偏好、主题等）使用 localStorage 是合理的
+- 加密存储非敏感数据会增加不必要的复杂度和性能开销
+- 当前架构已经达到了良好的安全隔离
+
+**替代方案**：
+- 敏感数据：使用 StorageService + StorageType.SESSION
+- 非敏感数据：使用 StorageService + StorageType.LOCAL
+- 加密需求：如需要，可在特定场景手动处理
 #### 任务4.2：创建SecureStorageService - **待执行**
 **新建文件**：`src/app/core/services/secure-storage.service.ts`
 
