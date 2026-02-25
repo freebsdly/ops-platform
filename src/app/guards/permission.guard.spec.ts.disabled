@@ -104,7 +104,7 @@ describe('permissionGuard', () => {
       action: 'read',
     });
 
-    const result = guard(mockRouteRoute, mockState);
+    const result = guard(mockRoute, mockState);
 
     expect(permissionFacadeMock.hasPermission).toHaveBeenCalledWith('user', 'read');
   });
