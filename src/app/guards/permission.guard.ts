@@ -5,7 +5,7 @@ import { map, catchError, switchMap, take, filter } from 'rxjs/operators';
 import { Store } from '@ngrx/store';
 import { AppState } from '../core/types/app-state';
 import * as AuthSelectors from '../core/stores/auth/auth.selectors';
-import { PermissionService } from '../services/permission.service';
+import { PermissionFacade } from '../core/stores/permission/permission.facade';
 import { UserApiService } from '../core/services/user-api.service';
 import { MenuPermissionMapperService } from '../core/services/menu-permission-mapper.service';
 import { MENUS_CONFIG } from '../config/menu.config';
@@ -22,7 +22,7 @@ export const permissionGuard = (
   return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const store = inject(Store<AppState>);
     const router = inject(Router);
-    const permissionService = inject(PermissionService);
+    const permissionFacade = inject(PermissionFacade);
     const userApiService = inject(UserApiService);
     const menuPermissionMapper = inject(MenuPermissionMapperService);
 
@@ -49,7 +49,7 @@ export const permissionGuard = (
             state,
             store,
             router,
-            permissionService,
+            permissionFacade,
             userApiService
           );
         }
@@ -112,11 +112,11 @@ function checkSpecificPermission(
   state: RouterStateSnapshot,
   store: Store<AppState>,
   router: Router,
-  permissionService: PermissionService,
+  permissionFacade: PermissionFacade,
   userApiService: UserApiService
 ): Observable<boolean> {
-  // 先检查本地权限
-  const hasLocalPermission = permissionService.hasPermission(
+  // 先检查本地权限（通过 PermissionFacade）
+  const hasLocalPermission = permissionFacade.hasPermission(
     permission.resource,
     permission.action
   );

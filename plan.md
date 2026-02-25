@@ -964,11 +964,12 @@ export class PermissionService {
 ## 实施时间线
 
 ### 第1周：NgRx + Signals 混合架构
-- ⏳ 任务1.1：创建 Permission Facade
-- ⏳ 任务1.2：更新守卫使用 Facade
-- ⏳ 任务1.3：重构组件使用 Signals
+- ✅ 任务1.1：创建 Permission Facade
+- ✅ 任务1.2：更新守卫使用 Facade
+- ✅ 任务1.3：重构组件使用 Signals
 - ⏳ 编写单元测试
 - ⏳ 集成测试验证
+
 
 ### 第2周：智能权限缓存
 - ⏳ 任务2.1：创建 PermissionCacheService
@@ -1081,3 +1082,27 @@ export class PermissionService {
 **最后更新: 2026-02-25**
 **负责人: 前端团队**
 **参考文档: permission.md, spec.md**
+
+---
+
+## 执行状态记录
+
+### 已完成任务
+
+#### 2026-02-25
+- ✅ **任务1.1：创建 Permission Facade** - 完成并集成到权限架构中
+  - 创建 `src/app/core/stores/permission/permission.facade.ts`
+  - 使用 `toSignal()` 将 NgRx Selectors 转换为 Signals
+  - 提供派生计算的权限检查 Signals
+  - 统一权限检查 API
+  - 实现类型安全的权限检查方法
+- ✅ **任务1.2：更新守卫使用 Facade** - 重构守卫以使用 PermissionFacade
+  - 更新 `src/app/guards/permission.guard.ts`
+  - 更新 `src/app/guards/role.guard.ts`
+  - 使用 PermissionFacade 进行权限和角色检查
+  - 移除对 PermissionService 的直接依赖
+- ✅ **任务1.3：重构组件使用 Signals** - 更新管道和指令使用 PermissionFacade
+  - 更新 `src/app/core/pipes/has-permission.pipe.ts`
+  - 更新 `src/app/core/pipes/has-role.pipe.ts`
+  - 更新 `src/app/core/directives/permission.directive.ts`
+  - 所有权限检查现在通过 PermissionFacade 统一管理

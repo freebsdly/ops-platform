@@ -36,7 +36,7 @@ describe('Notification', () => {
 
   it('should dismiss notification', () => {
     const event = new MouseEvent('click');
-    Object.defineProperty(event, 'stopPropagation', { value: jest.fn() });
+    Object.defineProperty(event, 'stopPropagation', { value: vi.fn() });
 
     const initialCount = component.notifications().length;
     component.dismissNotification(event, '1');

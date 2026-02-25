@@ -93,8 +93,8 @@ describe('Logo', () => {
           loaded: true,
           error: null,
           lastUpdated: Date.now()
-        });
-      
+        }
+      });
       fixture.detectChanges();
     });
 

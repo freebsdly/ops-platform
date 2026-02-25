@@ -1,14 +1,14 @@
 import { Pipe, PipeTransform, inject } from '@angular/core';
-import { PermissionService } from '../../services/permission.service';
+import { PermissionFacade } from '../stores/permission/permission.facade';
 
 @Pipe({
   name: 'hasPermission',
   standalone: true,
 })
 export class HasPermissionPipe implements PipeTransform {
-  private permissionService = inject(PermissionService);
+  private permissionFacade = inject(PermissionFacade);
 
   transform(resource: string, action: string): boolean {
-    return this.permissionService.hasPermission(resource, action);
+    return this.permissionFacade.hasPermission(resource, action);
   }
 }
