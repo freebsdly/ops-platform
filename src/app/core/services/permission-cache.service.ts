@@ -177,11 +177,12 @@ export class PermissionCacheService {
       map(response => {
         const results = new Map<string, boolean>();
         response.results.forEach(result => {
-          const check = checks.find(c => c.key === result.routePath);
+          // 查找匹配的检查项（通过 resource:action 格式匹配）
+          const check = checks.find(c => `${c.resource}:${c.action}` === result.routePath);
           if (check) {
-            results.set(check.key, result.hasPermission);
+            results.set(`${check.resource}:${check.action}`, result.hasPermission);
             // 更新缓存
-            this.permissionsCache.set(check.key, {
+            this.permissionsCache.set(`${check.resource}:${check.action}`, {
               value: result.hasPermission,
               timestamp: Date.now()
             });
