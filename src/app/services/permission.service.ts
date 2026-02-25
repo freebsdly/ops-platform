@@ -8,6 +8,7 @@ import { UserApiService } from '../core/services/user-api.service';
 import { MenuPermissionMapperService } from '../core/services/menu-permission-mapper.service';
 import { MenuItem, MENUS_CONFIG } from '../config/menu.config';
 import { UserCacheService } from '../core/services/user-cache.service';
+import { PermissionCacheService } from '../core/services/permission-cache.service';
 
 export interface PermissionCheck {
   resource: string;
@@ -21,7 +22,8 @@ export class PermissionService {
   private userApiService = inject(UserApiService);
   private menuPermissionMapper = inject(MenuPermissionMapperService);
   private userCacheService = inject(UserCacheService);
-  
+  private permissionCacheService = inject(PermissionCacheService);
+
   private currentPermissions: Permission[] = [];
   private currentMenuPermissions: MenuPermission[] = [];
   private allMenuItems: MenuItem[] = this.getAllMenuItems();
@@ -71,16 +73,11 @@ export class PermissionService {
 
   /**
    * 检查用户是否有特定路由的权限
+   * 通过 PermissionCacheService 实现短期内存缓存
    */
   checkRoutePermission(routePath: string, userId?: number): Observable<boolean> {
-    return this.userApiService.checkRoutePermission(routePath, userId).pipe(
-      map(response => response.hasPermission),
-      catchError(error => {
-        console.error('检查路由权限失败:', error);
-        // API失败时，回退到本地权限检查
-        return this.checkRoutePermissionLocally(routePath);
-      })
-    );
+    const [resource, action] = this.extractResourceAndAction(routePath);
+    return this.permissionCacheService.checkPermissionWithCache(resource, action);
   }
 
   /**
@@ -243,17 +240,23 @@ export class PermissionService {
 
   /**
    * 批量检查路由权限
+   * 通过 PermissionCacheService 实现批量缓存优化
    */
   checkBatchRoutePermissions(routes: string[], userId?: number): Observable<{
     routePath: string;
     hasPermission: boolean;
   }[]> {
-    return this.userApiService.checkBatchRoutePermissions(routes, userId).pipe(
-      map(response => response.results),
-      catchError(error => {
-        console.error('批量检查路由权限失败:', error);
-        // 失败时返回所有路由无权限
-        return of(routes.map(routePath => ({ routePath, hasPermission: false })));
+    const checks = routes.map(route => {
+      const parts = this.extractResourceAndAction(route);
+      return { resource: parts[0], action: parts[1] };
+    });
+
+    return this.permissionCacheService.checkPermissionsBatch(checks).pipe(
+      map((results: Map<string, boolean>) => {
+        return routes.map(route => ({
+          routePath: route,
+          hasPermission: results.get(route) || false
+        }));
       })
     );
   }
@@ -263,5 +266,15 @@ export class PermissionService {
    */
   preloadPermissions(): Observable<void> {
     return this.syncPermissionsWithApi();
+  }
+
+  /**
+   * 私有方法：从路径提取资源和操作
+   */
+  private extractResourceAndAction(routePath: string): [string, string] {
+    const parts = routePath.split('/').filter(Boolean);
+    const resource = parts[0] || 'unknown';
+    const action = parts[1] || 'read';
+    return [resource, action];
   }
 }

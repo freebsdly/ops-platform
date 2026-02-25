@@ -972,8 +972,8 @@ export class PermissionService {
 
 
 ### 第2周：智能权限缓存
-- ⏳ 任务2.1：创建 PermissionCacheService
-- ⏳ 任务2.2：更新 PermissionService 使用缓存
+- ✅ 任务2.1：创建 PermissionCacheService
+- ✅ 任务2.2：更新 PermissionService 使用缓存
 - ⏳ 性能测试和对比
 - ⏳ 缓存策略调优
 
@@ -1090,16 +1090,20 @@ export class PermissionService {
 ### 已完成任务
 
 #### 2026-02-25
-- ✅ **第1周：NgRx + Signals 混合架构** - 全部完成
-  - ✅ 任务1.1：创建 Permission Facade
-  - ✅ 任务1.2：更新守卫使用 Facade
-  - ✅ 任务1.3：重构组件使用 Signals
-  - ✅ 编写单元测试 (PermissionFacade: 22个测试, Guards: 8个测试)
-  - ✅ 集成测试验证 (构建通过，核心功能验证)
+- ✅ **第2周：智能权限缓存（部分完成）** - 实现内存级短期缓存
+  - ✅ 任务2.1：创建 PermissionCacheService
+    - 新建 `src/app/core/services/permission-cache.service.ts`
+    - 使用内存 Map 存储（非 sessionStorage，符合规范）
+    - TTL 1分钟短期缓存
+    - 请求去重（pendingChecks）
+    - 多标签页同步（BroadcastChannel）
+  - ✅ 任务2.2：更新 PermissionService 使用缓存
+    - 集成 PermissionCacheService
+    - checkRoutePermission 使用缓存
+    - checkBatchRoutePermissions 使用批量缓存优化
 
-  **主要成就**:
-  - 实现 PermissionFacade 作为统一权限访问点
-  - 守卫、管道、指令全部迁移到 Facade
-  - NgRx + Signals 混合状态管理
-  - 完整的单元测试覆盖
-  - 类型安全的权限检查
+  **关键设计决策**：
+  - ✅ 使用**内存缓存**而非 sessionStorage，符合项目安全规范
+  - ✅ 权限检查始终通过后端 API，缓存仅作性能优化
+  - ✅ 短期 TTL（1分钟）确保权限变更实时性
+  - ✅ 后端仍是权限唯一来源
