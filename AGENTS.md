@@ -170,6 +170,32 @@ This project follows Angular official AI development guidelines:
 
 The following high-priority skills are recommended for accelerating development:
 
+### docs-writer
+- **Purpose**: Write, review, or edit documentation files in `/docs` directory and `.md` files
+- **Use Cases**:
+  - Extending project specifications (spec.md, permission.md, i18n.md)
+  - Creating API documentation
+  - Documenting new features and architectural decisions
+  - Writing technical specifications
+- **When to Use**: When creating new documentation, updating technical specs, or collaborating on documentation
+
+### code-reviewer
+- **Purpose**: Review code for correctness, maintainability, and adherence to project standards
+- **Use Cases**:
+  - Reviewing local changes (staged or working tree)
+  - Reviewing remote Pull Requests by ID or URL
+  - Ensuring code follows Angular best practices
+  - Identifying potential bugs and improvements
+- **When to Use**: Before committing changes, during PR reviews, or when refactoring code
+
+### pr-creator
+- **Purpose**: Create pull requests following repository templates and standards
+- **Use Cases**:
+  - Creating standard PRs with proper formatting
+  - Following conventional commits format
+  - Including test plans and changelog entries
+- **When to Use**: When creating PRs for new features, bug fixes, or any code changes
+
 ### webapp-testing
 - **Purpose**: Test Angular application functionality using Playwright
 - **Use Cases**:
@@ -205,6 +231,22 @@ The following high-priority skills are recommended for accelerating development:
   - Creating dashboard visualizations
   - Designing user onboarding flows
 - **When to Use**: When building new pages, improving UI, or creating complex interfaces
+
+## Development Workflow
+
+### Typical Feature Development Process
+1. **docs-writer** → Document feature requirements and specifications
+2. **frontend-design** → Design UI components (if creating new interfaces)
+3. **Implement** → Write code following Angular best practices
+4. **webapp-testing** → Write and run E2E tests
+5. **code-reviewer** → Review changes locally
+6. **pr-creator** → Create standardized PR with proper documentation
+
+### Regular Maintenance
+- **Weekly**: Use `internal-comms` to generate project status reports
+- **Per Feature**: Use `docs-writer` to update relevant documentation
+- **Before Commit**: Use `code-reviewer` to review local changes
+- **After Changes**: Use `webapp-testing` to verify functionality
 
 ---
 
