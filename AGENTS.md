@@ -166,8 +166,48 @@ This project follows Angular official AI development guidelines:
 - [i18n.md](./i18n.md) - Internationalization guidelines
 - [plan.md](./plan.md) - Implementation roadmap
 
+## Recommended AI Skills
+
+The following high-priority skills are recommended for accelerating development:
+
+### webapp-testing
+- **Purpose**: Test Angular application functionality using Playwright
+- **Use Cases**:
+  - End-to-end testing of critical user flows
+  - UI behavior verification
+  - Browser interaction testing
+  - Screenshot comparison for visual regression
+- **When to Use**: When adding new features, modifying UI components, or ensuring critical paths work correctly
+
+### doc-coauthoring
+- **Purpose**: Collaborative documentation workflow for structured content
+- **Use Cases**:
+  - Writing technical specifications (extending spec.md)
+  - Creating API documentation
+  - Documenting new features and modules
+  - Writing architectural decision records
+- **When to Use**: When creating new documentation, updating technical specs, or collaborating on documentation
+
+### internal-comms
+- **Purpose**: Write internal communications in company-preferred formats
+- **Use Cases**:
+  - Status reports for DevOps platform
+  - Project updates and release notes
+  - Incident reports and post-mortems
+  - Team newsletters and announcements
+- **When to Use**: When communicating with team, reporting project status, or documenting incidents
+
+### frontend-design
+- **Purpose**: Create production-grade frontend interfaces with high design quality
+- **Use Cases**:
+  - Designing new page components for the platform
+  - Optimizing existing UI/UX
+  - Creating dashboard visualizations
+  - Designing user onboarding flows
+- **When to Use**: When building new pages, improving UI, or creating complex interfaces
+
 ---
 
-**Last updated**: 2026-02-24
+**Last updated**: 2026-02-25
 **Follows**: Angular Official AI Development Guide
 **Compatible with**: OpenAI Codex, Cursor, Jules, Aider, and other AGENTS.md-compatible agents
