@@ -1,7 +1,7 @@
 # DevOps Platform 优化执行计划
 
 ## 概述
-基于 Angular v20+ 最佳实践和权限模型最佳实践，全面优化项目的权限架构、状态管理和性能。采用 NgRx + Signals 混合架构，在保留 NgRx 强大功能的同时，利用 Signals 提升开发体验和性能。
+基于 Angular v21+ 最佳实践和权限模型最佳实践，全面优化项目的权限架构、状态管理和性能。采用 NgRx + Signals 混合架构，在保留 NgRx 强大功能的同时，利用 Signals 提升开发体验和性能。
 
 ---
 
@@ -24,11 +24,12 @@
 |------|---------|----------|---------|
 | 状态管理 | 纯 NgRx Observable | **NgRx + Signals 混合** | 🔴 高 |
 | 守卫实现 | 类守卫 | **Functional Guards** | 🟡 中 |
-| 权限缓存 | 简单内存缓存 | **带 TTL 的智能缓存 + 请求去重** | 🔴 高 |
+| 权限来源 | **后端 API 唯一来源** | **保持后端为唯一来源，移除本地缓存** | 🔴 高 |
+| 权限缓存 | 简单内存缓存 | **仅短期会话缓存，权限变更实时从后端获取** | 🔴 高 |
 | 类型安全 | 部分类型安全 | **完全类型安全的权限常量** | 🟡 中 |
 | 权限审计 | 未实现 | **添加权限审计日志** | 🟡 中 |
 | 渐进式检查 | 未实现 | **本地快速检查 + API 響证** | 🟡 中 |
-| 条件权限 | 未实现 | **支持动态条件权限** | 🟢 低 |
+| 条件权限 | 未实现 | **支持动态条件权限（后端实现）** | 🟢 低 |
 | 批量权限检查 | 已实现 | **优化批量检查性能** | 🟡 中 |
 
 ---
@@ -213,34 +214,34 @@ export class UserInfoComponent {
 
 ---
 
-### 阶段2：智能权限缓存系统 (高优先级)
+### 阶段2：权限缓存优化 (高优先级)
 
 #### 目标
-实现带 TTL 的智能缓存和请求去重，减少 API 调用，提升性能。
+实现短期会话缓存，减少 API 调用，同时确保权限变更实时从后端获取。后端是权限为唯一来源。
 
 #### 任务2.1：创建 PermissionCacheService
 
 **新建文件**：`src/app/core/services/permission-cache.service.ts`
 
 **核心功能**：
-- 权限检查结果缓存（TTL 5分钟）
+- 权限检查结果短期缓存（TTL 1分钟，快速响应）
 - 请求去重（避免同一权限重复检查）
 - 批量权限检查优化
+- **重要：缓存仅为性能优化，权限最终由后端决定**
 
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class PermissionCacheService {
-  private permissionService = inject(PermissionService);
   private userApiService = inject(UserApiService);
 
-  // 权限检查缓存
+  // 权限检查缓存（仅短期缓存，TTL 1分钟）
   private permissionsCache = new Map<string, { value: boolean; timestamp: number }>();
-  private readonly CACHE_TTL = 5 * 60 * 1000; // 5分钟
+  private readonly CACHE_TTL = 1 * 60 * 1000; // 1分钟 - 短期缓存
 
   // 进行中的请求（去重）
   private pendingChecks = new Map<string, Observable<boolean>>();
 
-  // 单个权限检查（带缓存）
+  // 单个权限检查（带短期缓存）
   checkPermissionWithCache(
     resource: string,
     action: string
@@ -315,18 +316,20 @@ export class PermissionCacheService {
     return cached.value;
   }
 
-  // 私有方法：执行权限检查
+  // 私有方法：执行权限检查（始终调用后端）
   private performPermissionCheck(
     resource: string,
     action: string,
     cacheKey: string
   ): Observable<boolean> {
-    return this.permissionService.checkRoutePermission(
+    // 始终从后端获取权限，后端是唯一来源
+    return this.userApiService.checkRoutePermission(
       `${resource}/${action}`,
       undefined
     ).pipe(
+      map(response => response.hasPermission),
       tap(hasPermission => {
-        // 更新缓存
+        // 更新短期缓存
         this.permissionsCache.set(cacheKey, {
           value: hasPermission,
           timestamp: Date.now()
@@ -367,7 +370,7 @@ export class PermissionCacheService {
 }
 ```
 
-#### 任务2.2：更新 PermissionService 使用缓存
+#### 任务2.2：更新 PermissionService 简化为后端调用
 
 **修改文件**：`src/app/services/permission.service.ts`
 
@@ -375,26 +378,35 @@ export class PermissionCacheService {
 
 ```typescript
 export class PermissionService {
-  // 注入缓存服务
+  private userApiService = inject(UserApiService);
   private permissionCache = inject(PermissionCacheService);
 
-  // 使用缓存的权限检查
+  // ✅ 权限检查始终从后端获取，后端是唯一来源
   checkRoutePermission(routePath: string, userId?: number): Observable<boolean> {
-    // 先尝试本地检查
+    // 通过缓存服务（短期缓存优化，但始终调用后端）
     const [resource, action] = this.extractResourceAndAction(routePath);
-    const localResult = this.hasPermission(resource, action);
-
-    if (localResult) {
-      return of(true);
-    }
-
-    // 使用缓存服务进行 API 检查
     return this.permissionCache.checkPermissionWithCache(resource, action);
   }
 
-  // 批量检查使用缓存
+  // ✅ 批量权限检查，从后端获取
   checkBatchRoutePermissions(routes: string[], userId?: number): Observable<{
     routePath: string;
+    hasPermission: boolean;
+  }[]> {
+    const checks = routes.map(route => {
+      const [resource, action] = this.extractResourceAndAction(route);
+      return { resource, action };
+    });
+
+    return this.permissionCache.checkPermissionsBatch(checks).pipe(
+      map(results => {
+        return routes.map(route => ({
+          routePath: route,
+          hasPermission: results.get(route) || false
+        }));
+      })
+    );
+  }
     hasPermission: boolean;
   }[]> {
     const checks = routes.map(route => {
@@ -419,6 +431,9 @@ export class PermissionService {
     const action = parts[1] || 'read';
     return [resource, action];
   }
+
+  // ❌ 移除 hasPermission 等本地权限检查方法
+  // 权限检查必须通过后端 API，后端是权限的唯一来源
 }
 ```
 
@@ -659,10 +674,10 @@ export class PermissionAuditService {
 
 ---
 
-### 阶段5：渐近式权限检查 (中优先级)
+### 阶段5：权限检查优化 (中优先级)
 
 #### 目标
-实现先本地快速检查、再异步 API 验证的渐进式检查，提升用户体验。
+优化权限检查流程，通过短期缓存和批量检查减少 API 调用，但始终以后端为权限唯一来源。
 
 #### 任务5.1：更新 PermissionGuard
 
@@ -680,29 +695,7 @@ export const permissionGuard = (
     const router = inject(Router);
     const auditService = inject(PermissionAuditService);
 
-    // ✅ 快速本地检查
-    if (requiredRoles) {
-      const hasRole = requiredRoles.some(role =>
-        permissionFacade.hasRole(role)
-      );
-      if (hasRole) {
-        auditService.logRouteAccess(state.url, true);
-        return of(true);
-      }
-    }
-
-    if (requiredPermissions) {
-      const hasPermission = permissionFacade.hasPermission(
-        requiredPermissions.resource,
-        requiredPermissions.action
-      );
-      if (hasPermission) {
-        auditService.logRouteAccess(state.url, true);
-        return of(true);
-      }
-    }
-
-    // ✅ 本地检查失败，异步 API 验证
+    // ✅ 始终调用后端进行权限检查，后端是唯一来源
     return permissionFacade.checkRoutePermission(state.url).pipe(
       tap(hasPermission => {
         auditService.logRouteAccess(state.url, hasPermission);
@@ -882,7 +875,7 @@ private getNestedValue(obj: any, path: string): any {
 ---
 
 ## 依赖项
-- Angular v20+ (已满足)
+- Angular v21+ (已满足)
 - NgRx v17+ (已满足)
 - RxJS v7+ (已满足)
 - 测试框架：Jest + Playwright

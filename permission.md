@@ -2,7 +2,7 @@
 
 ## 概述
 
-本项目采用平台级的权限管理架构，支持基于角色（RBAC）和基于资源（Resource-Based）的混合权限模型。权限系统通过多层防护确保系统安全，包括路由守卫、指令控制、管道过滤和API权限验证。
+本项目采用平台级的权限管理架构，支持基于角色（RBAC）和基于资源（Resource-Based）的混合权限模型。**权限数据完全由后端管理，前端仅作为客户端展示和检查工具，后端是权限的唯一来源**。权限系统通过多层防护确保系统安全，包括路由守卫、指令控制、管道过滤和API权限验证。
 
 ## 核心权限模型
 
@@ -93,14 +93,18 @@ export interface User {
 
 #### 权限检查策略
 
-1. **本地优先**: 优先使用本地缓存的权限进行检查
-`src/app/services/permission.service.ts:137-142`
+**重要原则：后端是权限的唯一来源**
 
-2. **API回退**: 本地检查失败时，调用API进行最终验证
+1. **API 检查**: 所有权限检查通过后端 API 进行
+`src/app/services/permission.service.ts:75-84`
+
+2. **短期缓存**: 为性能优化，可使用短期缓存（TTL 1分钟），但始终以后端为权威
 `src/app/services/permission.service.ts:76-84`
 
 3. **批量优化**: 支持批量权限检查，减少API调用次数
 `src/app/services/permission.service.ts:247-259`
+
+4. **无本地权限存储**: 前端不持久化权限数据，权限变更实时从后端获取
 
 ### MenuPermissionMapperService
 
@@ -131,11 +135,11 @@ export interface User {
 
 ## 权限状态管理
 
-### NgRx Store
+### NgRx + Signals 混合架构
 
 **位置**: `src/app/core/stores/auth/`
 
-权限状态通过NgRx进行统一管理，确保权限数据的一致性。
+权限状态采用 NgRx + Signals 混合架构管理，确保权限数据的一致性。NgRx 用于复杂状态管理和副作用，Signals 用于组件级状态提升开发体验和性能。
 
 #### 状态结构
 
@@ -149,6 +153,33 @@ export interface AuthState {
   error: string | null;
   permissions: Permission[];      // 用户权限列表
   roles: string[];                 // 用户角色列表
+}
+```
+
+#### 在组件中使用 Signals
+
+```typescript
+@Component({...})
+export class MyComponent {
+  // ✅ 通过 toSignal() 将 NgRx selectors 转换为 signals
+  readonly permissions = toSignal(
+    this.store.select(AuthSelectors.selectPermissions),
+    { initialValue: [] }
+  );
+
+  readonly user = toSignal<User | null>(
+    this.store.select(AuthSelectors.selectUser),
+    { initialValue: null }
+  );
+
+  readonly isLoading = toSignal(
+    this.store.select(AuthSelectors.selectIsLoading),
+    { initialValue: false }
+  );
+
+  // ✅ 派生计算
+  readonly isAuthenticated = computed(() => !!this.user());
+  readonly isAdmin = computed(() => this.user()?.roles?.includes('admin') ?? false);
 }
 ```
 
@@ -193,15 +224,12 @@ canActivate(route, state): Observable<boolean> | boolean
 **检查流程**:
 1. 等待认证状态加载完成
 2. 检查路由数据中的权限要求
-3. 根据权限类型执行相应的检查:
-   - **特定权限检查**: 检查 `route.data['permission']`
-   - **角色检查**: 检查 `route.data['roles']`
-   - **菜单权限检查**: 检查路由对应的菜单权限
+3. 调用后端 API 进行权限验证（后端是唯一来源）
 4. 无权限时重定向到 `/no-permission` 页面
 
 **权限检查策略**:
-- 本地权限检查优先
-- 本地检查失败时，调用API进行最终验证
+- 始终调用后端 API 进行权限验证最终检查
+- 可使用短期缓存优化性能，但以后端为准
 `src/app/guards/permission.guard.ts:73-112`
 
 ### 3. RoleGuard
@@ -360,11 +388,7 @@ PermissionGuard 检查权限
   ↓
 从路由数据获取权限要求
   ↓
-检查特定权限 / 角色 / 菜单权限
-  ↓
-本地权限检查
-  ↓ (失败)
-API权限验证
+调用后端 API 验证权限（后端是唯一来源）
   ↓
 有权限 → 允许访问
 无权限 → 重定向到无权限页面
@@ -396,9 +420,7 @@ MenuPermissionMapperService 过滤菜单
   ↓
 PermissionDirective / HasPermissionPipe
   ↓
-PermissionService.hasPermission()
-  ↓
-检查用户权限列表
+调用后端 API 检查权限（或使用短期缓存）
   ↓
 有权限 → 显示元素
 无权限 → 隐藏元素
@@ -413,15 +435,13 @@ PermissionService.hasPermission()
   ↓
 AuthService.login()
   ↓
-获取用户信息和权限
+后端返回用户信息（不包含详细权限，权限需通过 API 获取）
   ↓
-更新 AuthStore (user, permissions, roles)
+更新 AuthStore (user)
   ↓
-PermissionService.setPermissions()
+权限检查时动态调用后端 API
   ↓
-PermissionService.setMenuPermissions()
-  ↓
-权限数据同步完成
+权限数据实时验证
 ```
 
 ### 应用启动权限预加载
@@ -429,17 +449,11 @@ PermissionService.setMenuPermissions()
 ```
 App 初始化
   ↓
-PermissionService.preloadPermissions()
+权限检查时按需调用后端 API
   ↓
-syncPermissionsWithApi()
+短期缓存优化性能（TTL 1分钟）
   ↓
-并行加载:
-  - getUserPermissions()
-  - getUserMenuPermissions()
-  ↓
-更新本地权限缓存
-  ↓
-通知权限变更
+权限变更实时从后端获取
 ```
 
 ## 安全最佳实践
@@ -448,7 +462,7 @@ syncPermissionsWithApi()
 
 - **多层防护**: 路由守卫 + 指令控制 + API权限验证
 - **默认拒绝**: 未明确授权的资源默认拒绝访问
-- **本地缓存 + API验证**: 本地检查失败时调用API验证
+- **后端唯一来源**: 所有权限决策由后端完成，前端仅展示
 
 ### 2. 权限隔离
 
@@ -460,6 +474,7 @@ syncPermissionsWithApi()
 
 - **令牌安全**: 使用 `SecureTokenService` 管理认证令牌
 - **会话级别**: 敏感信息存储在 session 中，避免XSS攻击
+- **权限不持久化**: 权限数据不存储在前端，始终从后端获取
 
 ## 扩展指南
 
