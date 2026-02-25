@@ -3,6 +3,7 @@ import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } fr
 import { Observable, of } from 'rxjs';
 import { map, catchError, take } from 'rxjs/operators';
 import { PermissionFacade } from '../core/stores/permission/permission.facade';
+import { PermissionAuditService } from '../core/services/permission-audit.service';
 
 /**
  * 角色守卫工厂函数
@@ -12,17 +13,19 @@ export const roleGuard = (requiredRoles: string[]): CanActivateFn => {
   return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const permissionFacade = inject(PermissionFacade);
     const router = inject(Router);
+    const auditService = inject(PermissionAuditService);
 
     if (!requiredRoles || requiredRoles.length === 0) {
-      // 如果没有要求角色，允许访问
       return of(true);
     }
 
-    // ✅ 使用 PermissionFacade 检查角色（基于 Signals）
     const hasRequiredRole = requiredRoles.some(role => permissionFacade.hasRole(role));
 
+    requiredRoles.forEach(role => {
+      auditService.logRoleCheck(role, hasRequiredRole, { method: 'roleGuard', component: 'roleGuard' });
+    });
+
     if (!hasRequiredRole) {
-      // 权限不足，重定向到无权限页面
       router.navigate(['/no-permission'], {
         queryParams: { returnUrl: state.url }
       });

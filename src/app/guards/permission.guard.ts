@@ -8,6 +8,7 @@ import * as AuthSelectors from '../core/stores/auth/auth.selectors';
 import { PermissionFacade } from '../core/stores/permission/permission.facade';
 import { UserApiService } from '../core/services/user-api.service';
 import { MenuPermissionMapperService } from '../core/services/menu-permission-mapper.service';
+import { PermissionAuditService } from '../core/services/permission-audit.service';
 import { MENUS_CONFIG } from '../config/menu.config';
 
 /**
@@ -25,6 +26,7 @@ export const permissionGuard = (
     const permissionFacade = inject(PermissionFacade);
     const userApiService = inject(UserApiService);
     const menuPermissionMapper = inject(MenuPermissionMapperService);
+    const auditService = inject(PermissionAuditService);
 
     // 1. 从路由数据获取权限要求（如果未通过参数提供）
     const requiredPermission = permissionConfig || route.data['permission'] as {
@@ -50,7 +52,8 @@ export const permissionGuard = (
             store,
             router,
             permissionFacade,
-            userApiService
+            userApiService,
+            auditService
           );
         }
 
@@ -60,7 +63,8 @@ export const permissionGuard = (
             routeRequiredRoles,
             state,
             store,
-            router
+            router,
+            auditService
           );
         }
 
@@ -71,7 +75,8 @@ export const permissionGuard = (
           store,
           router,
           userApiService,
-          menuPermissionMapper
+          menuPermissionMapper,
+          auditService
         );
       })
     );
@@ -86,8 +91,9 @@ export const roleGuard = (requiredRoles: string[]): CanActivateFn => {
   return (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {
     const store = inject(Store<AppState>);
     const router = inject(Router);
+    const auditService = inject(PermissionAuditService);
 
-    return checkRoles(requiredRoles, state, store, router);
+    return checkRoles(requiredRoles, state, store, router, auditService);
   };
 };
 
@@ -113,12 +119,20 @@ function checkSpecificPermission(
   store: Store<AppState>,
   router: Router,
   permissionFacade: PermissionFacade,
-  userApiService: UserApiService
+  userApiService: UserApiService,
+  auditService: PermissionAuditService
 ): Observable<boolean> {
   // 先检查本地权限（通过 PermissionFacade）
   const hasLocalPermission = permissionFacade.hasPermission(
     permission.resource,
     permission.action
+  );
+
+  auditService.logPermissionCheck(
+    permission.resource,
+    permission.action,
+    hasLocalPermission,
+    { method: 'checkSpecificPermission', component: 'permissionGuard' }
   );
 
   if (hasLocalPermission) {
@@ -130,12 +144,20 @@ function checkSpecificPermission(
     take(1),
     switchMap(user => {
       if (!user || !user.id) {
+        auditService.logRouteAccess(state.url, false);
         redirectToNoPermission(router, state.url);
         return of(false);
       }
 
       return userApiService.checkRoutePermission(routePath, user.id).pipe(
         map(response => {
+          auditService.logPermissionCheck(
+            permission.resource,
+            permission.action,
+            response.hasPermission,
+            { method: 'checkSpecificPermission-API', component: 'permissionGuard' }
+          );
+
           if (!response.hasPermission) {
             redirectToNoPermission(router, state.url);
           }
@@ -143,6 +165,12 @@ function checkSpecificPermission(
         }),
         catchError(error => {
           console.error('API权限检查失败:', error);
+          auditService.logPermissionCheck(
+            permission.resource,
+            permission.action,
+            false,
+            { method: 'checkSpecificPermission-API', component: 'permissionGuard' }
+          );
           redirectToNoPermission(router, state.url);
           return of(false);
         })
@@ -158,7 +186,8 @@ function checkRoles(
   requiredRoles: string[],
   state: RouterStateSnapshot,
   store: Store<AppState>,
-  router: Router
+  router: Router,
+  auditService: PermissionAuditService
 ): Observable<boolean> {
   return store.select(AuthSelectors.selectUserRoles).pipe(
     take(1),
@@ -167,7 +196,12 @@ function checkRoles(
         userRoles.includes(role)
       );
 
+      requiredRoles.forEach(role => {
+        auditService.logRoleCheck(role, hasRequiredRole, { method: 'checkRoles', component: 'permissionGuard' });
+      });
+
       if (!hasRequiredRole) {
+        auditService.logRouteAccess(state.url, false);
         redirectToNoPermission(router, state.url);
       }
 
@@ -175,6 +209,7 @@ function checkRoles(
     }),
     catchError(error => {
       console.error('角色检查失败:', error);
+      auditService.logRouteAccess(state.url, false);
       redirectToNoPermission(router, state.url);
       return of(false);
     })
@@ -194,6 +229,7 @@ function checkRoles(
  * @param router - 路由器
  * @param userApiService - 用户 API 服务
  * @param menuPermissionMapper - 菜单权限映射服务
+ * @param auditService - 权限审计服务
  * @returns Observable<boolean> - 权限检查结果
  */
 function checkMenuPermission(
@@ -202,7 +238,8 @@ function checkMenuPermission(
   store: Store<AppState>,
   router: Router,
   userApiService: UserApiService,
-  menuPermissionMapper: MenuPermissionMapperService
+  menuPermissionMapper: MenuPermissionMapperService,
+  auditService: PermissionAuditService
 ): Observable<boolean> {
   // 检查是否有对应的菜单权限配置
   const allMenuItems = getAllMenuItems();
@@ -210,6 +247,7 @@ function checkMenuPermission(
 
   if (!menuPermission) {
     // 没有菜单权限配置，允许访问（或根据业务需求调整）
+    auditService.logRouteAccess(routePath, true);
     return of(true);
   }
 
@@ -218,6 +256,7 @@ function checkMenuPermission(
     take(1),
     switchMap(user => {
       if (!user || !user.id) {
+        auditService.logRouteAccess(state.url, false);
         redirectToNoPermission(router, state.url);
         return of(false);
       }
@@ -225,12 +264,14 @@ function checkMenuPermission(
       // 检查用户是否有菜单访问权限
       const menuItem = findMenuItemByPath(routePath, allMenuItems);
       if (menuItem && menuPermissionMapper.hasMenuAccess(user, menuItem)) {
+        auditService.logRouteAccess(routePath, true);
         return of(true);
       }
 
       // 本地检查失败，尝试API验证
       return userApiService.checkRoutePermission(routePath, user.id).pipe(
         map(response => {
+          auditService.logRouteAccess(routePath, response.hasPermission);
           if (!response.hasPermission) {
             redirectToNoPermission(router, state.url);
           }
@@ -238,6 +279,7 @@ function checkMenuPermission(
         }),
         catchError(error => {
           console.error('API菜单权限检查失败:', error);
+          auditService.logRouteAccess(routePath, false);
           redirectToNoPermission(router, state.url);
           return of(false);
         })
