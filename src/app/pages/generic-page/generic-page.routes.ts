@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { GenericPageComponent } from './generic-page.component';
 import { getAllMenuLinks } from './menu-routes.util';
-import { AuthGuard } from '../../guards/auth.guard';
+import { authGuard } from '../../guards/auth.guard';
 
 // 获取所有菜单链接
 const menuLinks = getAllMenuLinks();
@@ -10,7 +10,7 @@ const menuLinks = getAllMenuLinks();
 const routes = menuLinks.map(link => ({
   path: link.substring(1), // 去掉开头的 '/'
   component: GenericPageComponent,
-  canActivate: [AuthGuard]
+  canActivate: [authGuard]
 }));
 
 // 导出所有菜单路由

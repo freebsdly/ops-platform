@@ -1,28 +1,27 @@
-import { Injectable, inject } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { SecureTokenService } from '../core/services/secure-token.service';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthGuard implements CanActivate {
-  private secureTokenService = inject(SecureTokenService);
-  private router = inject(Router);
+/**
+ * 认证守卫函数
+ * 检查用户是否已登录
+ */
+export const authGuard: CanActivateFn = (
+  route: ActivatedRouteSnapshot,
+  state: RouterStateSnapshot
+) => {
+  const secureTokenService = inject(SecureTokenService);
+  const router = inject(Router);
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): boolean {
-    const isAuthenticated = this.secureTokenService.isAuthenticated();
-    console.log(`AuthGuard检查: isAuthenticated=${isAuthenticated}, path=${state.url}`);
-    
-    if (isAuthenticated) {
-      return true;
-    }
+  const isAuthenticated = secureTokenService.isAuthenticated();
+  console.log(`AuthGuard检查: isAuthenticated=${isAuthenticated}, path=${state.url}`);
 
-    // Store the attempted URL for redirecting
-    console.log(`AuthGuard: 用户未认证，导航到/login, returnUrl=${state.url}`);
-    this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
-    return false;
+  if (isAuthenticated) {
+    return true;
   }
-}
+
+  // Store attempted URL for redirecting
+  console.log(`AuthGuard: 用户未认证，导航到/login, returnUrl=${state.url}`);
+  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+  return false;
+};

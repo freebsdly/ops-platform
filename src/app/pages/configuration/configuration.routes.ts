@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { ConfigurationComponent } from './configuration.component';
 import { ConfigurationPageComponent } from './components/configuration-page.component';
-import { PermissionGuard } from '../../guards/permission.guard';
+import { permissionGuard } from '../../guards/permission.guard';
 
 // 配置模块的子路由
 export const CONFIGURATION_ROUTES: Routes = [
@@ -13,7 +13,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'management/model', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'configuration',
@@ -24,7 +24,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'management/attribute', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'configuration',
@@ -35,7 +35,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'management/relationship', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'configuration',
@@ -48,7 +48,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'operation/collection', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'configuration',
@@ -59,7 +59,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'operation/audit', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'configuration',
@@ -70,7 +70,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'operation/config-change', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'configuration',
@@ -83,7 +83,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'collaboration/topology', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'collaboration',
@@ -94,7 +94,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'collaboration/api', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'collaboration',
@@ -105,7 +105,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'collaboration/compliance', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'collaboration',
@@ -116,7 +116,7 @@ export const CONFIGURATION_ROUTES: Routes = [
       { 
         path: 'collaboration/analysis', 
         component: ConfigurationPageComponent,
-        canActivate: [PermissionGuard],
+        canActivate: [permissionGuard],
         data: {
           permission: {
             resource: 'collaboration',

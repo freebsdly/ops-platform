@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
-import { RootRedirectGuard } from './guards/root-redirect.guard';
+import { authGuard } from './guards/auth.guard';
+import { rootRedirectGuard } from './guards/root-redirect.guard';
 import { EmptyComponent } from './components/empty.component';
 import { NoPermissionComponent } from './pages/no-permission/no-permission.component';
 
@@ -21,7 +21,7 @@ export const routes: Routes = [
   { 
     path: '', 
     pathMatch: 'full', 
-    canActivate: [RootRedirectGuard],
+    canActivate: [rootRedirectGuard],
     component: EmptyComponent
   },
   { 
@@ -37,31 +37,31 @@ export const routes: Routes = [
   { 
     path: 'configuration', 
     loadChildren: () => import('./pages/configuration/configuration.routes').then(m => m.CONFIGURATION_ROUTES),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   // 监控中心模块 - 懒加载
   { 
     path: 'monitoring', 
     loadChildren: () => import('./pages/monitoring/monitoring.routes').then(m => m.MONITORING_ROUTES),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   // 事件中心模块 - 懒加载
   { 
     path: 'incident', 
     loadChildren: () => import('./pages/incident/incident.routes').then(m => m.INCIDENT_ROUTES),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   // 服务中心模块 - 懒加载
   { 
     path: 'service', 
     loadChildren: () => import('./pages/service/service.routes').then(m => m.SERVICE_ROUTES),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   // 工作台模块 - 懒加载
   { 
     path: 'workbench', 
     loadChildren: () => import('./pages/workbench/workbench.routes').then(m => m.WORKBENCH_ROUTES),
-    canActivate: [AuthGuard]
+    canActivate: [authGuard]
   },
   // 默认重定向到工作台模块
   { 

@@ -26,11 +26,12 @@
 | 守卫实现 | 类守卫 | **Functional Guards** | 🟡 中 |
 | 权限来源 | **后端 API 唯一来源** | **保持后端为唯一来源，移除本地缓存** | 🔴 高 |
 | 权限缓存 | 简单内存缓存 | **仅短期会话缓存，权限变更实时从后端获取** | 🔴 高 |
-| 类型安全 | 部分类型安全 | **完全类型安全的权限常量** | 🟡 中 |
-| 权限审计 | 未实现 | **添加权限审计日志** | 🟡 中 |
-| 渐进式检查 | 未实现 | **本地快速检查 + API 響证** | 🟡 中 |
-| 条件权限 | 未实现 | **支持动态条件权限（后端实现）** | 🟢 低 |
+| 类型安全 | 部分类型安全 | **完全类型安全的权限常量** | 🔴 高 |
+| 权限审计 | 未实现 | **添加权限审计日志** | 🔴 高 |
 | 批量权限检查 | 已实现 | **优化批量检查性能** | 🟡 中 |
+| 无权限页面 | 未实现 | **创建统一的无权限页面** | 🟡 中 |
+| 错误处理 | 部分实现 | **统一权限错误处理** | 🟡 中 |
+| 多标签同步 | 未实现 | **使用 BroadcastChannel 同步缓存** | 🟢 低 |
 
 ---
 
@@ -51,9 +52,16 @@
 - 统一权限检查 API
 
 ```typescript
+import { Injectable, inject, computed } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { AppState, AuthSelectors } from '../auth';
+import { PermissionActions } from './permission.actions';
+import { PermissionService } from '../../services/permission.service';
+
 @Injectable({ providedIn: 'root' })
 export class PermissionFacade {
-  private store = inject(Store<AuthState>);
+  private store = inject(Store<AppState>);
   private permissionService = inject(PermissionService);
 
   // ✅ NgRx 数据源转换为 Signals
@@ -121,6 +129,13 @@ export class PermissionFacade {
 
 ```typescript
 // permission.guard.ts - 重构为 Functional Guard
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { Observable, of, filter, take, switchMap, map } from 'rxjs';
+import { PermissionFacade } from '../core/stores/permission/permission.facade';
+import { Store } from '@ngrx/store';
+import { AppState, AuthSelectors } from '../core/stores/auth';
+
 export const permissionGuard = (
   requiredPermissions?: { resource: string; action: string },
   requiredRoles?: string[]
@@ -180,6 +195,9 @@ export const permissionGuard = (
 
 ```typescript
 // user-info.ts
+import { Component, ChangeDetectionStrategy, computed } from '@angular/core';
+import { PermissionFacade } from '../../core/stores/permission/permission.facade';
+
 @Component({
   selector: 'app-user-info',
   template: `
@@ -227,9 +245,14 @@ export class UserInfoComponent {
 - 权限检查结果短期缓存（TTL 1分钟，快速响应）
 - 请求去重（避免同一权限重复检查）
 - 批量权限检查优化
+- 多标签页同步（使用 BroadcastChannel）
 - **重要：缓存仅为性能优化，权限最终由后端决定**
 
 ```typescript
+import { Injectable, inject } from '@angular/core';
+import { Observable, of, map, tap, finalize, catchError } from 'rxjs';
+import { UserApiService } from './user-api.service';
+
 @Injectable({ providedIn: 'root' })
 export class PermissionCacheService {
   private userApiService = inject(UserApiService);
@@ -240,6 +263,25 @@ export class PermissionCacheService {
 
   // 进行中的请求（去重）
   private pendingChecks = new Map<string, Observable<boolean>>();
+
+  // 多标签页同步
+  private broadcastChannel: BroadcastChannel | null = null;
+
+  constructor() {
+    this.initBroadcastChannel();
+  }
+
+  // 初始化 BroadcastChannel
+  private initBroadcastChannel() {
+    if (typeof BroadcastChannel !== 'undefined') {
+      this.broadcastChannel = new BroadcastChannel('permission-cache-sync');
+      this.broadcastChannel.onmessage = (event) => {
+        if (event.data.type === 'invalidate') {
+          this.invalidateCache(event.data.keys);
+        }
+      };
+    }
+  }
 
   // 单个权限检查（带短期缓存）
   checkPermissionWithCache(
@@ -334,7 +376,8 @@ export class PermissionCacheService {
           value: hasPermission,
           timestamp: Date.now()
         });
-      })
+      }),
+      catchError(() => of(false)) // 失败时返回 false，不暴露错误
     );
   }
 
@@ -343,7 +386,7 @@ export class PermissionCacheService {
     checks: Array<{ resource: string; action: string; key: string }>
   ): Observable<Map<string, boolean>> {
     return this.userApiService.checkBatchRoutePermissions(
-      checks.map(c => `${c.resource}/${c.action}`)
+      checks.map(c => `${c.resource}/${action}`)
     ).pipe(
       map(response => {
         const results = new Map<string, boolean>();
@@ -359,13 +402,40 @@ export class PermissionCacheService {
           }
         });
         return results;
-      })
+      }),
+      catchError(() => of(new Map())) // 失败时返回空 Map
     );
   }
 
   // 清除缓存
   clearCache(): void {
     this.permissionsCache.clear();
+    this.notifyCacheInvalidation();
+  }
+
+  // 使特定缓存失效
+  invalidateCache(keys?: string[]): void {
+    if (keys) {
+      keys.forEach(key => this.permissionsCache.delete(key));
+    } else {
+      this.permissionsCache.clear();
+    }
+  }
+
+  // 通知其他标签页缓存失效
+  private notifyCacheInvalidation(keys?: string[]) {
+    if (this.broadcastChannel) {
+      this.broadcastChannel.postMessage({
+        type: 'invalidate',
+        keys
+      });
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.broadcastChannel) {
+      this.broadcastChannel.close();
+    }
   }
 }
 ```
@@ -407,22 +477,6 @@ export class PermissionService {
       })
     );
   }
-    hasPermission: boolean;
-  }[]> {
-    const checks = routes.map(route => {
-      const [resource, action] = this.extractResourceAndAction(route);
-      return { resource, action };
-    });
-
-    return this.permissionCache.checkPermissionsBatch(checks).pipe(
-      map(results => {
-        return routes.map(route => ({
-          routePath: route,
-          hasPermission: results.get(route) || false
-        }));
-      })
-    );
-  }
 
   // 私有方法：从路径提取资源和操作
   private extractResourceAndAction(routePath: string): [string, string] {
@@ -439,7 +493,7 @@ export class PermissionService {
 
 ---
 
-### 阶段3：类型安全的权限常量 (中优先级)
+### 阶段3：类型安全的权限常量 (高优先级)
 
 #### 目标
 创建完全类型安全的权限常量，避免字符串硬编码错误。
@@ -508,7 +562,7 @@ export const ROLES = {
 
 export type RoleId = typeof ROLES[keyof typeof ROLES];
 
-// 角色权限映射
+// 角色权限映射（仅用于文档和测试，实际权限由后端管理）
 export const ROLE_PERMISSIONS: Record<RoleId, PermissionId[]> = {
   [ROLES.ADMIN]: Object.values(PERMISSIONS.USER).concat(
     Object.values(PERMISSIONS.CONFIG),
@@ -537,12 +591,16 @@ export const ROLE_PERMISSIONS: Record<RoleId, PermissionId[]> = {
 if (permissionService.hasPermission('user', 'read')) { ... }
 
 // 之后：
+import { PermissionResource, PermissionAction } from '../../core/constants/permissions.constants';
+
 if (permissionService.hasPermission(
   PermissionResource.USER,
   PermissionAction.READ
 )) { ... }
 
 // 或使用权限 ID：
+import { PERMISSIONS } from '../../core/constants/permissions.constants';
+
 if (permissionFacade.hasPermissionSignal(
   PermissionResource.USER,
   PermissionAction.READ
@@ -551,7 +609,7 @@ if (permissionFacade.hasPermissionSignal(
 
 ---
 
-### 阶段4：权限审计日志 (中优先级)
+### 阶段4：权限审计日志 (高优先级)
 
 #### 目标
 实现权限审计功能，记录所有权限检查和访问尝试，便于安全审计和问题排查。
@@ -567,6 +625,14 @@ if (permissionFacade.hasPermissionSignal(
 - 审计日志管理
 
 ```typescript
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { isDevMode } from '@angular/core';
+import { PermissionFacade } from '../stores/permission/permission.facade';
+import { Router } from '@angular/router';
+
 export interface AuditLog {
   timestamp: string;
   userId?: number;
@@ -653,7 +719,7 @@ export class PermissionAuditService {
   }
 
   // 私有方法：发送到后端
-  private sendToBackend(log: AuditLog) {
+  private sendToBackend(log: AuditLog): void {
     // 开发环境只记录到控制台
     if (!isDevMode()) {
       this.http.post('/api/audit/permissions', log)
@@ -672,20 +738,10 @@ export class PermissionAuditService {
 - `src/app/guards/permission.guard.ts`
 - `src/app/services/permission.service.ts`
 
----
-
-### 阶段5：权限检查优化 (中优先级)
-
-#### 目标
-优化权限检查流程，通过短期缓存和批量检查减少 API 调用，但始终以后端为权限唯一来源。
-
-#### 任务5.1：更新 PermissionGuard
-
-**修改文件**：`src/app/guards/permission.guard.ts`
-
-**改动**：
+**示例集成**：
 
 ```typescript
+// permission.guard.ts
 export const permissionGuard = (
   requiredPermissions?: { resource: string; action: string },
   requiredRoles?: string[]
@@ -693,18 +749,42 @@ export const permissionGuard = (
   return (route, state) => {
     const permissionFacade = inject(PermissionFacade);
     const router = inject(Router);
+    const store = inject(Store<AppState>);
     const auditService = inject(PermissionAuditService);
 
-    // ✅ 始终调用后端进行权限检查，后端是唯一来源
-    return permissionFacade.checkRoutePermission(state.url).pipe(
-      tap(hasPermission => {
-        auditService.logRouteAccess(state.url, hasPermission);
-      }),
-      map(hasPermission => {
-        if (!hasPermission) {
-          return router.createUrlTree(['/no-permission']);
+    return store.select(AuthSelectors.selectIsLoading).pipe(
+      filter(isLoading => !isLoading),
+      take(1),
+      switchMap(() => {
+        let granted = true;
+
+        // 检查角色
+        if (requiredRoles && requiredRoles.length > 0) {
+          const hasRole = requiredRoles.some(role =>
+            permissionFacade.hasRole(role)
+          );
+          if (!hasRole) {
+            granted = false;
+            auditService.logRouteAccess(state.url, granted);
+            return of(router.createUrlTree(['/no-permission']));
+          }
         }
-        return true;
+
+        // 检查权限
+        if (requiredPermissions) {
+          const hasPermission = permissionFacade.hasPermission(
+            requiredPermissions.resource,
+            requiredPermissions.action
+          );
+          if (!hasPermission) {
+            granted = false;
+            auditService.logRouteAccess(state.url, granted);
+            return of(router.createUrlTree(['/no-permission']));
+          }
+        }
+
+        auditService.logRouteAccess(state.url, granted);
+        return of(true);
       })
     );
   };
@@ -713,92 +793,171 @@ export const permissionGuard = (
 
 ---
 
-### 阶段6：条件权限支持 (低优先级)
+### 阶段5：无权限页面和错误处理 (中优先级)
 
 #### 目标
-支持基于用户属性、资源属性、环境等动态条件的权限判断。
+创建统一的无权限页面和权限错误处理，提升用户体验。
 
-#### 任务6.1：扩展权限模型
+#### 任务5.1：创建无权限页面
 
-**修改文件**：`src/app/core/types/permission.interface.ts`
+**新建文件**：
+- `src/app/pages/no-permission/no-permission.component.ts`
+- `src/app/pages/no-permission/no-permission.component.html`
+- `src/app/pages/no-permission/no-permission.component.css`
 
-**改动**：
-
-```typescript
-export interface PermissionCondition {
-  type: 'attribute' | 'custom' | 'role';
-  key?: string;
-  operator?: 'eq' | 'in' | 'gt' | 'lt' | 'custom';
-  value?: any;
-  evaluateFn?: (user: User, resource?: any) => boolean;
-}
-
-export interface Permission {
-  id: string;
-  name: string;
-  type: 'menu' | 'operation' | 'data';
-  resource: string;
-  action: string[];
-  description?: string;
-  conditions?: PermissionCondition[]; // 新增：条件权限
-}
-```
-
-#### 任务6.2：实现条件权限评估
-
-**新建方法在**：`src/app/services/permission.service.ts`
+**核心功能**：
+- 显示友好的无权限提示
+- 提供返回首页或联系管理员的操作
+- 记录访问日志
 
 ```typescript
-// 检查条件权限
-evaluateConditions(conditions: PermissionCondition[], resource?: any): boolean {
-  const user = this.getCurrentUserFromLocalStorage();
+// no-permission.component.ts
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Router } from '@angular/router';
 
-  if (!conditions || conditions.length === 0) {
-    return true;
-  }
-
-  return conditions.every(condition => {
-    switch (condition.type) {
-      case 'attribute':
-        return this.evaluateAttributeCondition(condition, user, resource);
-      case 'role':
-        return user.roles.includes(condition.value as string);
-      case 'custom':
-        return condition.evaluateFn!(user, resource);
-      default:
-        return true;
+@Component({
+  selector: 'app-no-permission',
+  standalone: true,
+  template: `
+    <div class="no-permission-container">
+      <nz-result
+        nzStatus="403"
+        nz nzTitle="访问受限"
+        [nzSubTitle]="subTitle"
+      >
+        <div nz-result-extra>
+          <button nz-button nzType="primary" (click)="goHome()">
+            返回首页
+          </button>
+          <button nz-button (click)="goBack()">
+            返回上页
+          </button>
+        </div>
+      </nz-result>
+    </div>
+  `,
+  styles: [`
+    .no-permission-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
     }
-  });
+    nz-result {
+      width: 100%;
+      max-width: 500px;
+    }
+  `],
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class NoPermissionComponent {
+  private router = inject(Router);
+
+  readonly subTitle = '您没有访问此页面的权限，如需帮助请联系管理员。';
+
+  goHome() {
+    this.router.navigate(['/home']);
+  }
+
+  goBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      this.router.navigate(['/home']);
+    }
+  }
 }
+```
 
-// 私有方法：评估属性条件
-private evaluateAttributeCondition(
-  condition: PermissionCondition,
-  user: User,
-  resource?: any
-): boolean {
-  const userValue = this.getNestedValue(user, condition.key!);
-  const targetValue = condition.value;
+#### 任务5.2：统一权限错误处理
 
-  switch (condition.operator) {
-    case 'eq':
-      return userValue === targetValue;
-    case 'in':
-      return (targetValue as any[]).includes(userValue);
-    case 'gt':
-      return userValue > targetValue;
-    case 'lt':
-      return userValue <Value;
-    default:
-      return false;
+**修改文件**：`src/app/core/services/permission.service.ts`
+
+**核心功能**：
+- 统一权限错误格式
+- 提供友好的错误消息
+- 集成审计日志
+
+```typescript
+export class PermissionError extends Error {
+  constructor(
+    message: string,
+    public resource: string,
+    public action: string,
+    public userId?: number
+  ) {
+    super(message);
+    this.name = 'PermissionError';
   }
 }
 
-// 私有方法：获取嵌套属性值
-private getNestedValue(obj: any, path: string): any {
-  return path.split('.').reduce((current, key) => current?.[key], obj);
+export class PermissionService {
+  private userApiService = inject(UserApiService);
+  private permissionCache = inject(PermissionCacheService);
+  private auditService = inject(PermissionAuditService);
+  private permissionFacade = inject(PermissionFacade);
+
+  checkRoutePermission(routePath: string, userId?: number): Observable<boolean> {
+    const [resource, action] = this.extractResourceAndAction(routePath);
+
+    return this.permissionCache.checkPermissionWithCache(resource, action).pipe(
+      tap(hasPermission => {
+        // 记录审计日志
+        this.auditService.logPermissionCheck(resource, action, hasPermission, {
+          method: 'checkRoutePermission'
+        });
+      })
+    );
+  }
+
+  // 带错误处理的权限检查
+  checkRoutePermissionWithError(routePath: string, userId?: number): Observable<boolean> {
+    return this.checkRoutePermission(routePath, userId).pipe(
+      map(hasPermission => {
+        if (!hasPermission) {
+          throw new PermissionError(
+            `Permission denied: ${routePath}`,
+            ...this.extractResourceAndAction(routePath),
+            this.permissionFacade.user()?.id
+          );
+        }
+        return true;
+      })
+    );
+  }
 }
 ```
+
+---
+
+### 阶段6：测试和文档 (中优先级)
+
+#### 目标
+编写完整的测试用例和更新文档，确保权限系统稳定可靠。
+
+#### 任务6.1：编写单元测试
+
+**测试文件**：
+- `src/app/core/stores/permission/permission.facade.spec.ts`
+- `src/app/core/services/permission-cache.service.spec.ts`
+- `src/app/core/services/permission-audit.service.spec.ts`
+- `src/app/guards/permission.guard.spec.ts`
+
+#### 任务6.2：编写 E2E 测试
+
+**使用 webapp-testing skill**：
+- 测试路由权限守卫
+- 测试权限指令和管道
+- 测试无权限页面
+- 测试权限审计日志
+
+#### 任务6.3：更新文档
+
+**更新文件**：
+- `permission.md` - 更新架构说明
+- `spec.md` - 更新开发规范
+- README.md - 添加权限系统使用指南
 
 ---
 
@@ -824,11 +983,12 @@ private getNestedValue(obj: any, path: string): any {
 - ⏳ 任务4.2：集成到守卫和服务
 - ⏳ 审计功能测试
 
-### 第4周：渐进式和条件权限
-- ⏳ 任务5.1：更新 PermissionGuard 渐进式检查
-- ⏳ 任务6.1：扩展权限模型
-- ⏳ 任务6.2：实现条件权限评估
-- ⏳ 全面测试和文档更新
+### 第4周：无权限页面和测试
+- ⏳ 任务5.1：创建无权限页面
+- ⏳ 任务5.2：统一权限错误处理
+- ⏳ 任务6.1：编写单元测试
+- ⏳ 任务6.2：编写 E2E 测试
+- ⏳ 任务6.3：更新文档
 
 ---
 
@@ -918,6 +1078,6 @@ private getNestedValue(obj: any, path: string): any {
 
 ---
 
-*最后更新: 2026-02-24*
-*负责人: 前端团队*
-*参考文档: permission.md*
+**最后更新: 2026-02-25**
+**负责人: 前端团队**
+**参考文档: permission.md, spec.md**

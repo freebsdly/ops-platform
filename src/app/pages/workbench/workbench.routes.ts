@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { AuthGuard } from '../../guards/auth.guard';
+import { authGuard } from '../../guards/auth.guard';
 import { OverviewDashboardComponent } from './dashboard/overview/overview.component';
 import { NotificationCenterComponent } from './notification-center/notification-center.component';
 
@@ -14,7 +14,7 @@ export const WORKBENCH_ROUTES: Routes = [
   {
     path: 'dashboard/overview',
     component: OverviewDashboardComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: {
       permission: {
         resource: 'workbench',
@@ -27,7 +27,7 @@ export const WORKBENCH_ROUTES: Routes = [
   {
     path: 'notification-center',
     component: NotificationCenterComponent,
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: {
       permission: {
         resource: 'workbench',
