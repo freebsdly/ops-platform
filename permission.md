@@ -96,7 +96,60 @@ export interface User {
 **重要原则：后端是权限的唯一来源**
 
 1. **API 检查**: 所有权限检查通过后端 API 进行
-`src/app/services/permission.service.ts:75-84`
+   `src/app/services/permission.service.ts:75-84`
+
+2. **缓存优化**: 使用 PermissionCacheService 实现短期内存缓存
+   `src/app/core/services/permission-cache.service.ts`
+
+3. **权限常量**: 使用类型安全的权限常量
+   `src/app/core/constants/permissions.constants.ts`
+
+### PermissionCacheService
+
+**位置**: `src/app/core/services/permission-cache.service.ts`
+
+权限缓存服务，实现短期内存缓存以提升性能。
+
+#### 主要功能
+
+| 方法 | 功能描述 |
+|------|----------|
+| `checkPermissionWithCache(resource, action)` | 单个权限检查（带缓存） |
+| `checkPermissionsBatch(checks)` | 批量权限检查（优化） |
+| `clearCache()` | 清除缓存 |
+| `invalidateCache(keys?)` | 使特定缓存失效 |
+| `getCacheStats()` | 获取缓存统计信息 |
+
+#### 缓存策略
+
+- **存储方式**: 内存 Map（非 sessionStorage，符合安全规范）
+- **TTL**: 1 分钟短期缓存
+- **请求去重**: pendingChecks 防止重复请求
+- **多标签页同步**: 使用 BroadcastChannel 同步缓存失效
+
+### PermissionAuditService
+
+**位置**: `src/app/core/services/permission-audit.service.ts`
+
+权限审计服务，记录所有权限检查和访问尝试。
+
+#### 主要功能
+
+| 方法 | 功能描述 |
+|------|----------|
+| `logPermissionCheck(resource, action, granted, context)` | 记录权限检查 |
+| `logRouteAccess(route, granted)` | 记录路由访问 |
+| `logRoleCheck(roleId, granted, context)` | 记录角色检查 |
+| `getAuditLogs()` | 获取审计日志 |
+| `exportAuditLogs()` | 导出审计日志（JSON） |
+| `clearAuditLogs()` | 清除审计日志 |
+
+#### 审计功能
+
+- **开发环境**: 记录到控制台
+- **生产环境**: 发送到后端 `/api/audit/permissions`
+- **日志限制**: 最多 100 条日志（FIFO）
+- **审计内容**: 时间戳、用户、权限、资源、操作、结果、上下文
 
 2. **短期缓存**: 为性能优化，可使用短期缓存（TTL 1分钟），但始终以后端为权威
 `src/app/services/permission.service.ts:76-84`
@@ -597,5 +650,6 @@ A:
 
 ---
 
-**文档版本**: 1.0.0
-**最后更新**: 2026-02-24
+**文档版本**: 1.1.0
+**最后更新**: 2026-02-25
+**维护者**: 前端团队

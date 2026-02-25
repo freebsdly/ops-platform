@@ -344,19 +344,21 @@ this.data$.subscribe(data => {
 
 ### 7.3 安全性检查清单
 
-- [ ] 敏感数据不使用 `localStorage/sessionStorage`
-- [ ] 权限检查通过后端 API，后端是唯一来源
+- [x] 敏感数据不使用 `localStorage/sessionStorage`
+- [x] 权限检查通过后端 API，后端是唯一来源
 - [ ] 不直接使用 `innerHTML`
 - [ ] 日志不记录敏感信息
-- [ ] Token 使用 `SecureTokenService`
-- [ ] 用户信息使用 `UserCacheService`
+- [x] Token 使用 `SecureTokenService`
+- [x] 用户信息使用 `UserCacheService`
+- [ ] 权限审计使用 `PermissionAuditService`
 
 ### 7.4 性能检查清单
 
-- [ ] 使用 `ChangeDetectionStrategy.OnPush`
-- [ ] 复杂计算使用 `computed()`
+- [x] 使用 `ChangeDetectionStrategy.OnPush`
+- [x] 复杂计算使用 `computed()`
 - [ ] 避免不必要的订阅
-- [ ] 路由使用懒加载
+- [x] 路由使用懒加载
+- [x] 权限检查使用缓存优化
 
 ## 8. 相关文档
 
@@ -368,7 +370,6 @@ this.data$.subscribe(data => {
 | [i18n.md](./i18n.md) | 国际化开发规范 |
 
 ---
-
-**文档版本**: 2.0
-**最后更新**: 2026-02-24
+**文档版本**: 2.1
+**最后更新**: 2026-02-25
 **维护者**: 前端团队
