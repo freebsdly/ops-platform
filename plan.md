@@ -971,11 +971,11 @@ export class PermissionService {
 - ✅ 集成测试验证
 
 
-### 第2周：智能权限缓存
+### 第2周：智能权限缓存 ✅
 - ✅ 任务2.1：创建 PermissionCacheService
 - ✅ 任务2.2：更新 PermissionService 使用缓存
-- ⏳ 性能测试和对比
-- ⏳ 缓存策略调优
+- ✅ 性能测试和对比
+- ✅ 缓存策略调优
 
 ### 第3周：类型安全和审计
 - ⏳ 任务3.1：创建权限常量
