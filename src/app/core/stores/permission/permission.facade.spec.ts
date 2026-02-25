@@ -1,0 +1,278 @@
+import { TestBed } from '@angular/core/testing';
+import { provideMockStore } from '@ngrx/store/testing';
+import { PermissionFacade } from './permission.facade';
+import { PermissionService } from '../../../services/permission.service';
+import { Permission } from '../../types/permission.interface';
+import { User } from '../../types/user.interface';
+import { of } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../types/app-state';
+import {
+  loadPermissionsSuccess,
+  clearPermissions,
+} from '../auth/permission.actions';
+import { describe, it, expect, beforeEach, spyOn } from 'vitest';
+
+describe('PermissionFacade', () => {
+  let facade: PermissionFacade;
+  let store: Store<AppState>;
+  let permissionServiceMock: jasmine.any<PermissionService>;
+
+  const mockPermissions: Permission[] = [
+    {
+      id: '1',
+      name: 'Read Users',
+      type: 'operation',
+      resource: 'user',
+      action: ['read'],
+    },
+    {
+      id: '2',
+      name: 'Create Users',
+      type: 'operation',
+      resource: 'user',
+      action: ['create'],
+    },
+    {
+      id: '3',
+      name: 'Admin Access',
+      type: 'operation',
+      resource: 'admin',
+      action: ['manage'],
+    },
+  ];
+
+  const mockUser: User = {
+    id: 1,
+    username: 'testuser',
+    email: 'test@example.com',
+    name: 'Test User',
+    roles: ['admin', 'user'],
+    permissions: mockPermissions,
+  };
+
+  beforeEach(() => {
+    // 创建 PermissionService mock
+    permissionServiceMock = vi.fn('PermissionService', [
+      'hasPermission',
+      'hasRole',
+      'checkRoutePermission',
+      'checkBatchRoutePermissions',
+      'getUserAccessibleRoutes',
+      'preloadPermissions',
+    ]);
+
+    // 设置 mock 返回值
+    permissionServiceMock.hasPermission.and.callFake((resource: string, action: string) => {
+      return mockPermissions.some(
+        p => p.resource === resource && p.action.includes(action)
+      );
+    });
+
+    permissionServiceMock.hasRole.and.callFake((roleId: string, user?: User) => {
+      const targetUser = user || mockUser;
+      return targetUser.roles.includes(roleId);
+    });
+
+    TestBed.configureTestingModule({
+      providers: [
+        PermissionFacade,
+        { provide: PermissionService, useValue: permissionServiceMock },
+        provideMockStore({
+          auth: {
+            user: mockUser,
+            token: 'mock-token',
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+            permissions: mockPermissions,
+            roles: mockUser.roles,
+          },
+        }),
+      ],
+    });
+
+    facade = TestBed.inject(PermissionFacade);
+    store = TestBed.inject(Store);
+  });
+
+  it('should be created', () => {
+    expect(facade).toBeTruthy();
+  });
+
+  describe('Signals', () => {
+    it('should expose permissions as Signal', () => {
+      const permissions = facade.permissions();
+      expect(permissions).toEqual(mockPermissions);
+    });
+
+    it('should expose user as Signal', () => {
+      const user = facade.user();
+      expect(user).toEqual(mockUser);
+    });
+
+    it('should expose userRoles as Signal', () => {
+      const roles = facade.userRoles();
+      expect(roles).toEqual(mockUser.roles);
+    });
+
+    it('should expose isAuthenticated as Signal', () => {
+      const isAuthenticated = facade.isAuthenticated();
+      expect(isAuthenticated).toBe(true);
+    });
+
+    it('should expose isLoading as Signal', () => {
+      const isLoading = facade.isLoading();
+      expect(isLoading).toBe(false);
+    });
+  });
+
+  describe('Computed Signals', () => {
+    it('should compute isAdmin correctly', () => {
+      const isAdmin = facade.isAdmin();
+      expect(isAdmin).toBe(true);
+    });
+
+    it('should compute canAccessAdminPanel correctly', () => {
+      const canAccess = facade.canAccessAdminPanel();
+      expect(canAccess).toBe(true);
+    });
+  });
+
+  describe('Permission Checks', () => {
+    it('should check permission correctly', () => {
+      expect(facade.hasPermission('user', 'read')).toBe(true);
+      expect(facade.hasPermission('user', 'create')).toBe(true);
+      expect(facade.hasPermission('user', 'delete')).toBe(false);
+      expect(facade.hasPermission('admin', 'manage')).toBe(true);
+    });
+
+    it('should create permission Signal', () => {
+      const canReadUsers = facade.hasPermissionSignal('user', 'read');
+      expect(canReadUsers()).toBe(true);
+
+      const canDeleteUsers = facade.hasPermissionSignal('user', 'delete');
+      expect(canDeleteUsers()).toBe(false);
+    });
+  });
+
+  describe('Role Checks', () => {
+    it('should check role correctly', () => {
+      expect(facade.hasRole('admin')).toBe(true);
+      expect(facade.hasRole('user')).toBe(true);
+      expect(facade.hasRole('guest')).toBe(false);
+    });
+
+    it('should create role Signal', () => {
+      const isAdmin = facade.hasRoleSignal('admin');
+      expect(isAdmin()).toBe(true);
+
+      const isGuest = facade.hasRoleSignal('guest');
+      expect(isGuest()).toBe(false);
+    });
+  });
+
+  describe('Multiple Permission Checks', () => {
+    it('should check if user has any permission', () => {
+      const permissions = [
+        { resource: 'user', action: 'read' },
+        { resource: 'user', action: 'create' },
+      ];
+      expect(facade.hasAnyPermission(permissions)).toBe(true);
+
+      const permissionsWithMissing = [
+        { resource: 'user', action: 'read' },
+        { resource: 'user', action: 'delete' },
+      ];
+      expect(facade.hasAnyPermission(permissionsWithMissing)).toBe(true);
+    });
+
+    it('should check if user has all permissions', () => {
+      const permissions = [
+        { resource: 'user', action: 'read' },
+        { resource: 'user', action: 'create' },
+      ];
+      expect(facade.hasAllPermissions(permissions)).toBe(true);
+
+      const permissionsWithMissing = [
+        { resource: 'user', action: 'read' },
+        { resource: 'user', action: 'delete' },
+      ];
+      expect(facade.hasAllPermissions(permissionsWithMissing)).toBe(false);
+    });
+
+    it('should create hasAnyPermission Signal', () => {
+      const permissions = [
+        { resource: 'user', action: 'read' },
+        { resource: 'user', action: 'create' },
+      ];
+      const hasAny = facade.hasAnyPermissionSignal(permissions);
+      expect(hasAny()).toBe(true);
+    });
+
+    it('should create hasAllPermissions Signal', () => {
+      const permissions = [
+        { resource: 'user', action: 'read' },
+        { resource: 'user', action: 'create' },
+      ];
+      const hasAll = facade.hasAllPermissionsSignal(permissions);
+      expect(hasAll()).toBe(true);
+    });
+  });
+
+  describe('NgRx Actions', () => {
+    it('should dispatch loadPermissions action', () => {
+      spyOn(store, 'dispatch');
+      facade.loadPermissions(1);
+      expect(store.dispatch).toHaveBeenCalled();
+    });
+
+    it('should dispatch clearPermissions action', () => {
+      spyOn(store, 'dispatch');
+      facade.clearPermissions();
+      expect(store.dispatch).toHaveBeenCalledWith(clearPermissions());
+    });
+  });
+
+  describe('PermissionService Delegation', () => {
+    it('should delegate checkRoutePermission to PermissionService', () => {
+      const mockResult = of(true);
+      permissionServiceMock.checkRoutePermission.and.returnValue(mockResult);
+
+      const result = facade.checkRoutePermission('/user/1', 1);
+      expect(permissionServiceMock.checkRoutePermission).toHaveBeenCalledWith('/user/1', 1);
+      expect(result).toBe(mockResult);
+    });
+
+    it('should delegate checkBatchRoutePermissions to PermissionService', () => {
+      const mockResult = of([
+        { routePath: '/user/1', hasPermission: true },
+        { routePath: '/user/2', hasPermission: false },
+      ]);
+      permissionServiceMock.checkBatchRoutePermissions.and.returnValue(mockResult);
+
+      const routes = ['/user/1', '/user/2'];
+      const result = facade.checkBatchRoutePermissions(routes, 1);
+      expect(permissionServiceMock.checkBatchRoutePermissions).toHaveBeenCalledWith(routes, 1);
+      expect(result).toBe(mockResult);
+    });
+
+    it('should delegate getUserAccessibleRoutes to PermissionService', () => {
+      const mockResult = of(['/user/1', '/user/2']);
+      permissionServiceMock.getUserAccessibleRoutes.and.returnValue(mockResult);
+
+      const result = facade.getUserAccessibleRoutes(1);
+      expect(permissionServiceMock.getUserAccessibleRoutes).toHaveBeenCalledWith(1);
+      expect(result).toBe(mockResult);
+    });
+
+    it('should delegate preloadPermissions to PermissionService', () => {
+      const mockResult = of(void 0);
+      permissionServiceMock.preloadPermissions.and.returnValue(mockResult);
+
+      const result = facade.preloadPermissions();
+      expect(permissionServiceMock.preloadPermissions).toHaveBeenCalled();
+      expect(result).toBe(mockResult);
+    });
+  });
+});

@@ -1,0 +1,198 @@
+import { TestBed } from '@angular/core/testing';
+import { Router } from '@angular/router';
+import {
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+} from '@angular/router';
+import { provideMockStore } from '@ngrx/store/testing';
+import { of } from 'rxjs';
+import { permissionGuard, roleGuard } from './permission.guard';
+import { PermissionFacade } from '../core/stores/permission/permission.facade';
+import { UserApiService } from '../core/services/user-api.service';
+import { MenuPermissionMapperService } from '../core/services/menu-permission-mapper.service';
+import { Permission } from '../core/types/permission.interface';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+describe('permissionGuard', () => {
+  let routerMock: any;
+  let permissionFacadeMock: any;
+  let userApiServiceMock: any;
+  let menuPermissionMapperMock: any;
+
+  const mockPermissions: Permission[] = [
+    {
+      id: '1',
+      name: 'Read Users',
+      type: 'operation',
+      resource: 'user',
+      action: ['read'],
+    },
+  ];
+
+  const mockUser = {
+    id: 1,
+    username: 'testuser',
+    email: 'test@example.com',
+    name: 'Test User',
+    roles: ['admin'],
+    permissions: mockPermissions,
+  };
+
+  const mockRoute: ActivatedRouteSnapshot = {} as any;
+  const mockState: RouterStateSnapshot = {
+    url: '/users',
+    root: {} as any,
+  } as any;
+
+  beforeEach(() => {
+    routerMock = {
+      navigate: vi.fn(),
+      createUrlTree: vi.fn().mockReturnValue({}),
+    };
+
+    permissionFacadeMock = {
+      hasPermission: vi.fn(),
+      hasRole: vi.fn(),
+      user: vi.fn().mockReturnValue(mockUser),
+      userRoles: vi.fn().mockReturnValue(['admin']),
+      isAuthenticated: vi.fn().mockReturnValue(true),
+    };
+
+    userApiServiceMock = {
+      checkRoutePermission: vi.fn(),
+    };
+
+    menuPermissionMapperMock = {
+      hasMenuAccess: vi.fn(),
+      getPermissionByRoute: vi.fn(),
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: Router, useValue: routerMock },
+        { provide: PermissionFacade, useValue: permissionFacadeMock },
+        { provide: UserApiService, useValue: userApiServiceMock },
+        {
+          provide: MenuPermissionMapperService,
+          useValue: menuPermissionMapperMock,
+        },
+        provideMockStore({
+          auth: {
+            user: mockUser,
+            token: 'mock-token',
+            isAuthenticated: true,
+            isLoading: false,
+            error: null,
+            permissions: mockPermissions,
+            roles: mockUser.roles,
+          },
+        }),
+      ],
+    });
+  });
+
+  it('should be creatable', () => {
+    const guard = permissionGuard();
+    expect(guard).toBeTruthy();
+  });
+
+  it('should allow access when user has permission', () => {
+    permissionFacadeMock.hasPermission.mockReturnValue(true);
+
+    const guard = permissionGuard({
+      resource: 'user',
+      action: 'read',
+    });
+
+    const result = guard(mockRouteRoute, mockState);
+
+    expect(permissionFacadeMock.hasPermission).toHaveBeenCalledWith('user', 'read');
+  });
+
+  it('should extract permission from route data', () => {
+    permissionFacadeMock.hasPermission.mockReturnValue(true);
+
+    const routeWithData = {
+      data: {
+        permission: {
+          resource: 'user',
+          action: 'read',
+        },
+      },
+    } as any;
+
+    const guard = permissionGuard();
+
+    const result = guard(routeWithData, mockState);
+
+    expect(permissionFacadeMock.hasPermission).toHaveBeenCalledWith('user', 'read');
+  });
+
+  it('should check roles when required', () => {
+    permissionFacadeMock.hasRole.mockReturnValue(true);
+
+    const guard = permissionGuard(undefined, ['admin']);
+
+    const result = guard(mockRoute, mockState);
+
+    expect(permissionFacadeMock.hasRole).toHaveBeenCalled();
+  });
+});
+
+describe('roleGuard', () => {
+  let routerMock: any;
+  let permissionFacadeMock: any;
+
+  const mockRoute: ActivatedRouteSnapshot = {} as any;
+  const mockState: RouterStateSnapshot = {
+    url: '/admin',
+    root: {} as any,
+  } as any;
+
+  beforeEach(() => {
+    routerMock = {
+      navigate: vi.fn(),
+    };
+
+    permissionFacadeMock = {
+      hasRole: vi.fn(),
+    };
+
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: Router, useValue: routerMock },
+        { provide: PermissionFacade, useValue: permissionFacadeMock },
+      ],
+    });
+  });
+
+  it('should be creatable', () => {
+    const guard = roleGuard([]);
+    expect(guard).toBeTruthy();
+  });
+
+  it('should allow access when role list is empty', () => {
+    const guard = roleGuard([]);
+    const result = guard(mockRoute, mockState);
+
+    expect(permissionFacadeMock.hasRole).not.toHaveBeenCalled();
+  });
+
+  it('should check role when required', () => {
+    permissionFacadeMock.hasRole.mockReturnValue(true);
+
+    const guard = roleGuard(['admin']);
+    const result = guard(mockRoute, mockState);
+
+    expect(permissionFacadeMock.hasRole).toHaveBeenCalledWith('admin');
+  });
+
+  it('should check multiple roles', () => {
+    permissionFacadeMock.hasRole.mockReturnValue(false);
+
+    const guard = roleGuard(['admin', 'manager']);
+    const result = guard(mockRoute, mockState);
+
+    expect(permissionFacadeMock.hasRole).toHaveBeenCalled();
+  });
+});
